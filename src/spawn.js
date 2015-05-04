@@ -7,6 +7,7 @@ export default function (options={}) {
   
   return new Promise((resolve, reject) => {
     let error = null;
+    //console.log("Calling spawn! " + JSON.stringify(options));
     let proc = childProcess.spawn(options.cmd, options.args, options.opts);
     
     proc.stdout.on('data', (data) => {
@@ -28,13 +29,17 @@ export default function (options={}) {
     proc.on('error', (processError) => error = error || processError);
     
     proc.on('close', (exitCode, signal) => {
+      let stdoutStr = (_.isArray(stdout) ? stdout.join('') : '');
+      let stderrStr = (_.isArray(stderr) ? stderr.join('') : '');
+      
       if (exitCode !== 0) {
-        error = error || new Error(signal);
+        error = error || new Error("Process exited with code: " + exitCode);
+        error.stdout = stdoutStr;
+        error.stderr = stderrStr;
       }
       
       let results = {
-        stderr: (_.isArray(stderr) ? stderr.join('') : ''), 
-        stdout: (_.isArray(stdout) ? stdout.join('') : ''), 
+        stderr: stderrStr, stdout: stdoutStr,
         code: exitCode
       };
       
