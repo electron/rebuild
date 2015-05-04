@@ -12,16 +12,20 @@ describe('installNodeHeaders', function() {
   
   it('installs node headers for 0.25.2', async () => {
     let targetHeaderDir = path.join(__dirname, 'testheaders');
-    
-    if (await fs.stat(targetHeaderDir)) {
-      await rimraf(targetHeaderDir);
-    }
+
+    try {
+      if (await fs.stat(targetHeaderDir)) {
+        await rimraf(targetHeaderDir);
+      }  
+    } catch (e) { }
     
     await fs.mkdir(targetHeaderDir);
     
     await installNodeHeaders('0.25.2', null, targetHeaderDir);
     let canary = await fs.stat(path.join(targetHeaderDir, '.node-gyp', '0.25.2', 'common.gypi'));
     expect(canary).to.be.ok
+
+    await rimraf(targetHeaderDir);
   });
 });
 
@@ -59,5 +63,7 @@ describe('rebuildNativeModules', function() {
     expect(canary).to.be.ok;
     
     await rebuildNativeModules('0.25.2', targetModulesDir, targetHeaderDir);
+    await rimraf(targetModulesDir);
+    await rimraf(targetHeaderDir);
   });
 });
