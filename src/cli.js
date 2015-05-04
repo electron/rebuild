@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 require('babel/polyfill');
 
 import {installNodeHeaders, rebuildNativeModules} from './main.js';
@@ -42,6 +44,7 @@ installNodeHeaders(argv.v)
   .then(() => rebuildNativeModules(argv.v, argv.m))
   .then(() => process.exit(0))
   .catch((e) => {
-    console.error(e);
+    console.error(e.message);
+    console.error(e.stack);
     process.exit(-1);
   });
