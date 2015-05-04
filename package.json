@@ -5,7 +5,7 @@
   "main": "lib/main.js",
   "scripts": {
     "compile": "babel --stage 0 -d lib/ src/ && babel --stage 0 -d test-dist/ test/",
-    "prepublish": "npm run compile && chmod +x ./lib/cli.js",
+    "prepublish": "npm run compile",
     "test": "npm run compile && mocha test-dist/*"
   },
   "bin": {
