@@ -24,9 +24,9 @@
   "dependencies": {
     "babel-core": "^5.2.9",
     "lodash": "^3.8.0",
+    "ncp": "^2.0.0",
     "npm": "^2.9.0",
     "promise": "^7.0.1",
-    "rimraf": "^2.3.3",
-    "stream-cp": "^0.1.1"
+    "rimraf": "^2.3.3"
   }
 }
