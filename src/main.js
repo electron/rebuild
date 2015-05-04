@@ -1,4 +1,4 @@
-require('babel-core');
+require('babel/polyfill');
 
 import path from 'path';
 import _ from 'lodash';
@@ -56,7 +56,7 @@ export async function installNodeHeaders(nodeVersion, nodeDistUrl=null, headersD
   await spawnWithHeadersDir(cmd, args, headersDir);
 }
 
-export async function rebuildNativeModules(nodeVersion, nodeModulesPath=null, headersDir=null) {
+export async function rebuildNativeModules(nodeVersion, nodeModulesPath, headersDir=null) {
   headersDir = headersDir || getHeadersRootDirForVersion(nodeVersion);
   await checkForInstalledHeaders(nodeVersion, headersDir);
   

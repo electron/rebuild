@@ -8,6 +8,9 @@
     "prepublish": "npm run compile",
     "test": "npm run compile && mocha test-dist/*"
   },
+  "bin": {
+    "electron-rebuild": "lib/cli.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/paulcbetts/electron-rebuild"
@@ -27,6 +30,7 @@
     "ncp": "^2.0.0",
     "npm": "^2.9.0",
     "promise": "^7.0.1",
-    "rimraf": "^2.3.3"
+    "rimraf": "^2.3.3",
+    "yargs": "^3.8.0"
   }
 }
