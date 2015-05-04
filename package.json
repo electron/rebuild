@@ -1,0 +1,32 @@
+{
+  "name": "electron-rebuild",
+  "version": "0.1.0",
+  "description": "Electron supporting package to rebuild native node modules against the currently installed electron",
+  "main": "lib/main.js",
+  "scripts": {
+    "compile": "babel --stage 0 -d lib/ src/ && babel --stage 0 -d test-dist/ test/",
+    "prepublish": "npm run compile",
+    "test": "npm run compile && mocha test-dist/*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/paulcbetts/electron-rebuild"
+  },
+  "keywords": [
+    "electron"
+  ],
+  "author": "Paul Betts <paul@paulbetts.org>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/paulcbetts/electron-rebuild/issues"
+  },
+  "homepage": "https://github.com/paulcbetts/electron-rebuild",
+  "dependencies": {
+    "babel-core": "^5.2.9",
+    "lodash": "^3.8.0",
+    "npm": "^2.9.0",
+    "promise": "^7.0.1",
+    "rimraf": "^2.3.3",
+    "stream-cp": "^0.1.1"
+  }
+}
