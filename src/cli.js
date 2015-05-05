@@ -11,7 +11,7 @@ const argv = require('yargs')
   .alias('h', 'help')
   .describe('v', 'The version of Electron to build against')
   .alias('v', 'version')
-  .describe('m', 'The path to the node-modules directory to rebuild')
+  .describe('m', 'The path to the node_modules directory to rebuild')
   .alias('m', 'module-dir')
   .epilog('Copyright 2015')
   .argv;
