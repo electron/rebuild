@@ -1,4 +1,4 @@
-require('babel/polyfill');
+require('babel-core/polyfill');
 
 import path from 'path';
 import _ from 'lodash';

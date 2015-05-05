@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-require('babel/polyfill');
+require('babel-core/polyfill');
 
 import {installNodeHeaders, rebuildNativeModules} from './main.js';
 import path from 'path';
