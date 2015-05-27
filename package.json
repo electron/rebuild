@@ -28,7 +28,8 @@
     "babel-core": "^5.2.9",
     "lodash": "^3.8.0",
     "ncp": "^2.0.0",
-    "npm": "^2.9.0",
+    "npm": "^2.10.1",
+    "nslog": "^2.0.0",
     "promise": "^7.0.1",
     "rimraf": "^2.3.3",
     "yargs": "^3.8.0"
@@ -37,6 +38,7 @@
     "babel": "^5.2.9",
     "chai": "^2.3.0",
     "chai-as-promised": "^5.0.0",
+    "electron-prebuilt": "^0.26.1",
     "mocha": "^2.2.4"
   }
 }

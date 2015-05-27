@@ -2,8 +2,9 @@
 
 require('babel-core/polyfill');
 
-import {installNodeHeaders, rebuildNativeModules} from './main.js';
+import {installNodeHeaders, rebuildNativeModules, shouldRebuildNativeModules} from './main.js';
 import path from 'path';
+import fs from 'fs';
 
 const argv = require('yargs')
   .usage('Usage: electron-rebuild --version [version] --module-dir [path]')
@@ -11,6 +12,10 @@ const argv = require('yargs')
   .alias('h', 'help')
   .describe('v', 'The version of Electron to build against')
   .alias('v', 'version')
+  .describe('n', 'The NODE_MODULE_VERSION to compare against (process.versions.modules)')
+  .alias('n', 'node-module-version')
+  .describe('f', 'Force rebuilding modules, even if we would skip it otherwise')
+  .alias('f', 'force')
   .describe('m', 'The path to the node_modules directory to rebuild')
   .alias('m', 'module-dir')
   .epilog('Copyright 2015')
@@ -20,12 +25,36 @@ if (!argv.v) {
   // NB: We assume here that electron-prebuilt is a sibling package of ours
   let pkg = null;
   try {
-    pkg = require('../../electron-prebuilt/package.json');
+    let pkgJson = path.join(
+      __dirname,
+      '..', '..', 'electron-prebuilt',
+      'package.json');
+      
+    pkg = require(pkgJson);
+      
     argv.v = pkg.version;
   } catch (e) {
     console.error("Unable to find electron-prebuilt's version number, either install it or specify an explicit version");
     process.exit(-1);
   }
+}
+
+let electronPath = null;
+let nodeModuleVersion = null;
+
+if (!argv.n) {
+  try {
+    let pathDotText = path.join(
+      __dirname,
+      '..', '..', 'electron-prebuilt',
+      'path.txt');
+          
+    electronPath = fs.readFileSync(pathDotText, 'utf8');
+  } catch (e) {
+    console.error("Couldn't find electron-prebuilt and no --node-module-version parameter set, always rebuilding");
+  }
+} else {
+  nodeModuleVersion = parseInt(argv.n);
 }
 
 if (!argv.m) {
@@ -40,9 +69,23 @@ if (!argv.m) {
   }
 }
 
-installNodeHeaders(argv.v)
-  .then(() => rebuildNativeModules(argv.v, argv.m))
-  .then(() => process.exit(0))
+let shouldRebuildPromise = null;
+if (!electronPath && !nodeModuleVersion) {
+  shouldRebuildPromise = Promise.resolve(true);
+} else if (argv.f) {
+  shouldRebuildPromise = Promise.resolve(true);
+} else {
+  shouldRebuildPromise = shouldRebuildNativeModules(electronPath, nodeModuleVersion);
+}
+
+shouldRebuildPromise
+  .then(x => {
+    if (!x) process.exit(0);
+    
+    return installNodeHeaders(argv.v)
+      .then(() => rebuildNativeModules(argv.v, argv.m))
+      .then(() => process.exit(0));
+  })
   .catch((e) => {
     console.error(e.message);
     console.error(e.stack);
