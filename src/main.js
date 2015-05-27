@@ -43,9 +43,11 @@ const spawnWithHeadersDir = async (cmd, args, headersDir, cwd) => {
 
 const getElectronModuleVersion = async (pathToElectronExecutable) => {
   let args = [ '-e', 'console.log(process.versions.modules)' ]
-  let env = _.extend({}, process.env, { ATOM_SHELL_INTERNAL_RUN_AS_NODE: '1' });
+  let env = { ATOM_SHELL_INTERNAL_RUN_AS_NODE: '1' };
   
-  let versionAsString = await spawn({cmd: pathToElectronExecutable, args, opts: {env}});
+  let result = await spawn({cmd: pathToElectronExecutable, args, opts: {env}});
+  let versionAsString = (result.stdout + result.stderr).replace(/\n/g, '');
+  
   if (!versionAsString.match(/^\d+$/)) {
     throw new Error(`Failed to check Electron's module version number: ${versionAsString}`);
   }
