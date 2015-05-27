@@ -75,7 +75,7 @@ export async function installNodeHeaders(nodeVersion, nodeDistUrl=null, headersD
   await spawnWithHeadersDir(cmd, args, headersDir);
 }
 
-export async function shouldRebuildNativeModules(pathToElectronExecutable) {
+export async function shouldRebuildNativeModules(pathToElectronExecutable, explicitNodeVersion=null) {
   // Try to load our canary module - if it fails, we know that it's built 
   // against a different node module than ours, so we're good
   //
@@ -92,7 +92,8 @@ export async function shouldRebuildNativeModules(pathToElectronExecutable) {
   
   // We need to check the native module version of Electron vs ours - if they
   // happen to be the same, we're good
-  let version = await getElectronModuleVersion(pathToElectronExecutable);
+  let version = explicitNodeVersion || 
+    (await getElectronModuleVersion(pathToElectronExecutable));
   
   if (version === process.versions.modules) { 
     return false;
