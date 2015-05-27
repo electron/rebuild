@@ -20,14 +20,19 @@ const checkForInstalledHeaders = async function(nodeVersion, headersDir) {
   return true;
 };
 
-const spawnWithHeadersDir = async (cmd, args, headersDir) => {
+const spawnWithHeadersDir = async (cmd, args, headersDir, cwd) => {
   let env = _.extend({}, process.env, { HOME: headersDir });
   if (process.platform === 'win32')  {
     env.USERPROFILE = env.HOME;
   }
   
   try {
-    return await spawn({cmd, args, opts: {env}});
+    let opts = {env};
+    if (cwd) { 
+      opts.cwd = cwd;
+    }
+    
+    return await spawn({cmd, args, opts});
   } catch (e) {
     if (e.stdout) console.log(e.stdout);
     if (e.stderr) console.log(e.stderr);
@@ -100,5 +105,5 @@ export async function rebuildNativeModules(nodeVersion, nodeModulesPath, headers
     `--arch=${process.arch}`
   ];
   
-  await spawnWithHeadersDir(cmd, args, headersDir);
+  await spawnWithHeadersDir(cmd, args, headersDir, nodeModulesPath);
 }
