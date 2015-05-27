@@ -32,9 +32,11 @@ describe('installNodeHeaders', function() {
 describe('rebuildNativeModules', function() {
   this.timeout(60*1000);
   
-  it('Rebuilds native modules against 0.21.0', async () => {
+  const nativeModuleVersionToBuildAgainst = '0.22.0';
+  
+  it(`Rebuilds native modules against ${nativeModuleVersionToBuildAgainst}`, async () => {
     const targetHeaderDir = path.join(__dirname, 'testheaders');
-    const targetModulesDir = path.join(__dirname, 'test_modules');
+    const targetModulesDir = path.join(__dirname, 'node_modules');
     
     try {
       if (await fs.stat(targetHeaderDir)) {
@@ -50,10 +52,8 @@ describe('rebuildNativeModules', function() {
       }
     } catch (e) { }
     
-    console.log("Got here!");
-    
-    await installNodeHeaders('0.21.0', null, targetHeaderDir);
-    let canary = await fs.stat(path.join(targetHeaderDir, '.node-gyp', '0.21.0', 'common.gypi'));
+    await installNodeHeaders(nativeModuleVersionToBuildAgainst, null, targetHeaderDir);
+    let canary = await fs.stat(path.join(targetHeaderDir, '.node-gyp', nativeModuleVersionToBuildAgainst, 'common.gypi'));
     expect(canary).to.be.ok
     
     // Copy our own node_modules folder to a fixture so we don't trash it
@@ -62,7 +62,7 @@ describe('rebuildNativeModules', function() {
     canary = await fs.stat(path.join(targetModulesDir, 'babel'));
     expect(canary).to.be.ok;
     
-    await rebuildNativeModules('0.21.0', targetModulesDir, targetHeaderDir);
+    await rebuildNativeModules(nativeModuleVersionToBuildAgainst, path.resolve(targetModulesDir, '..'), targetHeaderDir);
     await rimraf(targetModulesDir);
     await rimraf(targetHeaderDir);
   });
