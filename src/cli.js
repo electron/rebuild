@@ -25,7 +25,13 @@ if (!argv.v) {
   // NB: We assume here that electron-prebuilt is a sibling package of ours
   let pkg = null;
   try {
-    pkg = require('../../electron-prebuilt/package.json');
+    let pkgJson = path.join(
+      __dirname,
+      '..', '..', 'electron-prebuilt',
+      'package.json');
+      
+    pkg = require(pkgJson);
+      
     argv.v = pkg.version;
   } catch (e) {
     console.error("Unable to find electron-prebuilt's version number, either install it or specify an explicit version");
@@ -39,7 +45,8 @@ let nodeModuleVersion = null;
 if (!argv.n) {
   try {
     let pathDotText = path.join(
-      path.dirname(require.resolve('../../electron-prebuilt')),
+      __dirname,
+      '..', '..', 'electron-prebuilt',
       'path.txt');
           
     electronPath = fs.readFileSync(pathDotText, 'utf8');
