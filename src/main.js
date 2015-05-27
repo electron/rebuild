@@ -36,6 +36,18 @@ const spawnWithHeadersDir = async (cmd, args, headersDir) => {
   }
 };
 
+const getElectronModuleVersion = async (pathToElectronExecutable) => {
+  let args = [ '-e', 'console.log(process.versions.modules)' ]
+  let env = _.extend({}, process.env, { ATOM_SHELL_INTERNAL_RUN_AS_NODE: '1' });
+  
+  let versionAsString = await spawn({cmd: pathToElectronExecutable, args, opts: {env}});
+  if (!versionAsString.match(/^\d+$/)) {
+    throw new Error(`Failed to check Electron's module version number: ${versionAsString}`);
+  }
+  
+  return toString(versionAsString);
+}
+
 export async function installNodeHeaders(nodeVersion, nodeDistUrl=null, headersDir=null) {
   headersDir = headersDir || getHeadersRootDirForVersion(nodeVersion);
   let distUrl = nodeDistUrl || 'https://gh-contractor-zcbenz.s3.amazonaws.com/atom-shell/dist';
@@ -54,6 +66,27 @@ export async function installNodeHeaders(nodeVersion, nodeDistUrl=null, headersD
   ];
   
   await spawnWithHeadersDir(cmd, args, headersDir);
+}
+
+export async function shouldRebuildNativeModules(pathToElectronExecutable) {
+  // Try to load our canary module - if it fails, we know that it's built 
+  // against a different node module than ours, so we're good
+  try {
+    require('nslog');
+  } catch (e) {
+    return false;
+  }
+  
+  // We need to check the native module version of Electron vs ours - if they
+  // happen to be the same, we're good
+  let version = await getElectronModuleVersion(pathToElectronExecutable);
+  
+  if (version === process.versions.modules) { 
+    return false;
+  }
+  
+  // If we loaded nslog and the versions don't match, we've got to rebuild
+  return true;
 }
 
 export async function rebuildNativeModules(nodeVersion, nodeModulesPath, headersDir=null) {
