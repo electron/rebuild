@@ -78,7 +78,13 @@ export async function installNodeHeaders(nodeVersion, nodeDistUrl=null, headersD
 export async function shouldRebuildNativeModules(pathToElectronExecutable) {
   // Try to load our canary module - if it fails, we know that it's built 
   // against a different node module than ours, so we're good
+  //
+  // NB: Apparently on OS X, this not only fails to be required, it segfaults
+  // the process, because lol.
   try {
+    let args = ['-e', 'require("nslog")']
+    await spawn({cmd: process.execPath, args});
+    
     require('nslog');
   } catch (e) {
     return false;
