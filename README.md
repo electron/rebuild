@@ -25,7 +25,17 @@ electron-rebuild is also a library that you can just require into your app or
 build process. It has two main methods:
 
 ```js
-import { installNodeHeaders, rebuildNativeModules } from 'electron-rebuild';
+import { installNodeHeaders, rebuildNativeModules, shouldRebuildNativeModules } from 'electron-rebuild';
+
+// Public: Determines whether we need to rebuild native modules (i.e. if they're 
+// already compiled for the right version of Electron, no need to rebuild them!)
+//
+// pathToElectronExecutable - Path to the electron executable that we'll use 
+//                            to determine NODE_MODULE_VERSION
+// explicitNodeVersion (optional) - If given, use this instead of probing Electron
+//
+// Returns a Promise that if true, indicates you should build native modules
+let shouldBuild = shouldRebuildNativeModules('/path/to/Electron');
 
 // Public: Downloads and installs the header / lib files required to build
 // native modules.
@@ -33,6 +43,8 @@ import { installNodeHeaders, rebuildNativeModules } from 'electron-rebuild';
 // nodeVersion - the version of Electron to download headers for
 // nodeDistUrl (optional) - the URL to download the distribution from
 // headersDir (optional) - where to put the headers
+// arch (optional) - The architecture to build against (for building 32-bit apps 
+//                   on 64-bit Windows for example)
 //
 // Returns a Promise indicating whether the operation succeeded or not
 let headerResult = installNodeHeaders('v0.25.0');
@@ -44,4 +56,20 @@ let headerResult = installNodeHeaders('v0.25.0');
 // headersDir (optional) - where to find the headers
 // Returns a Promise indicating whether the operation succeeded or not
 headerResult.then(() => rebuildNativeModules('v0.25.0', './node_modules'));
+```
+
+A full build process might look something like:
+
+```js
+shouldRebuildNativeModules(pathToElectron)
+  .then((shouldBuild) => {
+    if (!shouldBuild) return true;
+    
+    return installNodeHeaders('v0.27.2')
+      .then(() => rebuildNativeModules('v0.27.2', './node_modules'));
+  })
+  .catch((e) => {
+    console.error("Building modules didn't work!");
+    console.error(e);
+  });
 ```
