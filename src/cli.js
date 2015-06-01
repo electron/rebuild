@@ -16,6 +16,8 @@ const argv = require('yargs')
   .alias('n', 'node-module-version')
   .describe('f', 'Force rebuilding modules, even if we would skip it otherwise')
   .alias('f', 'force')
+  .describe('a', "Override the target architecture to something other than your system's")
+  .alias('a', 'arch')
   .describe('m', 'The path to the node_modules directory to rebuild')
   .alias('m', 'module-dir')
   .epilog('Copyright 2015')
@@ -82,8 +84,8 @@ shouldRebuildPromise
   .then(x => {
     if (!x) process.exit(0);
     
-    return installNodeHeaders(argv.v)
-      .then(() => rebuildNativeModules(argv.v, argv.m))
+    return installNodeHeaders(argv.v, null, null, argv.a)
+      .then(() => rebuildNativeModules(argv.v, argv.m, null, argv.a))
       .then(() => process.exit(0));
   })
   .catch((e) => {
