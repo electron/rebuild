@@ -27,6 +27,34 @@ describe('installNodeHeaders', function() {
 
     await rimraf(targetHeaderDir);
   });
+
+  it('check for installed headers for 0.27.2', async () => {
+    let targetHeaderDir = path.join(__dirname, 'testheaders');
+
+    try {
+      if (await fs.stat(targetHeaderDir)) {
+        await rimraf(targetHeaderDir);
+      }
+    } catch (e) { }
+
+    await fs.mkdir(targetHeaderDir);
+    await fs.mkdir(path.join(targetHeaderDir, '.node-gyp'));
+    await fs.mkdir(path.join(targetHeaderDir, '.node-gyp', '0.27.2'));
+    const canary = path.join(targetHeaderDir, '.node-gyp', '0.27.2', 'common.gypi');
+    await fs.close(await fs.open(canary, 'w'));
+
+    await installNodeHeaders('0.27.2', null, targetHeaderDir);
+    let shouldDie = true;
+    try {
+      await fs.stat(path.join(targetHeaderDir, '.node-gyp', '0.27.2', 'config.gypi'));
+    } catch (err) {
+      expect(err).to.exist;
+      shouldDie = false;
+    }
+    expect(shouldDie).to.equal(false);
+
+    await rimraf(targetHeaderDir);
+  });
 });
 
 describe('rebuildNativeModules', function() {

@@ -60,7 +60,7 @@ export async function installNodeHeaders(nodeVersion, nodeDistUrl=null, headersD
   let distUrl = nodeDistUrl || 'https://gh-contractor-zcbenz.s3.amazonaws.com/atom-shell/dist';
 
   try {
-    await checkForInstalledHeaders(headersDir);
+    await checkForInstalledHeaders(nodeVersion, headersDir);
     return;
   } catch (e) { }
   
