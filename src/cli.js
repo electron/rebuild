@@ -47,7 +47,6 @@ if (!argv.v) {
 let electronPath = null;
 let nodeModuleVersion = null;
 
-console.log(argv.e);
 if (!argv.n) {
   try {
     let pathDotText = path.join(argv.e, 'path.txt');
