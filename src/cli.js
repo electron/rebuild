@@ -26,7 +26,7 @@ const argv = require('yargs')
   .argv;
 
 if (!argv.e) {
-  argv.e = path.join(__dirname, '..', '..', 'electron-prebuilt')
+  argv.e = path.join(__dirname, '..', '..', 'electron-prebuilt');
 }
 
 if (!argv.v) {
