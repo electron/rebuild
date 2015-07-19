@@ -20,20 +20,23 @@ const argv = require('yargs')
   .alias('a', 'arch')
   .describe('m', 'The path to the node_modules directory to rebuild')
   .alias('m', 'module-dir')
+  .describe('e', 'The path to electron-prebuilt')
+  .alias('e', 'electron-prebuilt-dir')
   .epilog('Copyright 2015')
   .argv;
-  
+
+if (!argv.e){
+  argv.e = path.join(__dirname, '..', '..', 'electron-prebuilt')
+}
+
 if (!argv.v) {
   // NB: We assume here that electron-prebuilt is a sibling package of ours
   let pkg = null;
   try {
-    let pkgJson = path.join(
-      __dirname,
-      '..', '..', 'electron-prebuilt',
-      'package.json');
-      
+    let pkgJson = path.join(argv.e, 'package.json');
+
     pkg = require(pkgJson);
-      
+
     argv.v = pkg.version;
   } catch (e) {
     console.error("Unable to find electron-prebuilt's version number, either install it or specify an explicit version");
@@ -44,13 +47,10 @@ if (!argv.v) {
 let electronPath = null;
 let nodeModuleVersion = null;
 
+console.log(argv.e);
 if (!argv.n) {
   try {
-    let pathDotText = path.join(
-      __dirname,
-      '..', '..', 'electron-prebuilt',
-      'path.txt');
-          
+    let pathDotText = path.join(argv.e, 'path.txt');
     electronPath = fs.readFileSync(pathDotText, 'utf8');
   } catch (e) {
     console.error("Couldn't find electron-prebuilt and no --node-module-version parameter set, always rebuilding");
