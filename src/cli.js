@@ -60,7 +60,7 @@ if (!argv.n) {
 }
 
 if (!argv.m) {
-  // NB: We assume here that we're going to rebuild the immediate parent's 
+  // NB: We assume here that we're going to rebuild the immediate parent's
   // node modules, which might not always be the case but it's at least a
   // good guess
   try {
@@ -83,7 +83,7 @@ if (!electronPath && !nodeModuleVersion) {
 shouldRebuildPromise
   .then(x => {
     if (!x) process.exit(0);
-    
+
     return installNodeHeaders(argv.v, null, null, argv.a)
       .then(() => rebuildNativeModules(argv.v, argv.m, null, argv.a))
       .then(() => process.exit(0));
