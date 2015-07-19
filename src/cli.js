@@ -25,7 +25,7 @@ const argv = require('yargs')
   .epilog('Copyright 2015')
   .argv;
 
-if (!argv.e){
+if (!argv.e) {
   argv.e = path.join(__dirname, '..', '..', 'electron-prebuilt')
 }
 
