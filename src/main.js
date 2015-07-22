@@ -87,7 +87,7 @@ export async function shouldRebuildNativeModules(pathToElectronExecutable, expli
     
     require('nslog');
   } catch (e) {
-    return false;
+    return true;
   }
   
   // We need to check the native module version of Electron vs ours - if they
