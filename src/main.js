@@ -1,6 +1,3 @@
-// XXX: Pray babel/babel#2050 lands
-if (!global._babelPolyfill) require('babel-core/polyfill');
-
 import path from 'path';
 import _ from 'lodash';
 import childProcess from 'child_process';

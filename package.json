@@ -4,7 +4,7 @@
   "description": "Electron supporting package to rebuild native node modules against the currently installed electron",
   "main": "lib/main.js",
   "scripts": {
-    "compile": "babel --stage 0 -d lib/ src/ && babel --stage 0 -d test-dist/ test/",
+    "compile": "babel --stage 1 --optional runtime -d lib/ src/ && babel --stage 1 --optional runtime -d test-dist/ test/",
     "prepublish": "npm run compile",
     "test": "npm run compile && mocha test-dist/*"
   },
@@ -25,20 +25,20 @@
   },
   "homepage": "https://github.com/paulcbetts/electron-rebuild",
   "dependencies": {
-    "babel-core": "^5.6.15",
-    "lodash": "^3.8.0",
+    "babel-runtime": "^5.8.20",
+    "lodash": "^3.10.1",
     "ncp": "^2.0.0",
-    "npm": "^2.10.1",
-    "nslog": "^2.0.0",
-    "promise": "^7.0.1",
-    "rimraf": "^2.3.3",
-    "yargs": "^3.8.0"
+    "npm": "^2.14.1",
+    "nslog": "^3.0.0",
+    "promise": "^7.0.4",
+    "rimraf": "^2.4.3",
+    "yargs": "^3.23.0"
   },
   "devDependencies": {
-    "babel": "^5.6.14",
-    "chai": "^2.3.0",
-    "chai-as-promised": "^5.0.0",
-    "electron-prebuilt": "^0.26.1",
-    "mocha": "^2.2.4"
+    "babel": "^5.8.23",
+    "chai": "^3.2.0",
+    "chai-as-promised": "^5.1.0",
+    "electron-prebuilt": "^0.31.2",
+    "mocha": "^2.3.0"
   }
 }
