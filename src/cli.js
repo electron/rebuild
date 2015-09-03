@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-require('babel-runtime/polyfill');
-
 import {installNodeHeaders, rebuildNativeModules, shouldRebuildNativeModules} from './main.js';
 import path from 'path';
 import fs from 'fs';
