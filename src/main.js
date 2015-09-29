@@ -108,6 +108,7 @@ export async function rebuildNativeModules(nodeVersion, nodeModulesPath, headers
   let cmd = 'node';
   let args = [
     require.resolve('npm/bin/npm-cli'), 'rebuild', 
+    '--runtime=electron',
     `--target=${nodeVersion}`, 
     `--arch=${arch || process.arch}`
   ];
