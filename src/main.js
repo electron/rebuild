@@ -13,7 +13,7 @@ const getHeadersRootDirForVersion = (version) => {
 const checkForInstalledHeaders = async function(nodeVersion, headersDir) {
   const canary = path.join(headersDir, '.node-gyp', nodeVersion, 'common.gypi');
   let stat = await fs.stat(canary);
-  
+
   if (!stat) throw new Error("Canary file 'common.gypi' doesn't exist");
   return true;
 };
@@ -23,18 +23,18 @@ const spawnWithHeadersDir = async (cmd, args, headersDir, cwd) => {
   if (process.platform === 'win32')  {
     env.USERPROFILE = env.HOME;
   }
-  
+
   try {
     let opts = {env};
-    if (cwd) { 
+    if (cwd) {
       opts.cwd = cwd;
     }
-    
+
     return await spawn({cmd, args, opts});
   } catch (e) {
     if (e.stdout) console.log(e.stdout);
     if (e.stderr) console.log(e.stderr);
-    
+
     throw e;
   }
 };
@@ -42,14 +42,14 @@ const spawnWithHeadersDir = async (cmd, args, headersDir, cwd) => {
 const getElectronModuleVersion = async (pathToElectronExecutable) => {
   let args = [ '-e', 'console.log(process.versions.modules)' ]
   let env = { ATOM_SHELL_INTERNAL_RUN_AS_NODE: '1' };
-  
+
   let result = await spawn({cmd: pathToElectronExecutable, args, opts: {env}});
   let versionAsString = (result.stdout + result.stderr).replace(/\n/g, '');
-  
+
   if (!versionAsString.match(/^\d+$/)) {
     throw new Error(`Failed to check Electron's module version number: ${versionAsString}`);
   }
-  
+
   return toString(versionAsString);
 }
 
@@ -61,7 +61,7 @@ export async function installNodeHeaders(nodeVersion, nodeDistUrl=null, headersD
     await checkForInstalledHeaders(nodeVersion, headersDir);
     return;
   } catch (e) { }
-  
+
   let cmd = 'node';
   let args = [
     require.resolve('npm/node_modules/node-gyp/bin/node-gyp'), 'install',
@@ -69,12 +69,12 @@ export async function installNodeHeaders(nodeVersion, nodeDistUrl=null, headersD
     `--arch=${arch || process.arch}`,
     `--dist-url=${distUrl}`
   ];
-  
+
   await spawnWithHeadersDir(cmd, args, headersDir);
 }
 
 export async function shouldRebuildNativeModules(pathToElectronExecutable, explicitNodeVersion=null) {
-  // Try to load our canary module - if it fails, we know that it's built 
+  // Try to load our canary module - if it fails, we know that it's built
   // against a different node module than ours, so we're good
   //
   // NB: Apparently on OS X, this not only fails to be required, it segfaults
@@ -82,36 +82,44 @@ export async function shouldRebuildNativeModules(pathToElectronExecutable, expli
   try {
     let args = ['-e', 'require("nslog")']
     await spawn({cmd: process.execPath, args});
-    
+
     require('nslog');
   } catch (e) {
     return true;
   }
-  
+
   // We need to check the native module version of Electron vs ours - if they
   // happen to be the same, we're good
-  let version = explicitNodeVersion || 
+  let version = explicitNodeVersion ||
     (await getElectronModuleVersion(pathToElectronExecutable));
-  
-  if (version === process.versions.modules) { 
+
+  if (version === process.versions.modules) {
     return false;
   }
-  
+
   // If we loaded nslog and the versions don't match, we've got to rebuild
   return true;
 }
 
-export async function rebuildNativeModules(nodeVersion, nodeModulesPath, headersDir=null, arch=null) {
+export async function rebuildNativeModules(nodeVersion, nodeModulesPath, whichModule=null, headersDir=null, arch=null) {
   headersDir = headersDir || getHeadersRootDirForVersion(nodeVersion);
   await checkForInstalledHeaders(nodeVersion, headersDir);
-  
+
   let cmd = 'node';
   let args = [
-    require.resolve('npm/bin/npm-cli'), 'rebuild', 
-    '--runtime=electron',
-    `--target=${nodeVersion}`, 
-    `--arch=${arch || process.arch}`
+    require.resolve('npm/bin/npm-cli'),
+    'rebuild'
   ];
-  
+
+  if (whichModule) {
+    args.push(whichModule);
+  }
+
+  args.push(
+    '--runtime=electron',
+    `--target=${nodeVersion}`,
+    `--arch=${arch || process.arch}`
+  );
+
   await spawnWithHeadersDir(cmd, args, headersDir, nodeModulesPath);
 }
