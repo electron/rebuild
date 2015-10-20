@@ -184,6 +184,7 @@ export async function rebuildNativeModulesDefault(opts) {
   let args = [
     require.resolve('npm/bin/npm-cli'), 'rebuild',
     opts.package ? opts.package : null,
+    opts.whichModule ? opts.whichModule : null,
     '--runtime=electron',
     `--target=${opts.nodeVersion}`,
     `--arch=${opts.arch || process.arch}`

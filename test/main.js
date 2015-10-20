@@ -15,7 +15,6 @@ describe('installNodeHeaders', function() {
     let targetHeaderDir = path.join(__dirname, 'testheaders');
     await rmdir(targetHeaderDir);
     await mkdir(targetHeaderDir);
-
     await installNodeHeaders('0.25.2', null, targetHeaderDir);
     let canary = await fs.stat(path.join(targetHeaderDir, '.node-gyp', '0.25.2', 'common.gypi'));
     expect(canary).to.be.ok
