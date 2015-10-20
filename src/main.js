@@ -3,6 +3,8 @@ import _ from 'lodash';
 import childProcess from 'child_process';
 import spawn from './spawn';
 import promisify from './promisify';
+import os from 'os';
+import { getCachedBuildVersions, getInstalledModules, upsertCache } from './cache';
 
 const fs = promisify(require('fs'));
 
@@ -101,25 +103,92 @@ export async function shouldRebuildNativeModules(pathToElectronExecutable, expli
   return true;
 }
 
-export async function rebuildNativeModules(nodeVersion, nodeModulesPath, whichModule=null, headersDir=null, arch=null) {
-  headersDir = headersDir || getHeadersRootDirForVersion(nodeVersion);
-  await checkForInstalledHeaders(nodeVersion, headersDir);
+export async function rebuildNativeModules(cfg) {
+  let opts = _.isString(cfg) ? { nodeVersion: cfg } : _.assign({}, cfg);
+  opts = _.defaults(opts, { headersDir: null, arch: null });
+  opts.headersDir = opts.headersDir || getHeadersRootDirForVersion(opts.nodeVersion);
+  await checkForInstalledHeaders(opts.nodeVersion, opts.headersDir);
 
-  let cmd = 'node';
-  let args = [
-    require.resolve('npm/bin/npm-cli'),
-    'rebuild'
-  ];
+  if (opts.quick) {
+      return rebuildNativeModulesQuick(opts);
+  }
+  return rebuildNativeModulesDefault(opts);
+}
 
-  if (whichModule) {
-    args.push(whichModule);
+/**
+ * Rebuilds modules one-by-one, conditionally, if they are not already built
+ * per the cache table
+ * @param {object} opts cli-ops
+ * @return {Promise}
+ */
+export async function rebuildNativeModulesQuick(opts) {
+  const { nodeModulesPath } = opts;
+  const [ installedPkgs, builtPkgs ] = await Promise.all([
+      getInstalledModules(nodeModulesPath),
+      getCachedBuildVersions(nodeModulesPath)
+  ]);
+  let toBuild = installedPkgs.filter(pkg => {
+    // test if installed pkg has matching built pkg, per the cache.
+    // include pkg in the `toBuild` list if no matching built module, or if
+    // the module folder has changed since last build
+    return !builtPkgs.some(builtPkg => {
+        return (
+            builtPkg.package === pkg.package &&
+            builtPkg.nodeVersion === opts.nodeVersion &&
+            builtPkg.ctime === pkg.stat.ctime.toISOString()
+        );
+    });
+  });
+
+  if (opts.ignore) {
+      const ignore = Array.isArray(opts.ignore) ? opts.ignore : [opts.ignore];
+      toBuild = toBuild.filter(pkg => !_.contains(ignore, pkg.package));
   }
 
-  args.push(
-    '--runtime=electron',
-    `--target=${nodeVersion}`,
-    `--arch=${arch || process.arch}`
-  );
+  toBuild = toBuild.map(pkg => {
+      return {
+          package: pkg.package,
+          nodeVersion: opts.nodeVersion,
+          ctime: pkg.stat.ctime.toISOString()
+      };
+  });
+  if (!toBuild.length) {
+      console.log(`electron-rebuild: all builds up-to-date`);
+      return Promise.resolve();
+  }
+  try {
+    // sequentially build each package
+    const total = toBuild.length;
+    await toBuild.reduce((prev, bld, ndx)=> {
+       const buildNdx = ndx + 1;
+       const bOps = Object.assign({}, bld, opts);
+       return prev.then(last => {
+          console.log(`electron-rebuild: ${buildNdx}/${total}, ${bld.package}`);
+          return rebuildNativeModulesDefault(bOps);
+      }).catch(function(err) {
+          console.log(err);
+          throw err;
+      });
+    }, Promise.resolve());
+    console.log('electron-rebuild: updating build cache');
+    return await upsertCache(nodeModulesPath, toBuild);
+  } catch(err) {
+    console.error('unable to build target modules or update cache');
+    throw err;
+  }
+}
 
-  await spawnWithHeadersDir(cmd, args, headersDir, nodeModulesPath);
+export async function rebuildNativeModulesDefault(opts) {
+  const { headersDir, nodeModulesPath } = opts;
+  let cmd = 'node';
+  let args = [
+    require.resolve('npm/bin/npm-cli'), 'rebuild',
+    opts.package ? opts.package : null,
+    opts.whichModule ? opts.whichModule : null,
+    '--runtime=electron',
+    `--target=${opts.nodeVersion}`,
+    `--arch=${opts.arch || process.arch}`
+   ].filter(arg => arg);
+
+  return await spawnWithHeadersDir(cmd, args, headersDir, nodeModulesPath);
 }

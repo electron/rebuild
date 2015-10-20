@@ -9,6 +9,8 @@ const argv = require('yargs')
   .help('h')
   .alias('h', 'help')
   .describe('v', 'The version of Electron to build against')
+  .alias('q', 'quick')
+  .describe('q', 'Enable quick rebuilds')
   .alias('v', 'version')
   .describe('n', 'The NODE_MODULE_VERSION to compare against (process.versions.modules)')
   .alias('n', 'node-module-version')
@@ -88,7 +90,15 @@ shouldRebuildPromise
     if (!x) process.exit(0);
 
     return installNodeHeaders(argv.v, null, null, argv.a)
-      .then(() => rebuildNativeModules(argv.v, argv.m, argv.w, null, argv.a))
+      .then(() => {
+          return rebuildNativeModules({
+              arch: argv.a,
+              nodeModulesPath: argv.m,
+              nodeVersion: argv.v,
+              quick: argv.q,
+              whichModule: argv.w
+          });
+      })
       .then(() => process.exit(0));
   })
   .catch((e) => {

@@ -1,8 +1,9 @@
 import _ from './support';
 import path from 'path';
+import pkgMock from 'mock-npm-install';
 import promisify from '../lib/promisify';
+import { mkdir, rmdir } from './utils/fileio.js';
 const fs = promisify(require('fs'));
-const rimraf = promisify(require('rimraf'));
 const cp = promisify(require('ncp').ncp);
 
 import {installNodeHeaders, rebuildNativeModules, shouldRebuildNativeModules} from '../lib/main.js';
@@ -12,34 +13,21 @@ describe('installNodeHeaders', function() {
 
   it('installs node headers for 0.25.2', async () => {
     let targetHeaderDir = path.join(__dirname, 'testheaders');
-
-    try {
-      if (await fs.stat(targetHeaderDir)) {
-        await rimraf(targetHeaderDir);
-      }
-    } catch (e) { }
-
-    await fs.mkdir(targetHeaderDir);
-
+    await rmdir(targetHeaderDir);
+    await mkdir(targetHeaderDir);
     await installNodeHeaders('0.25.2', null, targetHeaderDir);
     let canary = await fs.stat(path.join(targetHeaderDir, '.node-gyp', '0.25.2', 'common.gypi'));
     expect(canary).to.be.ok
 
-    await rimraf(targetHeaderDir);
+    await rmdir(targetHeaderDir);
   });
 
   it('check for installed headers for 0.27.2', async () => {
     let targetHeaderDir = path.join(__dirname, 'testheaders');
-
-    try {
-      if (await fs.stat(targetHeaderDir)) {
-        await rimraf(targetHeaderDir);
-      }
-    } catch (e) { }
-
-    await fs.mkdir(targetHeaderDir);
-    await fs.mkdir(path.join(targetHeaderDir, '.node-gyp'));
-    await fs.mkdir(path.join(targetHeaderDir, '.node-gyp', '0.27.2'));
+    await rmdir(targetHeaderDir);
+    await mkdir(targetHeaderDir);
+    await mkdir(path.join(targetHeaderDir, '.node-gyp'));
+    await mkdir(path.join(targetHeaderDir, '.node-gyp', '0.27.2'));
     const canary = path.join(targetHeaderDir, '.node-gyp', '0.27.2', 'common.gypi');
     await fs.close(await fs.open(canary, 'w'));
 
@@ -53,7 +41,7 @@ describe('installNodeHeaders', function() {
     }
     expect(shouldDie).to.equal(false);
 
-    await rimraf(targetHeaderDir);
+    await rmdir(targetHeaderDir);
   });
 });
 
@@ -62,38 +50,45 @@ describe('rebuildNativeModules', function() {
 
   const moduleVersionsToTest = ['0.22.0', '0.31.2'];
 
-  for(let nativeModuleVersionToBuildAgainst of moduleVersionsToTest) {
-    it(`Rebuilds native modules against ${nativeModuleVersionToBuildAgainst}`, async () => {
-      const targetHeaderDir = path.join(__dirname, 'testheaders');
-      const targetModulesDir = path.join(__dirname, 'node_modules');
-
+  for(let version of moduleVersionsToTest) {
+    it(`Rebuilds native modules against ${version}`, async () => {
       try {
-        if (await fs.stat(targetHeaderDir)) {
-          await rimraf(targetHeaderDir);
-        }
-      } catch (e) { }
+          const targetHeaderDir = path.join(__dirname, 'testheaders');
+          const targetModulesDir = path.join(__dirname, 'node_modules');
+          await rmdir(targetHeaderDir);
+          await mkdir(targetHeaderDir);
+          await rmdir(targetModulesDir);
+          await mkdir(targetModulesDir);
+          await installNodeHeaders(version, null, targetHeaderDir);
+          let canary = await fs.stat(path.join(targetHeaderDir, '.node-gyp', version, 'common.gypi'));
+          expect(canary).to.be.ok
 
-      await fs.mkdir(targetHeaderDir);
+          rmdir('mock-pkg-1');
+          const mockPkg = pkgMock.install({
+              nodeModulesDir: targetModulesDir,
+              package: {
+                  name: 'mock-pkg-1',
+                  scripts: { postinstall: `touch ${version}`} // npm build will run postinstall
+              }
+          });
 
-      try {
-        if (await fs.stat(targetModulesDir)) {
-          await rimraf(targetModulesDir);
-        }
-      } catch (e) { }
+          await rebuildNativeModules({
+              nodeVersion: version,
+              nodeModulesPath: targetModulesDir,
+              headersDir: targetHeaderDir
+          });
 
-      await installNodeHeaders(nativeModuleVersionToBuildAgainst, null, targetHeaderDir);
-      let canary = await fs.stat(path.join(targetHeaderDir, '.node-gyp', nativeModuleVersionToBuildAgainst, 'common.gypi'));
-      expect(canary).to.be.ok
 
-      // Copy our own node_modules folder to a fixture so we don't trash it
-      await cp(path.resolve(__dirname, '..', 'node_modules'), targetModulesDir);
+          let buildTestFile = await fs.stat(path.resolve(targetModulesDir, mockPkg.name, `${version}`));
+          expect(buildTestFile).to.be.ok
 
-      canary = await fs.stat(path.join(targetModulesDir, 'babel'));
-      expect(canary).to.be.ok;
-
-      await rebuildNativeModules(nativeModuleVersionToBuildAgainst, path.resolve(targetModulesDir, '..'), null, targetHeaderDir);
-      await rimraf(targetModulesDir);
-      await rimraf(targetHeaderDir);
+          // clean up
+          await rmdir(targetModulesDir);
+          await rmdir(targetHeaderDir);
+      } catch(err) {
+          console.error(err.message);
+          console.log(err);
+      }
     });
   }
 });
@@ -108,9 +103,8 @@ describe('shouldRebuildNativeModules', function() {
       'path.txt');
 
     let electronPath = await fs.readFile(pathDotText, 'utf8');
-    //console.log(`Electron Path: ${electronPath}`)
     let result = await shouldRebuildNativeModules(electronPath);
 
     expect(result).to.be.ok;
   });
-})
+});
