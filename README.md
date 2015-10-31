@@ -19,6 +19,12 @@ Then, whenever you install a new npm package, rerun electron-rebuild:
 ./node_modules/.bin/electron-rebuild
 ```
 
+Or if you're on Windows:
+
+```sh
+.\node_modules\.bin\electron-rebuild.cmd
+```
+
 ### How can I integrate this into Grunt / Gulp / Whatever?
 
 electron-rebuild is also a library that you can just require into your app or
