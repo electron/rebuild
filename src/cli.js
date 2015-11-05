@@ -96,7 +96,7 @@ shouldRebuildPromise
     if (!x) process.exit(0);
 
     return installNodeHeaders(argv.v, null, null, argv.a)
-      .then(() => rebuildNativeModules(argv.v, argv.m, argv.w, argv.c, null, argv.a))
+      .then(() => rebuildNativeModules(argv.v, argv.m, argv.w, null, argv.a, argv.c))
       .then(() => process.exit(0));
   })
   .catch((e) => {
