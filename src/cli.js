@@ -22,11 +22,17 @@ const argv = require('yargs')
   .alias('w', 'which-module')
   .describe('e', 'The path to electron-prebuilt')
   .alias('e', 'electron-prebuilt-dir')
+  .describe('c', 'The npm command to run')
+  .alias('c', 'command')
   .epilog('Copyright 2015')
   .argv;
 
 if (!argv.e) {
   argv.e = path.join(__dirname, '..', '..', 'electron-prebuilt');
+}
+
+if (!argv.c) {
+  argv.c = 'rebuild';
 }
 
 if (!argv.v) {
@@ -79,6 +85,8 @@ if (!electronPath && !nodeModuleVersion) {
   shouldRebuildPromise = Promise.resolve(true);
 } else if (argv.f) {
   shouldRebuildPromise = Promise.resolve(true);
+} else if (argv.c == 'install') {
+  shouldRebuildPromise = Promise.resolve(true);
 } else {
   shouldRebuildPromise = shouldRebuildNativeModules(electronPath, nodeModuleVersion);
 }
@@ -88,7 +96,7 @@ shouldRebuildPromise
     if (!x) process.exit(0);
 
     return installNodeHeaders(argv.v, null, null, argv.a)
-      .then(() => rebuildNativeModules(argv.v, argv.m, argv.w, null, argv.a))
+      .then(() => rebuildNativeModules(argv.v, argv.m, argv.w, argv.c, null, argv.a))
       .then(() => process.exit(0));
   })
   .catch((e) => {
