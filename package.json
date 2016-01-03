@@ -26,6 +26,7 @@
   "homepage": "https://github.com/paulcbetts/electron-rebuild",
   "dependencies": {
     "babel-runtime": "^5.8.20",
+    "glob": "^6.0.3",
     "lodash": "^3.10.1",
     "ncp": "^2.0.0",
     "npm": "^2.14.1",
