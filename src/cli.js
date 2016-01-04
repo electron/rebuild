@@ -87,16 +87,13 @@ if (!electronPath && !nodeModuleVersion) {
 }
 
 shouldRebuildPromise
-  .then(async (x) => {
-    var beforeRebuild;
-
+  .then(x => {
     if (!x) process.exit(0);
-    if (argv.p) return await preGypFixSetup(argv.m);
   })
   .then((x, beforeRebuild) => {
     return installNodeHeaders(argv.v, null, null, argv.a)
       .then(() => rebuildNativeModules(argv.v, argv.m, argv.w, null, argv.a))
-      .then(() => preGypFixRun(argv.m))
+      .then(() => preGypFixRun(argv.m, argv.p, electronPath, nodeModuleVersion))
       .then(() => process.exit(0));
   })
   .catch((e) => {

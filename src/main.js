@@ -39,7 +39,7 @@ const spawnWithHeadersDir = async (cmd, args, headersDir, cwd) => {
   }
 };
 
-const getElectronModuleVersion = async (pathToElectronExecutable) => {
+export async function getElectronModuleVersion(pathToElectronExecutable) {
   let args = [ '-e', 'console.log(process.versions.modules)' ]
   let env = { ATOM_SHELL_INTERNAL_RUN_AS_NODE: '1' };
 
