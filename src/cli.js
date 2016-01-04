@@ -53,7 +53,7 @@ let nodeModuleVersion = null;
 if (!argv.n) {
   try {
     let pathDotText = path.join(argv.e, 'path.txt');
-    electronPath = path.join(argv.e, fs.readFileSync(pathDotText, 'utf8'));
+    electronPath = path.resolve(argv.e, fs.readFileSync(pathDotText, 'utf8'));
   } catch (e) {
     console.error("Couldn't find electron-prebuilt and no --node-module-version parameter set, always rebuilding");
   }
