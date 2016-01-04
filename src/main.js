@@ -50,7 +50,7 @@ const getElectronModuleVersion = async (pathToElectronExecutable) => {
     throw new Error(`Failed to check Electron's module version number: ${versionAsString}`);
   }
 
-  return toString(versionAsString);
+  return versionAsString;
 }
 
 export async function installNodeHeaders(nodeVersion, nodeDistUrl=null, headersDir=null, arch=null) {
