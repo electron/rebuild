@@ -29,7 +29,16 @@ const argv = require('yargs')
   .argv;
 
 if (!argv.e) {
-  argv.e = path.join(__dirname, '..', '..', 'electron-prebuilt');
+  var e = [
+    path.join(__dirname, '..', '..', 'electron-prebuilt'),
+    path.join('/usr/local/lib/node_modules', 'electron-prebuilt')
+  ];
+  var i = 0;
+  do {
+    stats = fs.lstatSync(path = e[i])
+    i++;
+  } while(stats.isDirectory())
+  argv.e = path;
 }
 
 if (!argv.v) {
