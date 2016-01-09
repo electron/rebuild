@@ -30,6 +30,8 @@ const argv = require('yargs')
 
 if (!argv.e) {
   argv.e = path.join(__dirname, '..', '..', 'electron-prebuilt');
+} else {
+  argv.e = path.resolve(process.cwd(), argv.e);
 }
 
 if (!argv.v) {
