@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import {installNodeHeaders, rebuildNativeModules, shouldRebuildNativeModules} from './main.js';
+import { preGypFixSetup, preGypFixRun } from './node-pre-gyp-fix.js'
 import path from 'path';
 import fs from 'fs';
 
@@ -22,6 +23,8 @@ const argv = require('yargs')
   .alias('w', 'which-module')
   .describe('e', 'The path to electron-prebuilt')
   .alias('e', 'electron-prebuilt-dir')
+  .describe('p', 'Enable the ugly (and hopefully not needed soon enough) node-pre-gyp path fixer')
+  .alias('p', 'pre-gyp-fix')
   .epilog('Copyright 2015')
   .argv;
 
@@ -86,9 +89,11 @@ if (!electronPath && !nodeModuleVersion) {
 shouldRebuildPromise
   .then(x => {
     if (!x) process.exit(0);
-
+  })
+  .then((x, beforeRebuild) => {
     return installNodeHeaders(argv.v, null, null, argv.a)
       .then(() => rebuildNativeModules(argv.v, argv.m, argv.w, null, argv.a))
+      .then(() => preGypFixRun(argv.m, argv.p, electronPath, nodeModuleVersion))
       .then(() => process.exit(0));
   })
   .catch((e) => {

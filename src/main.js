@@ -39,7 +39,7 @@ const spawnWithHeadersDir = async (cmd, args, headersDir, cwd) => {
   }
 };
 
-const getElectronModuleVersion = async (pathToElectronExecutable) => {
+export async function getElectronModuleVersion(pathToElectronExecutable) {
   let args = [ '-e', 'console.log(process.versions.modules)' ]
   let env = { ATOM_SHELL_INTERNAL_RUN_AS_NODE: '1', ELECTRON_NO_ATTACH_CONSOLE: '1' };
 
@@ -50,7 +50,7 @@ const getElectronModuleVersion = async (pathToElectronExecutable) => {
     throw new Error(`Failed to check Electron's module version number: ${versionAsString}`);
   }
 
-  return toString(versionAsString);
+  return versionAsString;
 }
 
 export async function installNodeHeaders(nodeVersion, nodeDistUrl=null, headersDir=null, arch=null) {
