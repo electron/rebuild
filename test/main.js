@@ -103,12 +103,7 @@ describe('shouldRebuildNativeModules', function() {
 
   it('should always return true most of the time maybe', async () => {
     // Use the electron-prebuilt path
-    let pathDotText = path.join(
-      path.dirname(require.resolve('electron-prebuilt')),
-      'path.txt');
-
-    let electronPath = await fs.readFile(pathDotText, 'utf8');
-    //console.log(`Electron Path: ${electronPath}`)
+    let electronPath = require('electron-prebuilt');
     let result = await shouldRebuildNativeModules(electronPath);
 
     expect(result).to.be.ok;
