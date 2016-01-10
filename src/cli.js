@@ -5,7 +5,7 @@ import { preGypFixSetup, preGypFixRun } from './node-pre-gyp-fix.js'
 import path from 'path';
 import fs from 'fs';
 
-const argv = require('yargs')
+const yargs = require('yargs')
   .usage('Usage: electron-rebuild --version [version] --module-dir [path]')
   .help('h')
   .alias('h', 'help')
@@ -27,8 +27,14 @@ const argv = require('yargs')
   .alias('p', 'pre-gyp-fix')
   .describe('c', 'The npm command to run')
   .alias('c', 'command')
-  .epilog('Copyright 2015')
-  .argv;
+  .epilog('Copyright 2015');
+
+const argv = yargs.argv;
+
+if (argv.h) {
+  yargs.showHelp();
+  process.exit(0);
+}
 
 if (!argv.e) {
   argv.e = path.join(__dirname, '..', '..', 'electron-prebuilt');
