@@ -29,17 +29,17 @@
     "glob": "^6.0.3",
     "lodash": "^3.10.1",
     "ncp": "^2.0.0",
-    "npm": "^2.14.1",
+    "npm": "^3.5.3",
     "nslog": "^3.0.0",
-    "promise": "^7.0.4",
-    "rimraf": "^2.4.3",
-    "yargs": "^3.23.0"
+    "promise": "^7.1.1",
+    "rimraf": "^2.5.0",
+    "yargs": "^3.31.0"
   },
   "devDependencies": {
     "babel": "^5.8.23",
-    "chai": "^3.2.0",
-    "chai-as-promised": "^5.1.0",
-    "electron-prebuilt": "^0.31.2",
-    "mocha": "^2.3.0"
+    "chai": "^3.4.1",
+    "chai-as-promised": "^5.2.0",
+    "electron-prebuilt": "^0.36.3",
+    "mocha": "^2.3.4"
   }
 }
