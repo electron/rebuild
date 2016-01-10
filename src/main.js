@@ -101,14 +101,14 @@ export async function shouldRebuildNativeModules(pathToElectronExecutable, expli
   return true;
 }
 
-export async function rebuildNativeModules(nodeVersion, nodeModulesPath, whichModule=null, headersDir=null, arch=null) {
+export async function rebuildNativeModules(nodeVersion, nodeModulesPath, whichModule=null, headersDir=null, arch=null, command='rebuild') {
   headersDir = headersDir || getHeadersRootDirForVersion(nodeVersion);
   await checkForInstalledHeaders(nodeVersion, headersDir);
 
   let cmd = 'node';
   let args = [
     require.resolve('npm/bin/npm-cli'),
-    'rebuild'
+    command
   ];
 
   if (whichModule) {
