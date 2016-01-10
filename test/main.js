@@ -10,7 +10,7 @@ import {installNodeHeaders, rebuildNativeModules, shouldRebuildNativeModules} fr
 describe('installNodeHeaders', function() {
   this.timeout(30*1000);
 
-  it('installs node headers for 0.25.2', async () => {
+  it('installs node headers for 0.36.2', async () => {
     let targetHeaderDir = path.join(__dirname, 'testheaders');
 
     try {
@@ -21,14 +21,14 @@ describe('installNodeHeaders', function() {
 
     await fs.mkdir(targetHeaderDir);
 
-    await installNodeHeaders('0.25.2', null, targetHeaderDir);
-    let canary = await fs.stat(path.join(targetHeaderDir, '.node-gyp', '0.25.2', 'common.gypi'));
+    await installNodeHeaders('0.36.2', null, targetHeaderDir);
+    let canary = await fs.stat(path.join(targetHeaderDir, '.node-gyp', '0.36.2', 'common.gypi'));
     expect(canary).to.be.ok
 
     await rimraf(targetHeaderDir);
   });
 
-  it('check for installed headers for 0.27.2', async () => {
+  it('check for installed headers for 0.36.2', async () => {
     let targetHeaderDir = path.join(__dirname, 'testheaders');
 
     try {
@@ -39,14 +39,14 @@ describe('installNodeHeaders', function() {
 
     await fs.mkdir(targetHeaderDir);
     await fs.mkdir(path.join(targetHeaderDir, '.node-gyp'));
-    await fs.mkdir(path.join(targetHeaderDir, '.node-gyp', '0.27.2'));
-    const canary = path.join(targetHeaderDir, '.node-gyp', '0.27.2', 'common.gypi');
+    await fs.mkdir(path.join(targetHeaderDir, '.node-gyp', '0.36.2'));
+    const canary = path.join(targetHeaderDir, '.node-gyp', '0.36.2', 'common.gypi');
     await fs.close(await fs.open(canary, 'w'));
 
-    await installNodeHeaders('0.27.2', null, targetHeaderDir);
+    await installNodeHeaders('0.36.2', null, targetHeaderDir);
     let shouldDie = true;
     try {
-      await fs.stat(path.join(targetHeaderDir, '.node-gyp', '0.27.2', 'config.gypi'));
+      await fs.stat(path.join(targetHeaderDir, '.node-gyp', '0.36.2', 'config.gypi'));
     } catch (err) {
       expect(err).to.exist;
       shouldDie = false;
@@ -60,7 +60,7 @@ describe('installNodeHeaders', function() {
 describe('rebuildNativeModules', function() {
   this.timeout(60*1000);
 
-  const moduleVersionsToTest = ['0.22.0', '0.31.2'];
+  const moduleVersionsToTest = ['0.34.0', '0.35.5'];
 
   for(let nativeModuleVersionToBuildAgainst of moduleVersionsToTest) {
     it(`Rebuilds native modules against ${nativeModuleVersionToBuildAgainst}`, async () => {
