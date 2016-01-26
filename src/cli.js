@@ -38,6 +38,9 @@ if (argv.h) {
 
 if (!argv.e) {
   argv.e = path.join(__dirname, '..', '..', 'electron-prebuilt');
+  if (!fs.existsSync(argv.e)) {
+    argv.e = path.join(__dirname, '..', '..', 'electron-prebuilt-compile');
+  }
 } else {
   argv.e = path.resolve(process.cwd(), argv.e);
 }
