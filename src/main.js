@@ -3,6 +3,7 @@ import _ from 'lodash';
 import childProcess from 'child_process';
 import spawn from './spawn';
 import promisify from './promisify';
+export { preGypFixRun } from './node-pre-gyp-fix';
 
 const fs = promisify(require('fs'));
 

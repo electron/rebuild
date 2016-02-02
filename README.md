@@ -79,3 +79,23 @@ shouldRebuildNativeModules(pathToElectron)
     console.error(e);
   });
 ```
+
+### `node-pre-gyp` workaround
+
+Note that there is a known [issue](https://github.com/mapbox/node-pre-gyp/pull/187) with
+`node-pre-gyp` that prevents it from correctly locating the native modules built by
+`electron-rebuild`. `node-pre-gyp` is used by some popular NPM packages like `sqlite3`,
+and `node-inspector`, so even if your app or package does not have a direct dependency on
+`node-pre-gyp` you're bound to run into this issue sooner or later. To work around it call
+`preGypFixRun` after the build is complete in order to copy the native modules to a location
+where `node-pre-gyp` can find them:
+
+```js
+import { preGypFixRun } from 'electron-rebuild';
+
+return installNodeHeaders('v0.27.2')
+  .then(() => rebuildNativeModules('v0.27.2', './node_modules'))
+  .then(() => preGypFixRun('./node_modules', true, pathToElectron));
+``` 
+
+If you're using the CLI to perform the build then use the `-p` or `--pre-gyp-fix` option.
