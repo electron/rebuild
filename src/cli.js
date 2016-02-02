@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import {installNodeHeaders, rebuildNativeModules, shouldRebuildNativeModules} from './main.js';
-import { preGypFixSetup, preGypFixRun } from './node-pre-gyp-fix.js'
+import { preGypFixRun } from './node-pre-gyp-fix.js'
 import path from 'path';
 import fs from 'fs';
 
