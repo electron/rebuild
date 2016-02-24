@@ -4,10 +4,10 @@
   "description": "Electron supporting package to rebuild native node modules against the currently installed electron",
   "main": "lib/main.js",
   "scripts": {
-    "compile": "babel --stage 1 --optional runtime -d lib/ src/ && babel --stage 1 --optional runtime -d test-dist/ test/",
+    "compile": "babel -d lib/ src/",
     "prepublish": "npm run compile",
     "shame": "eslint ./src && eslint ./test",
-    "test": "npm run shame && npm run compile && mocha test-dist/*"
+    "test": "npm run shame && mocha --compilers js:babel-register test/*.js"
   },
   "bin": {
     "electron-rebuild": "lib/cli.js"
@@ -37,7 +37,7 @@
     "yargs": "^4.1.0"
   },
   "devDependencies": {
-    "babel-cli": "^6.5.2",
+    "babel-cli": "^6.5.1",
     "babel-eslint": "^5.0.0",
     "chai": "^3.5.0",
     "chai-as-promised": "^5.2.0",
