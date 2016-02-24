@@ -1,5 +1,4 @@
 import path from 'path';
-import spawn from './spawn.js';
 import promisify from './promisify.js';
 import {getElectronModuleVersion} from './main.js';
 const glob = promisify(require('glob'));
@@ -16,6 +15,6 @@ export async function preGypFixRun(cwd, shouldRun, electronPath, explicitNodeVer
     let newPath = path.replace(/electron-v[^-]+/, 'node-v'+electronModuleVersion);
 
     await cp(path, newPath);
-    console.log('node-pre-gyp fixer:', path, 'copied to', newPath)
+    console.log('node-pre-gyp fixer:', path, 'copied to', newPath);
   }
 }

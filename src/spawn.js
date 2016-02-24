@@ -28,7 +28,7 @@ export default function (options={}) {
         
     proc.on('error', (processError) => error = error || processError);
     
-    proc.on('close', (exitCode, signal) => {
+    proc.on('close', (exitCode) => {
       let stdoutStr = (_.isArray(stdout) ? stdout.join('') : '');
       let stderrStr = (_.isArray(stderr) ? stderr.join('') : '');
       

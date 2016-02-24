@@ -1,13 +1,12 @@
 import path from 'path';
 import _ from 'lodash';
-import childProcess from 'child_process';
 import spawn from './spawn';
 import promisify from './promisify';
 export { preGypFixRun } from './node-pre-gyp-fix';
 
 const fs = promisify(require('fs'));
 
-const getHeadersRootDirForVersion = (version) => {
+const getHeadersRootDirForVersion = () => {
   return path.resolve(__dirname, 'headers');
 };
 
@@ -41,7 +40,7 @@ const spawnWithHeadersDir = async (cmd, args, headersDir, cwd) => {
 };
 
 export async function getElectronModuleVersion(pathToElectronExecutable) {
-  let args = [ '-e', 'console.log(process.versions.modules)' ]
+  let args = [ '-e', 'console.log(process.versions.modules)' ];
   let env = { ATOM_SHELL_INTERNAL_RUN_AS_NODE: '1', ELECTRON_NO_ATTACH_CONSOLE: '1' };
 
   let result = await spawn({cmd: pathToElectronExecutable, args, opts: {env}});
@@ -61,7 +60,9 @@ export async function installNodeHeaders(nodeVersion, nodeDistUrl=null, headersD
   try {
     await checkForInstalledHeaders(nodeVersion, headersDir);
     return;
-  } catch (e) { }
+  } catch (e) { 
+    //
+  }
 
   let cmd = 'node';
   let args = [
@@ -81,7 +82,7 @@ export async function shouldRebuildNativeModules(pathToElectronExecutable, expli
   // NB: Apparently on OS X, this not only fails to be required, it segfaults
   // the process, because lol.
   try {
-    let args = ['-e', 'require("nslog")']
+    let args = ['-e', 'require("nslog")'];
     await spawn({cmd: process.execPath, args});
 
     require('nslog');

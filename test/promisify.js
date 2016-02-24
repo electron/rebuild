@@ -1,7 +1,8 @@
-import _ from './support';
+import './support';
+
 import fs from 'fs';
 import path from 'path';
-import promisify from '../lib/promisify.js';
+import promisify from '../src/promisify.js';
 
 describe('promisify', () => {
   it('should handle fs.stat', async () => {

@@ -1,11 +1,13 @@
-import _ from './support';
+import './support';
+
 import path from 'path';
-import promisify from '../lib/promisify';
+import promisify from '../src/promisify';
+
 const fs = promisify(require('fs'));
 const rimraf = promisify(require('rimraf'));
 const cp = promisify(require('ncp').ncp);
 
-import {installNodeHeaders, rebuildNativeModules, shouldRebuildNativeModules} from '../lib/main.js';
+import {installNodeHeaders, rebuildNativeModules, shouldRebuildNativeModules} from '../src/main.js';
 
 describe('installNodeHeaders', function() {
   this.timeout(30*1000);
@@ -17,13 +19,15 @@ describe('installNodeHeaders', function() {
       if (await fs.stat(targetHeaderDir)) {
         await rimraf(targetHeaderDir);
       }
-    } catch (e) { }
+    } catch (e) { 
+      //
+    }
 
     await fs.mkdir(targetHeaderDir);
 
     await installNodeHeaders('0.36.2', null, targetHeaderDir);
     let canary = await fs.stat(path.join(targetHeaderDir, '.node-gyp', '0.36.2', 'common.gypi'));
-    expect(canary).to.be.ok
+    expect(canary).to.be.ok;
 
     await rimraf(targetHeaderDir);
   });
@@ -35,7 +39,9 @@ describe('installNodeHeaders', function() {
       if (await fs.stat(targetHeaderDir)) {
         await rimraf(targetHeaderDir);
       }
-    } catch (e) { }
+    } catch (e) { 
+      //
+    }
 
     await fs.mkdir(targetHeaderDir);
     await fs.mkdir(path.join(targetHeaderDir, '.node-gyp'));
@@ -71,7 +77,9 @@ describe('rebuildNativeModules', function() {
         if (await fs.stat(targetHeaderDir)) {
           await rimraf(targetHeaderDir);
         }
-      } catch (e) { }
+      } catch (e) {
+        //
+      }
 
       await fs.mkdir(targetHeaderDir);
 
@@ -79,11 +87,13 @@ describe('rebuildNativeModules', function() {
         if (await fs.stat(targetModulesDir)) {
           await rimraf(targetModulesDir);
         }
-      } catch (e) { }
+      } catch (e) { 
+        //
+      }
 
       await installNodeHeaders(nativeModuleVersionToBuildAgainst, null, targetHeaderDir);
       let canary = await fs.stat(path.join(targetHeaderDir, '.node-gyp', nativeModuleVersionToBuildAgainst, 'common.gypi'));
-      expect(canary).to.be.ok
+      expect(canary).to.be.ok;
 
       // Copy our own node_modules folder to a fixture so we don't trash it
       await cp(path.resolve(__dirname, '..', 'node_modules'), targetModulesDir);
@@ -108,4 +118,4 @@ describe('shouldRebuildNativeModules', function() {
 
     expect(result).to.be.ok;
   });
-})
+});

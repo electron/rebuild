@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import {installNodeHeaders, rebuildNativeModules, shouldRebuildNativeModules} from './main.js';
-import { preGypFixRun } from './node-pre-gyp-fix.js'
+import { preGypFixRun } from './node-pre-gyp-fix.js';
 import path from 'path';
 import fs from 'fs';
 
@@ -109,7 +109,7 @@ shouldRebuildPromise
   .then(x => {
     if (!x) process.exit(0);
   })
-  .then((x, beforeRebuild) => {
+  .then(() => {
     return installNodeHeaders(argv.v, null, null, argv.a)
       .then(() => rebuildNativeModules(argv.v, argv.m, argv.w, null, argv.a, argv.c))
       .then(() => preGypFixRun(argv.m, argv.p, electronPath, nodeModuleVersion))

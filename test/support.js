@@ -1,3 +1,5 @@
+import 'babel-polyfill';
+
 global.Promise = global.Promise || require('promise');
 let chai = require("chai");
 let chaiAsPromised = require("chai-as-promised");

@@ -1,8 +1,6 @@
-import _ from './support';
-import path from 'path';
-import fs from 'fs';
+import './support';
 
-import spawn from '../lib/spawn.js';
+import spawn from '../src/spawn.js';
 
 describe('spawn', () => {
   it('should work with ls', async () => {
