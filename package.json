@@ -6,7 +6,8 @@
   "scripts": {
     "compile": "babel --stage 1 --optional runtime -d lib/ src/ && babel --stage 1 --optional runtime -d test-dist/ test/",
     "prepublish": "npm run compile",
-    "test": "npm run compile && mocha test-dist/*"
+    "shame": "eslint ./src && eslint ./test",
+    "test": "npm run shame && npm run compile && mocha test-dist/*"
   },
   "bin": {
     "electron-rebuild": "lib/cli.js"
