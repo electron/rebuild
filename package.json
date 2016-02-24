@@ -26,23 +26,23 @@
   },
   "homepage": "https://github.com/paulcbetts/electron-rebuild",
   "dependencies": {
-    "babel-runtime": "^5.8.20",
-    "glob": "^6.0.3",
-    "lodash": "^3.10.1",
+    "babel-polyfill": "^6.5.0",
+    "glob": "^7.0.0",
+    "lodash": "^4.5.1",
     "ncp": "^2.0.0",
-    "npm": "^3.5.3",
+    "npm": "^3.7.3",
     "nslog": "^3.0.0",
     "promise": "^7.1.1",
-    "rimraf": "^2.5.0",
-    "yargs": "^3.31.0"
+    "rimraf": "^2.5.2",
+    "yargs": "^4.1.0"
   },
   "devDependencies": {
-    "babel": "^5.8.23",
+    "babel-cli": "^6.5.2",
     "babel-eslint": "^5.0.0",
-    "chai": "^3.4.1",
+    "chai": "^3.5.0",
     "chai-as-promised": "^5.2.0",
-    "electron-prebuilt": "^0.36.3",
+    "electron-prebuilt": "^0.36.8",
     "eslint": "^2.2.0",
-    "mocha": "^2.3.4"
+    "mocha": "^2.4.5"
   }
 }
