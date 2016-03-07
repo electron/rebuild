@@ -99,3 +99,8 @@ return installNodeHeaders('v0.27.2')
 ``` 
 
 If you're using the CLI to perform the build then use the `-p` or `--pre-gyp-fix` option.
+
+### Alternatives
+
+- [require-rebuild](https://github.com/juliangruber/require-rebuild) patches `require()` to rebuild native node modules on the fly
+
