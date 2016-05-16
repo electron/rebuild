@@ -60,7 +60,7 @@ describe('installNodeHeaders', function() {
 describe('rebuildNativeModules', function() {
   this.timeout(60*1000);
 
-  const moduleVersionsToTest = ['0.34.0', '0.35.5'];
+  const moduleVersionsToTest = ['0.34.0', '0.35.5', '1.0.1'];
 
   for(let nativeModuleVersionToBuildAgainst of moduleVersionsToTest) {
     it(`Rebuilds native modules against ${nativeModuleVersionToBuildAgainst}`, async () => {
