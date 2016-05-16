@@ -82,8 +82,6 @@ describe('rebuildNativeModules', function() {
       } catch (e) { }
 
       await installNodeHeaders(nativeModuleVersionToBuildAgainst, null, targetHeaderDir);
-      let canary = await fs.stat(path.join(targetHeaderDir, '.node-gyp', nativeModuleVersionToBuildAgainst, 'common.gypi'));
-      expect(canary).to.be.ok
 
       // Copy our own node_modules folder to a fixture so we don't trash it
       await cp(path.resolve(__dirname, '..', 'node_modules'), targetModulesDir);
