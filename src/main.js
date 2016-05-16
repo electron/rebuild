@@ -2,20 +2,19 @@ import path from 'path';
 import _ from 'lodash';
 import childProcess from 'child_process';
 import spawn from './spawn';
-import promisify from './promisify';
 export { preGypFixRun } from './node-pre-gyp-fix';
 
-const fs = promisify(require('fs'));
+const fs = require('fs');
 
 const getHeadersRootDirForVersion = (version) => {
   return path.resolve(__dirname, 'headers');
 };
 
 const checkForInstalledHeaders = async function(nodeVersion, headersDir) {
-  const canary = path.join(headersDir, '.node-gyp', nodeVersion, 'common.gypi');
-  let stat = await fs.stat(canary);
+  const canaryNode = path.join(headersDir, '.node-gyp', nodeVersion, 'common.gypi');
+  const canaryIoJS = path.join(headersDir, '.node-gyp', `iojs-${nodeVersion}`, 'common.gypi');
 
-  if (!stat) throw new Error("Canary file 'common.gypi' doesn't exist");
+  if (!(fs.existsSync(canaryNode) || fs.existsSync(canaryIoJS))) throw new Error("Canary file 'common.gypi' doesn't exist");
   return true;
 };
 
