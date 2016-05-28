@@ -86,7 +86,7 @@ describe('rebuildNativeModules', function() {
       // Copy our own node_modules folder to a fixture so we don't trash it
       await cp(path.resolve(__dirname, '..', 'node_modules'), targetModulesDir);
 
-      canary = await fs.stat(path.join(targetModulesDir, 'babel'));
+      let canary = await fs.stat(path.join(targetModulesDir, 'babel'));
       expect(canary).to.be.ok;
 
       await rebuildNativeModules(nativeModuleVersionToBuildAgainst, path.resolve(targetModulesDir, '..'), null, targetHeaderDir);
