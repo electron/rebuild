@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 import {installNodeHeaders, rebuildNativeModules, shouldRebuildNativeModules} from './main.js';
-import { preGypFixRun } from './node-pre-gyp-fix.js'
+import {preGypFixRun} from './node-pre-gyp-fix.js'
+import {locateElectronPrebuilt} from './electron-locater';
 import path from 'path';
 import fs from 'fs';
 
@@ -39,10 +40,7 @@ if (argv.h) {
 }
 
 if (!argv.e) {
-  argv.e = path.join(__dirname, '..', '..', 'electron-prebuilt');
-  if (!fs.existsSync(argv.e)) {
-    argv.e = path.join(__dirname, '..', '..', 'electron-prebuilt-compile');
-  }
+  argv.e = locateElectronPrebuilt();
 } else {
   argv.e = path.resolve(process.cwd(), argv.e);
 }
