@@ -24,16 +24,20 @@ Or if you're on Windows:
 ```sh
 .\node_modules\.bin\electron-rebuild.cmd
 ```
-If you have a good node-gyp config but you see an error about a missing element on Windows like "Could not load the Visual C++ component "VCBuild.exe" , try to launch electron-rebuild in a npm script
+If you have a good node-gyp config but you see an error about a missing element on Windows like "Could not load the Visual C++ component "VCBuild.exe" , try to launch electron-rebuild in an npm script:
+
 ```json
-'scripts': {
-  'rebuild' : 'electron-rebuild -f -w yourmodule'
+"scripts": {
+  "rebuild" : "electron-rebuild -f -w yourmodule"
 }
 ```
+
 and then
+
 ```sh
 npm run rebuild
 ```
+
 ### How can I integrate this into Grunt / Gulp / Whatever?
 
 electron-rebuild is also a library that you can just require into your app or
