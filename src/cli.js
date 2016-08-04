@@ -27,6 +27,8 @@ const yargs = require('yargs')
   .alias('p', 'pre-gyp-fix')
   .describe('c', 'The npm command to run')
   .alias('c', 'command')
+  .describe('d', 'Custom header tarball URL')
+  .alias('d', 'dist-url')
   .epilog('Copyright 2015');
 
 const argv = yargs.argv;
@@ -110,7 +112,7 @@ shouldRebuildPromise
     if (!x) process.exit(0);
   })
   .then((x, beforeRebuild) => {
-    return installNodeHeaders(argv.v, null, null, argv.a)
+    return installNodeHeaders(argv.v, argv.d, null, argv.a)
       .then(() => rebuildNativeModules(argv.v, argv.m, argv.w, null, argv.a, argv.c))
       .then(() => preGypFixRun(argv.m, argv.p, electronPath, nodeModuleVersion))
       .then(() => process.exit(0));
