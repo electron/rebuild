@@ -38,3 +38,16 @@ possible with your report. If you can, please include:
 * Limit the first line to 72 characters or less
 * Reference issues and pull requests liberally
 * When only changing documentation, include `[ci skip]` in the commit description
+
+## Publishing to npm
+
+This project has a generated changelog. This process could eventually be
+automated, but for now there are some manual steps:
+
+1. Edit `package.json`, setting `version` to the upcoming release number.
+1. Run `npm run changelog`. This will update `changelog.md` and revert your `version` changes in `package.json`.
+1. Verify that `changelog.md` looks right.
+1. Commit changes: `git commit -m "update changelog"`
+1. Create a git tag for the upcoming version using `npm version patch|minor|major -m "new stuff"`
+1. `npm publish`
+1. `git push origin master --follow-tags`
