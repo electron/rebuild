@@ -1,8 +1,6 @@
 import _ from './support';
 import fs from 'fs';
-import npm from 'npm';
 import path from 'path';
-import promisify from '../lib/promisify.js';
 import {spawn} from 'child_process';
 
 import {locateElectronPrebuilt} from '../lib/electron-locater';
