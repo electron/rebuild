@@ -1,30 +1,31 @@
 import fs from 'fs';
 import path from 'path';
 
+const possibleModuleNames = ['electron', 'electron-prebuilt', 'electron-prebuilt-compile'];
+
 export const locateElectronPrebuilt = () => {
-  let electronPath = path.join(__dirname, '..', '..', 'electron');
-  if (!fs.existsSync(electronPath)) {
-    electronPath = path.join(__dirname, '..', '..', 'electron-prebuilt');
-  }
-  if (!fs.existsSync(electronPath)) {
-    electronPath = path.join(__dirname, '..', '..', 'electron-prebuilt-compile');
-  }
-  if (!fs.existsSync(electronPath)) {
+  let electronPath;
+
+  // Attempt to locate modules by path
+  let foundModule = possibleModuleNames.some((moduleName) => {
+    electronPath = path.join(__dirname, '..', '..', moduleName);
+    return fs.existsSync(electronPath);
+  });
+
+  // Return a path if we found one
+  if (foundModule) return electronPath;
+
+  // Attempt to locate modules by require
+  foundModule = possibleModuleNames.some((moduleName) => {
     try {
-      electronPath = path.join(require.resolve('electron'), '..');
+      electronPath = path.join(require.resolve(moduleName), '..');
     } catch (e) {
-      // Module not found, do nothing
+      return false;
     }
-  }
-  if (!fs.existsSync(electronPath)) {
-    try {
-      electronPath = path.join(require.resolve('electron-prebuilt'), '..');
-    } catch (e) {
-      // Module not found, do nothing
-    }
-  }
-  if (!fs.existsSync(electronPath)) {
-    electronPath = null;
-  }
-  return electronPath;
+    return fs.existsSync(electronPath);
+  });
+
+  // Return a path if we found one
+  if (foundModule) return electronPath;
+  return null;
 }
