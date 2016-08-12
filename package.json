@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/paulcbetts/electron-rebuild"
+    "url": "https://github.com/electron/electron-rebuild"
   },
   "keywords": [
     "electron"
@@ -21,9 +21,9 @@
   "author": "Paul Betts <paul@paulbetts.org>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/paulcbetts/electron-rebuild/issues"
+    "url": "https://github.com/electron/electron-rebuild/issues"
   },
-  "homepage": "https://github.com/paulcbetts/electron-rebuild",
+  "homepage": "https://github.com/electron/electron-rebuild",
   "dependencies": {
     "babel-runtime": "^5.8.20",
     "glob": "^6.0.3",
