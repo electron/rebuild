@@ -3,6 +3,7 @@
 import {installNodeHeaders, rebuildNativeModules, shouldRebuildNativeModules} from './main.js';
 import {preGypFixRun} from './node-pre-gyp-fix.js'
 import {locateElectronPrebuilt} from './electron-locater';
+import logger from './logger';
 import path from 'path';
 import fs from 'fs';
 
@@ -30,7 +31,8 @@ const yargs = require('yargs')
   .alias('c', 'command')
   .describe('d', 'Custom header tarball URL')
   .alias('d', 'dist-url')
-  .epilog('Copyright 2015');
+  .describe('verbose', 'Print debugging information')
+  .epilog('Copyright 2016');
 
 const argv = yargs.argv;
 
@@ -47,6 +49,10 @@ if (!argv.e) {
 
 if (!argv.c) {
   argv.c = 'rebuild';
+}
+
+if (argv.verbose) {
+  logger.enable();
 }
 
 if (!argv.v) {

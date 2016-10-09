@@ -4,6 +4,7 @@ import childProcess from 'child_process';
 import spawn from './spawn';
 export { preGypFixRun } from './node-pre-gyp-fix';
 
+import logger from './logger';
 const fs = require('fs');
 
 const getHeadersRootDirForVersion = (version) => {
@@ -11,10 +12,12 @@ const getHeadersRootDirForVersion = (version) => {
 };
 
 const checkForInstalledHeaders = async function(nodeVersion, headersDir) {
+  logger("checkForInstalledHeaders:", nodeVersion, headersDir);
   const canaryNode = path.join(headersDir, '.node-gyp', nodeVersion, 'common.gypi');
   const canaryIoJS = path.join(headersDir, '.node-gyp', `iojs-${nodeVersion}`, 'common.gypi');
 
   if (!(fs.existsSync(canaryNode) || fs.existsSync(canaryIoJS))) throw new Error("Canary file 'common.gypi' doesn't exist");
+  logger("checkForInstalledHeaders:", 'headers exists!', `canaryNode=${canaryNode} canaryIoJS=${canaryIoJS}`);
   return true;
 };
 
@@ -107,6 +110,7 @@ export async function shouldRebuildNativeModules(pathToElectronExecutable, expli
 
 export async function rebuildNativeModules(nodeVersion, nodeModulesPath, whichModule=null, headersDir=null, arch=null, command='rebuild') {
   headersDir = headersDir || getHeadersRootDirForVersion(nodeVersion);
+  logger('rebuildNativeModules', `headersDir=${headersDir} nodeVersion=${nodeVersion}`);
   await checkForInstalledHeaders(nodeVersion, headersDir);
 
   let cmd = 'node';
@@ -124,6 +128,7 @@ export async function rebuildNativeModules(nodeVersion, nodeModulesPath, whichMo
     `--target=${nodeVersion}`,
     `--arch=${arch || process.arch}`
   );
+  if (process.env.DEBUG) args.push('--verbose');
 
   await spawnWithHeadersDir(cmd, args, headersDir, nodeModulesPath);
 }
