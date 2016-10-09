@@ -1,0 +1,20 @@
+{
+  "name": "electron-prebuild-test",
+  "main": "index.js",
+  "version": "0.1.0",
+  "repository": "https://github.com/electron/electron-rebuild",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "rebuild": "electron-rebuild -f -p --verbose"
+  },
+  "devDependencies": {
+    "electron": "^1.4.3",
+    "electron-rebuild": "github:electron/electron-rebuild"
+  },
+  "dependencies": {
+    "fibers": "github:laverdet/node-fibers",
+    "pg": "^6.1.0",
+    "pg-native": "1.10.0"
+  }
+}
