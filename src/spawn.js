@@ -16,7 +16,7 @@ export default function (options={}) {
     let proc = childProcess.spawn(options.cmd, options.args, options.opts);
 
     proc.stdout.on('data', (data) => {
-      logger.print(data.toString());
+      logger(data.toString());
       if(_.isArray(stdout)) {
         stdout.push(data.toString());
       } else {
@@ -25,7 +25,7 @@ export default function (options={}) {
     });
 
     proc.stderr.on('data', (data) => {
-      logger.print(data.toString());
+      logger(data.toString());
       if(_.isArray(stderr)) {
         stderr.push(data.toString());
       } else {

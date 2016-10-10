@@ -52,7 +52,7 @@ if (!argv.c) {
 }
 
 if (argv.verbose) {
-  logger.enable();
+  logger.enabled = true;
 }
 
 if (!argv.v) {

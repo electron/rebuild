@@ -128,7 +128,7 @@ export async function rebuildNativeModules(nodeVersion, nodeModulesPath, whichMo
     `--target=${nodeVersion}`,
     `--arch=${arch || process.arch}`
   );
-  if (process.env.DEBUG) args.push('--verbose');
+  if (logger.enabled) args.push('--verbose');
 
   await spawnWithHeadersDir(cmd, args, headersDir, nodeModulesPath);
 }
