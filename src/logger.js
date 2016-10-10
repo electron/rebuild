@@ -1,6 +1,5 @@
-import colors from 'colors/safe';
-
-const colorList = ['blue', 'magenta', 'cyan'];
+const ansiCyan = '\u001b[36m';
+const ansiReset = '\u001b[39m';
 let enabled = false;
 
 export default function logger (command, ...messages) {
@@ -8,8 +7,8 @@ export default function logger (command, ...messages) {
     if (messages.length == 0) {
       console.log(command);
     } else {
-      var color = colorList[command.length % colorList.length];
-      console.log.apply(console, [colors[color](command)].concat(messages));
+      command = `${ansiCyan}${command}${ansiReset}`;
+      console.log(command, ...messages);
     }
   }
 }
