@@ -122,7 +122,8 @@ export async function rebuildNativeModules(nodeVersion, nodeModulesPath, whichMo
   args.push(
     '--runtime=electron',
     `--target=${nodeVersion}`,
-    `--arch=${arch || process.arch}`
+    `--arch=${arch || process.arch}`,
+    `--update-binary`
   );
 
   await spawnWithHeadersDir(cmd, args, headersDir, nodeModulesPath);
