@@ -20,7 +20,7 @@ const yargs = require('yargs')
   .alias('a', 'arch')
   .describe('m', 'The path to the node_modules directory to rebuild')
   .alias('m', 'module-dir')
-  .describe('w', 'A specific module to build')
+  .describe('w', 'A specific module to build, or comma separated list of modules')
   .alias('w', 'which-module')
   .describe('e', 'The path to electron-prebuilt')
   .alias('e', 'electron-prebuilt-dir')
@@ -30,6 +30,12 @@ const yargs = require('yargs')
   .alias('c', 'command')
   .describe('d', 'Custom header tarball URL')
   .alias('d', 'dist-url')
+  .describe('id', 'Ignore devDependencies')
+  .alias('id', 'ignore-devdeps')
+  .describe('io', 'Ignore optionalDependencies')
+  .alias('io', 'ignore-optdeps')
+  .describe('l', 'Log the rebuild process')
+  .alias('l', 'log')
   .epilog('Copyright 2015');
 
 const argv = yargs.argv;
@@ -111,7 +117,7 @@ shouldRebuildPromise
   })
   .then((x, beforeRebuild) => {
     return installNodeHeaders(argv.v, argv.d, null, argv.a)
-      .then(() => rebuildNativeModules(argv.v, argv.m, argv.w, null, argv.a, argv.c))
+      .then(() => rebuildNativeModules(argv.v, argv.m, argv.w, null, argv.a, argv.c, argv.id, argv.io, argv.log))
       .then(() => preGypFixRun(argv.m, argv.p, electronPath, nodeModuleVersion))
       .then(() => process.exit(0));
   })
