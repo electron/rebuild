@@ -21,7 +21,7 @@ const checkForInstalledHeaders = async function(nodeVersion, headersDir) {
   return true;
 };
 
-const spawnWithHeadersDir = async (cmd, args, headersDir, cwd) => {
+const spawnWithHeadersDir = async (cmd, args, headersDir, cwd, verbose=false) => {
   let env = _.extend({}, process.env, { HOME: headersDir });
   if (process.platform === 'win32')  {
     env.USERPROFILE = env.HOME;
@@ -33,7 +33,7 @@ const spawnWithHeadersDir = async (cmd, args, headersDir, cwd) => {
       opts.cwd = cwd;
     }
 
-    return await spawn({cmd, args, opts});
+    return await spawn({cmd, args, opts}, verbose);
   } catch (e) {
     if (e.stdout) console.log(e.stdout);
     if (e.stderr) console.log(e.stderr);
@@ -108,7 +108,7 @@ export async function shouldRebuildNativeModules(pathToElectronExecutable, expli
   return true;
 }
 
-export async function rebuildNativeModules(nodeVersion, nodeModulesPath, whichModule=null, headersDir=null, arch=null, command='rebuild') {
+export async function rebuildNativeModules(nodeVersion, nodeModulesPath, whichModule=null, headersDir=null, arch=null, command='rebuild', ignoreDevDeps=false, ignoreOptDeps=false, verbose=false) {
   headersDir = headersDir || getHeadersRootDirForVersion(nodeVersion);
   logger('rebuildNativeModules', `headersDir=${headersDir} nodeVersion=${nodeVersion}`);
   await checkForInstalledHeaders(nodeVersion, headersDir);
@@ -120,15 +120,29 @@ export async function rebuildNativeModules(nodeVersion, nodeModulesPath, whichMo
   ];
 
   if (whichModule) {
-    args.push(whichModule);
+    args = args.concat(whichModule.split(','));
+  }
+
+  if (ignoreDevDeps || ignoreOptDeps) {
+    console.log(nodeModulesPath)
+    const packageJSON = require(path.resolve(nodeModulesPath, '..', 'package.json'));
+    let modules = Object.keys(packageJSON.dependencies);
+    if (!ignoreDevDeps) {
+      modules = modules.concat(Object.keys(packageJSON.devDependencies))
+    }
+    if (!ignoreOptDeps) {
+      modules = modules.concat(Object.keys(packageJSON.optionalDependencies))
+    }
+    args = args.concat(modules)
   }
 
   args.push(
     '--runtime=electron',
     `--target=${nodeVersion}`,
-    `--arch=${arch || process.arch}`
+    `--arch=${arch || process.arch}`,
+    `--update-binary`
   );
   if (logger.enabled) args.push('--verbose');
 
-  await spawnWithHeadersDir(cmd, args, headersDir, nodeModulesPath);
+  await spawnWithHeadersDir(cmd, args, headersDir, nodeModulesPath, verbose);
 }
