@@ -3,7 +3,7 @@ import path from 'path';
 
 const possibleModuleNames = ['electron', 'electron-prebuilt', 'electron-prebuilt-compile'];
 
-export const locateElectronPrebuilt = () => {
+export function locateElectronPrebuilt() {
   let electronPath;
 
   // Attempt to locate modules by path
