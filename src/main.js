@@ -2,7 +2,10 @@ import path from 'path';
 import _ from 'lodash';
 import childProcess from 'child_process';
 import spawn from './spawn';
-export { preGypFixRun } from './node-pre-gyp-fix';
+import { preGypFixRun } from './node-pre-gyp-fix';
+import { locateElectronPrebuilt } from './electron-locater';
+
+export { preGypFixRun };
 
 const fs = require('fs');
 
@@ -140,4 +143,27 @@ export async function rebuildNativeModules(nodeVersion, nodeModulesPath, whichMo
   );
 
   await spawnWithHeadersDir(cmd, args, headersDir, nodeModulesPath, verbose);
+}
+
+export function createPackagerCopyHook(distUrl=null, ignoreDev=false, ignoreOpt=false, preGypFix=false, verbose=false) {
+  return (buildPath, electronVersion, platform, arch, callback) => {
+    if (process.platform !== platform) return callback(new Error('You can\'t rebuild native modules for a platform that is not your current platform'))
+    let electronPath = locateElectronPrebuilt();
+    try {
+      let pathDotText = path.join(electronPath, 'path.txt');
+      electronPath = path.resolve(electronPath, fs.readFileSync(pathDotText, 'utf8'));
+    } catch (e) {
+      console.error("Couldn't find electron-prebuilt in the temporary packager directory, this probably means something is wrong");
+    }
+    console.log('Rebuilding native modultes in:', buildPath)
+
+    installNodeHeaders(electronVersion, distUrl, null, arch)
+      .then(() => rebuildNativeModules(electronVersion, path.resolve(buildPath, 'node_modules'), null, null, arch, 'rebuild', ignoreDev, ignoreOpt, verbose))
+      .then(() => preGypFixRun(path.resolve(buildPath, 'node_modules'), preGypFix, electronPath, null))
+      .then(() => {
+        console.log('Rebuild completed successfully')
+        callback()
+      })
+      .catch((err) => callback(err));
+  }
 }
