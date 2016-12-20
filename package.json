@@ -4,7 +4,7 @@
   "description": "Electron supporting package to rebuild native node modules against the currently installed electron",
   "main": "lib/index.js",
   "scripts": {
-    "compile": "babel --stage 1 --optional runtime -d lib/ src/ && babel --stage 1 --optional runtime -d test-dist/ test/",
+    "compile": "babel -d lib/ src/ && babel -d test-dist/ test/",
     "prepublish": "npm run compile",
     "test": "npm run compile && mocha test-dist/* --timeout 120000"
   },
@@ -25,21 +25,42 @@
   },
   "homepage": "https://github.com/electron/electron-rebuild",
   "dependencies": {
-    "babel-runtime": "^5.8.20",
-    "glob": "^6.0.3",
-    "lodash": "^3.10.1",
-    "ncp": "^2.0.0",
-    "npm": "^3.5.3",
-    "nslog": "^3.0.0",
-    "promise": "^7.1.1",
+    "babel-register": "^6.16.3",
+    "colors": "^1.1.2",
+    "debug": "^2.4.5",
+    "fs-promise": "^1.0.0",
+    "node-gyp": "^3.4.0",
+    "ora": "^0.3.0",
+    "pify": "^2.3.0",
     "rimraf": "^2.5.0",
     "yargs": "^3.31.0"
   },
   "devDependencies": {
-    "babel": "^5.8.23",
+    "babel-cli": "^6.5.2",
+    "babel-plugin-syntax-async-functions": "^6.13.0",
+    "babel-plugin-transform-async-to-module-method": "^6.16.0",
+    "babel-plugin-transform-runtime": "^6.15.0",
+    "babel-preset-es2015": "^6.16.0",
+    "bluebird": "^3.4.6",
     "chai": "^3.4.1",
-    "chai-as-promised": "^5.2.0",
-    "electron-prebuilt": "^0.36.3",
-    "mocha": "^2.3.4"
+    "chai-as-promised": "^6.0.0",
+    "electron-prebuilt": "^1.4.12",
+    "mocha": "^3.2.0"
+  },
+  "babel": {
+    "presets": [
+      "es2015"
+    ],
+    "plugins": [
+      "transform-runtime",
+      "syntax-async-functions",
+      [
+        "transform-async-to-module-method",
+        {
+          "module": "bluebird",
+          "method": "coroutine"
+        }
+      ]
+    ]
   }
 }

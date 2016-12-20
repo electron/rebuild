@@ -38,43 +38,54 @@ and then
 npm run rebuild
 ```
 
+### CLI Arguments
+
+```
+Usage: electron-rebuild --version [version] --module-dir [path]
+
+Options:
+  -h, --help                   Show help                               [boolean]
+  -v, --version                The version of Electron to build against
+  -f, --force                  Force rebuilding modules, even if we would skip
+                               it otherwise
+  -a, --arch                   Override the target architecture to something
+                               other than your system's
+  -m, --module-dir             The path to the app directory to rebuild
+  -w, --which-module           A specific module to build, or comma separated
+                               list of modules
+  -e, --electron-prebuilt-dir  The path to electron-prebuilt
+  -d, --dist-url               Custom header tarball URL
+  -t, --types                  The types of dependencies to rebuild.  Comma
+                               seperated list of "prod", "dev" and "optional".
+                               Default is "prod,optional"
+  -p, --parallel               Rebuild in parallel, this is enabled by default
+                               on macOS and Linux
+  -s, --sequential             Rebuild modules sequentially, this is enabled by
+                               default on Windows
+
+Copyright 2016
+```
+
 ### How can I integrate this into Grunt / Gulp / Whatever?
 
 electron-rebuild is also a library that you can just require into your app or
-build process. It has two main methods:
+build process. It has a very simple API:
 
 ```js
-import { installNodeHeaders, rebuildNativeModules, shouldRebuildNativeModules } from 'electron-rebuild';
-
-// Public: Determines whether we need to rebuild native modules (i.e. if they're
-// already compiled for the right version of Electron, no need to rebuild them!)
-//
-// pathToElectronExecutable - Path to the electron executable that we'll use
-//                            to determine NODE_MODULE_VERSION
-// explicitNodeVersion (optional) - If given, use this instead of probing Electron
-//
-// Returns a Promise that if true, indicates you should build native modules
-let shouldBuild = shouldRebuildNativeModules('/path/to/Electron');
-
-// Public: Downloads and installs the header / lib files required to build
-// native modules.
-//
-// nodeVersion - the version of Electron to download headers for
-// nodeDistUrl (optional) - the URL to download the distribution from
-// headersDir (optional) - where to put the headers
-// arch (optional) - The architecture to build against (for building 32-bit apps
-//                   on 64-bit Windows for example)
-//
-// Returns a Promise indicating whether the operation succeeded or not
-let headerResult = installNodeHeaders('1.3.1');
+import rebuild from 'electron-rebuild';
 
 // Public: Rebuilds a node_modules directory with the given Electron version.
 //
-// nodeVersion - the version of Electron to download headers for
-// nodeModulesPath - the path to a node_modules directory
-// headersDir (optional) - where to find the headers
+// appPath - An absolute path to your app's directory.  (The directory that contains your node_modules)
+// electronVersion - The version of Electron to rebuild for
+// arch (optional) - Default: process.arch - The arch to rebuild for
+// extraModules (optional) - Default: [] - An array of modules to rebuild as well as the detected modules
+// forceRebuild (optional) - Default: false - Force a rebuild of modules regardless of their current build state
+// headerURL (optional) - Default: atom.io/download/electron - The URL to download Electron header files from
+// types (optional) - Default: ['prod', 'optional'] - The types of modules to rebuild
+// mode (optional) - The rebuild mode, either 'sequential' or 'parallel' - Default varies per platform (probably shouldn't mess with this one)
+
 // Returns a Promise indicating whether the operation succeeded or not
-headerResult.then(() => rebuildNativeModules('1.3.1', './node_modules'));
 ```
 
 A full build process might look something like:
@@ -83,43 +94,13 @@ A full build process might look something like:
 let childProcess = require('child_process');
 let pathToElectron = require('electron-prebuilt');
 
-shouldRebuildNativeModules(pathToElectron)
-  .then((shouldBuild) => {
-    if (!shouldBuild) return true;
-
-    let electronVersion = childProcess.execSync(`${pathToElectron} --version`, {
-      encoding: 'utf8',
+  rebuild(__dirname, '1.4.12')
+    .then(() => console.info('Rebuild Successful'))
+    .catch((e) => {
+      console.error("Building modules didn't work!");
+      console.error(e);
     });
-    electronVersion = electronVersion.match(/v(\d+\.\d+\.\d+)/)[1];
-
-    return installNodeHeaders(electronVersion)
-      .then(() => rebuildNativeModules(electronVersion, './node_modules'));
-  })
-  .catch((e) => {
-    console.error("Building modules didn't work!");
-    console.error(e);
-  });
 ```
-
-### `node-pre-gyp` workaround
-
-Note that there is a known [issue](https://github.com/mapbox/node-pre-gyp/pull/187) with
-`node-pre-gyp` that prevents it from correctly locating the native modules built by
-`electron-rebuild`. `node-pre-gyp` is used by some popular NPM packages like `sqlite3`,
-and `node-inspector`, so even if your app or package does not have a direct dependency on
-`node-pre-gyp` you're bound to run into this issue sooner or later. To work around it call
-`preGypFixRun` after the build is complete in order to copy the native modules to a location
-where `node-pre-gyp` can find them:
-
-```js
-import { preGypFixRun } from 'electron-rebuild';
-
-return installNodeHeaders('1.3.1')
-  .then(() => rebuildNativeModules('1.3.1', './node_modules'))
-  .then(() => preGypFixRun('./node_modules', true, pathToElectron));
-```
-
-If you're using the CLI to perform the build then use the `-p` or `--pre-gyp-fix` option.
 
 ### Alternatives
 

@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 
-import {installNodeHeaders, rebuildNativeModules, shouldRebuildNativeModules} from './main.js';
-import {preGypFixRun} from './node-pre-gyp-fix.js'
-import {locateElectronPrebuilt} from './electron-locater';
+import 'colors';
+import fs from 'fs-promise';
 import path from 'path';
-import fs from 'fs';
+import ora from 'ora';
+
+import rebuild from './rebuild.js';
+import { locateElectronPrebuilt } from './electron-locater';
 
 const yargs = require('yargs')
   .usage('Usage: electron-rebuild --version [version] --module-dir [path]')
@@ -12,8 +14,6 @@ const yargs = require('yargs')
   .alias('h', 'help')
   .describe('v', 'The version of Electron to build against')
   .alias('v', 'version')
-  .describe('n', 'The NODE_MODULE_VERSION to compare against (process.versions.modules)')
-  .alias('n', 'node-module-version')
   .describe('f', 'Force rebuilding modules, even if we would skip it otherwise')
   .alias('f', 'force')
   .describe('a', "Override the target architecture to something other than your system's")
@@ -24,19 +24,15 @@ const yargs = require('yargs')
   .alias('w', 'which-module')
   .describe('e', 'The path to electron-prebuilt')
   .alias('e', 'electron-prebuilt-dir')
-  .describe('p', 'Enable the ugly (and hopefully not needed soon enough) node-pre-gyp path fixer')
-  .alias('p', 'pre-gyp-fix')
-  .describe('c', 'The npm command to run')
-  .alias('c', 'command')
   .describe('d', 'Custom header tarball URL')
   .alias('d', 'dist-url')
-  .describe('id', 'Ignore devDependencies')
-  .alias('id', 'ignore-devdeps')
-  .describe('io', 'Ignore optionalDependencies')
-  .alias('io', 'ignore-optdeps')
-  .describe('l', 'Log the rebuild process')
-  .alias('l', 'log')
-  .epilog('Copyright 2015');
+  .describe('t', 'The types of dependencies to rebuild.  Comma seperated list of "prod", "dev" and "optional".  Default is "prod,optional"')
+  .alias('t', 'types')
+  .describe('p', 'Rebuild in parallel, this is enabled by default on macOS and Linux')
+  .alias('p', 'parallel')
+  .describe('s', 'Rebuild modules sequentially, this is enabled by default on Windows')
+  .alias('s', 'sequential')
+  .epilog('Copyright 2016');
 
 const argv = yargs.argv;
 
@@ -45,84 +41,72 @@ if (argv.h) {
   process.exit(0);
 }
 
-if (!argv.e) {
-  argv.e = locateElectronPrebuilt();
-} else {
-  argv.e = path.resolve(process.cwd(), argv.e);
-}
+const handler = (err) => {
+  console.error('An unhandled error occurred inside electron-rebuild'.red);
+  console.error(`${err.message}\n\n${err.stack}`.red);
+  process.exit(-1);
+};
+process.on('uncaughtException', handler);
+process.on('unhandledRejection', handler);
 
-if (!argv.c) {
-  argv.c = 'rebuild';
-}
 
-if (!argv.v) {
-  // NB: We assume here that electron-prebuilt is a sibling package of ours
-  let pkg = null;
-  try {
-    let pkgJson = path.join(argv.e, 'package.json');
+(async () => {
+  const electronPrebuiltPath = argv.e ? path.resolve(process.cwd(), argv.e) : locateElectronPrebuilt();
+  let electronPrebuiltVersion = argv.v; 
 
-    pkg = require(pkgJson);
+  if (!electronPrebuiltVersion) {
+    try {
+      const pkgJson = require(path.join(electronPrebuiltPath, 'package.json'));
 
-    argv.v = pkg.version;
-  } catch (e) {
-    console.error("Unable to find electron-prebuilt's version number, either install it or specify an explicit version");
-    process.exit(-1);
+      electronPrebuiltVersion = pkgJson.version;
+    } catch (e) {
+      throw new Error('Unable to find electron-prebuilt\'s version number, either install it or specify an explicit version');
+    }
   }
-}
 
-let electronPath = null;
-let nodeModuleVersion = null;
+  let rootDirectory = argv.m;
 
-if (!argv.n) {
-  try {
-    let pathDotText = path.join(argv.e, 'path.txt');
-    electronPath = path.resolve(argv.e, fs.readFileSync(pathDotText, 'utf8'));
-  } catch (e) {
-    console.error("Couldn't find electron-prebuilt and no --node-module-version parameter set, always rebuilding");
+  if (!rootDirectory) {
+    // NB: We assume here that we're going to rebuild the immediate parent's
+    // node modules, which might not always be the case but it's at least a
+    // good guess
+    rootDirectory = path.resolve(__dirname, '../..');
+    if (!await fs.exists(rootDirectory)) {
+      throw new Error('Unable to find parent node_modules directory, specify it via --module-dir');
+    }
+  } else {
+    rootDirectory = path.resolve(process.cwd(), rootDirectory);
   }
-} else {
-  nodeModuleVersion = parseInt(argv.n);
-}
-
-if (!argv.m) {
-  // NB: We assume here that we're going to rebuild the immediate parent's
-  // node modules, which might not always be the case but it's at least a
-  // good guess
-  try {
-    argv.m = path.resolve(__dirname, '../..');
-  } catch (e) {
-    console.error("Unable to find parent node_modules directory, specify it via --module-dir");
-    process.exit(-1);
+  
+  let modulesDone = 0;
+  let moduleTotal = 0;
+  const rebuildSpinner = ora('Searching dependency tree').start();
+  let lastModuleName;
+  const redraw = (moduleName) => {
+    if (moduleName) lastModuleName = moduleName;
+    if (argv.p) {
+      rebuildSpinner.text = `Building modules: ${modulesDone}/${moduleTotal}`;
+    } else {
+      rebuildSpinner.text = `Building module: ${lastModuleName}, Completed: ${modulesDone}`;
+    }
   }
-}
-
-if (!argv.w) {
-  argv.w = null;
-}
-
-let shouldRebuildPromise = null;
-if (!electronPath && !nodeModuleVersion) {
-  shouldRebuildPromise = Promise.resolve(true);
-} else if (argv.f) {
-  shouldRebuildPromise = Promise.resolve(true);
-} else if (argv.c == 'install') {
-  shouldRebuildPromise = Promise.resolve(true);
-} else {
-  shouldRebuildPromise = shouldRebuildNativeModules(electronPath, nodeModuleVersion);
-}
-
-shouldRebuildPromise
-  .then(x => {
-    if (!x) process.exit(0);
-  })
-  .then((x, beforeRebuild) => {
-    return installNodeHeaders(argv.v, argv.d, null, argv.a)
-      .then(() => rebuildNativeModules(argv.v, argv.m, argv.w, null, argv.a, argv.c, argv.id, argv.io, argv.log))
-      .then(() => preGypFixRun(argv.m, argv.p, electronPath, nodeModuleVersion))
-      .then(() => process.exit(0));
-  })
-  .catch((e) => {
-    console.error(e.message);
-    console.error(e.stack);
-    process.exit(-1);
+  const rebuilder = rebuild(rootDirectory, electronPrebuiltVersion, argv.a || process.arch, argv.w ? argv.w.split(',') : [], argv.f, argv.d, argv.t ? argv.t.split(',') : ['prod', 'dev'], argv.p ? 'parallel' : (argv.s ? 'sequential' : undefined));
+  const lifecycle = rebuilder.lifecycle;
+  lifecycle.on('module-found', (moduleName) => {
+    moduleTotal += 1;
+    redraw(moduleName);
   });
+  lifecycle.on('module-done', () => {
+    modulesDone += 1;
+    redraw();
+  });
+  try {
+    await rebuilder;
+  } catch (err) {
+    rebuildSpinner.text = 'Rebuild Failed';
+    rebuildSpinner.fail();
+    throw err;
+  }
+  rebuildSpinner.text = 'Rebuild Complete';
+  rebuildSpinner.succeed();
+})();
