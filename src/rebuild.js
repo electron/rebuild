@@ -10,7 +10,7 @@ const d = debug('electron-rebuild');
 
 const defaultMode = process.platform === 'win32' ? 'sequential' : 'parallel';
 
-const _rebuild = async (lifecycle, buildPath, electronVersion, arch = process.arch, extraModules = [], forceRebuild = false, headerURL = 'https://atom.io/download/electron', types = ['prod', 'dev'], mode = defaultMode) => {
+const _rebuild = async (lifecycle, buildPath, electronVersion, arch = process.arch, extraModules = [], forceRebuild = false, headerURL = 'https://atom.io/download/electron', types = ['prod', 'optional'], mode = defaultMode) => {
   if (!path.isAbsolute(buildPath)) {
     throw new Error('Expected buildPath to be an absolute path');
   }
@@ -118,7 +118,7 @@ const _rebuild = async (lifecycle, buildPath, electronVersion, arch = process.ar
     const childPackageJSON = await readPackageJSON(modulePath);
     const moduleWait = [];
 
-    Object.keys(childPackageJSON.dependencies || {}).forEach((key) => {
+    Object.keys(childPackageJSON.dependencies || {}).concat(Object.keys(childPackageJSON.optionalDependencies || {})).forEach((key) => {
       if (prodDeps[key]) return;
       prodDeps[key] = true;
       moduleWait.push(findModule(key, modulePath, markChildrenAsProdDeps));
@@ -128,7 +128,17 @@ const _rebuild = async (lifecycle, buildPath, electronVersion, arch = process.ar
 
   const rootPackageJSON = await readPackageJSON(buildPath);
   const markWaiters = [];
-  Object.keys(rootPackageJSON.dependencies || {}).concat(Object.keys(rootPackageJSON.optionalDependencies || {})).forEach((key) => {
+  const depKeys = [];
+  if (types.indexOf('prod') !== -1) {
+    depKeys.push(...Object.keys(rootPackageJSON.dependencies || {}));
+  }
+  if (types.indexOf('optional') !== -1) {
+    depKeys.push(...Object.keys(rootPackageJSON.optionalDependencies || {}));
+  }
+  if (types.indexOf('dev') !== -1) {
+    depKeys.push(...Object.keys(rootPackageJSON.devDependencies || {}));
+  }
+  depKeys.forEach((key) => {
     prodDeps[key] = true;
     markWaiters.push(markChildrenAsProdDeps(path.resolve(buildPath, 'node_modules', key)));
   });
