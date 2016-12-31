@@ -1,4 +1,5 @@
 import path from 'path';
+import { expect } from 'chai';
 
 import readPackageJSON from '../lib/read-package-json';
 
