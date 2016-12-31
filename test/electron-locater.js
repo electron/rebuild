@@ -7,12 +7,10 @@ import { locateElectronPrebuilt } from '../lib/electron-locater';
 
 const packageCommand = (command, packageName) =>
   new Promise((resolve, reject) => {
-    const child = spawn(path.resolve(__dirname, '..', 'node_modules', '.bin', `npm${process.platform === 'win32' ? '.cmd' : ''}`), [command, packageName], {
-      cwd: path.resolve(__dirname, '..')
+    const child = spawn('npm', [command, packageName], {
+      cwd: path.resolve(__dirname, '..'),
+      stdio: 'ignore',
     });
-
-    child.stdout.on('data', () => {});
-    child.stderr.on('data', () => {});
 
     child.on('close', (code) => {
       if (code === 0) return resolve();
