@@ -1,4 +1,4 @@
-import { spawn } from 'child_process';
+import { spawnPromise } from 'spawn-rx';
 import debug from 'debug';
 import EventEmitter from 'events';
 import fs from 'fs-promise';
@@ -56,31 +56,23 @@ const _rebuild = async (lifecycle, buildPath, electronVersion, arch = process.ar
         rebuildArgs.push(`--${binaryKey}=${value}`);
       });
 
-      await new Promise((resolve, reject) => {
-        const child = spawn(path.resolve(__dirname, `../node_modules/.bin/node-gyp${process.platform === 'win32' ? '.cmd' : ''}`), rebuildArgs, {
-          cwd: modulePath,
-          env: Object.assign({}, process.env, {
-            HOME: path.resolve(os.homedir(), '.electron-gyp'),
-            USERPROFILE: path.resolve(os.homedir(), '.electron-gyp'),
-            npm_config_disturl: 'https://atom.io/download/electron',
-            npm_config_runtime: 'electron',
-            npm_config_arch: arch,
-            npm_config_target_arch: arch,
-            npm_config_build_from_source: true,
-          }),
-        });
-        let output = '';
-        child.stdout.on('data', (data) => { output += data; });
-        child.stderr.on('data', (data) => { output += data; });
-        child.on('exit', async (code) => {
-          d('built:', path.basename(modulePath));
-          if (code !== 0) return reject(new Error(`Failed to rebuild: ${modulePath}\n\n${output}`));
-          await fs.mkdirs(path.dirname(metaPath));
-          await fs.writeFile(metaPath, arch);
-          lifecycle.emit('module-done');
-          resolve();
-        });
+      await spawnPromise(path.resolve(__dirname, `../node_modules/.bin/node-gyp${process.platform === 'win32' ? '.cmd' : ''}`), rebuildArgs, {
+        cwd: modulePath,
+        env: Object.assign({}, process.env, {
+          HOME: path.resolve(os.homedir(), '.electron-gyp'),
+          USERPROFILE: path.resolve(os.homedir(), '.electron-gyp'),
+          npm_config_disturl: 'https://atom.io/download/electron',
+          npm_config_runtime: 'electron',
+          npm_config_arch: arch,
+          npm_config_target_arch: arch,
+          npm_config_build_from_source: true,
+        }),
       });
+
+      d('built:', path.basename(modulePath));
+      await fs.mkdirs(path.dirname(metaPath));
+      await fs.writeFile(metaPath, arch);
+      lifecycle.emit('module-done');
     }
   };
 

@@ -1,22 +1,15 @@
 import fs from 'fs';
 import path from 'path';
 import { expect } from 'chai';
-import { spawn } from 'child_process';
+import { spawnPromise } from 'spawn-rx';
 
 import { locateElectronPrebuilt } from '../lib/electron-locater';
 
 const packageCommand = (command, packageName) =>
-  new Promise((resolve, reject) => {
-    const child = spawn('npm', [command, packageName], {
-      cwd: path.resolve(__dirname, '..'),
-      stdio: 'ignore',
-    });
-
-    child.on('close', (code) => {
-      if (code === 0) return resolve();
-      reject(code);
-    });
-  })
+  spawnPromise('npm', [command, packageName], {
+    cwd: path.resolve(__dirname, '..'),
+    stdio: 'ignore',
+  });
 
 const install = packageCommand.bind(this, 'install');
 const uninstall = packageCommand.bind(this, 'uninstall');

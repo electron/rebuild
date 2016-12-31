@@ -25,14 +25,15 @@
   },
   "homepage": "https://github.com/electron/electron-rebuild",
   "dependencies": {
-    "babel-runtime": "6.18.0",
     "babel-register": "^6.16.3",
+    "babel-runtime": "6.18.0",
     "colors": "^1.1.2",
     "debug": "^2.4.5",
     "fs-promise": "^1.0.0",
     "node-gyp": "^3.4.0",
     "ora": "^0.3.0",
     "rimraf": "^2.5.0",
+    "spawn-rx": "^2.0.7",
     "yargs": "^3.31.0"
   },
   "devDependencies": {

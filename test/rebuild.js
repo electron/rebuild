@@ -2,7 +2,7 @@ import fs from 'fs-promise';
 import path from 'path';
 import os from 'os';
 import ora from 'ora';
-import { spawn } from 'child_process';
+import { spawnPromise } from 'spawn-rx';
 
 import { expect } from 'chai';
 
@@ -17,16 +17,9 @@ describe('rebuilder', () => {
     await fs.remove(testModulePath);
     await fs.mkdirs(testModulePath);
     await fs.writeFile(path.resolve(testModulePath, 'package.json'), await fs.readFile(path.resolve(__dirname, '../test/fixture/native-app1/package.json'), 'utf8'));
-    await new Promise((resolve, reject) => {
-      const child = spawn('npm', ['install'], {
-        cwd: testModulePath,
-        stdio: 'inherit',
-        // stdio: process.platform === 'win32' ? 'inherit' : 'pipe',
-      });
-      child.on('exit', (code) => {
-        if (code === 0) resolve();
-        if (code !== 0) reject(new Error('Failed to install dependencies for test module'));
-      });
+    await spawnPromise('npm', ['install'], {
+      cwd: testModulePath,
+      stdio: 'inherit',
     });
   };
 
