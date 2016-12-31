@@ -24,8 +24,8 @@ const uninstall = packageCommand.bind(this, 'uninstall');
 const testElectronCanBeFound = () => {
   it('should return a valid path', () => {
     const electronPath = locateElectronPrebuilt();
-    electronPath.should.be.a('string');
-    fs.existsSync(electronPath).should.be.equal(true);
+    expect(electronPath).to.be.a('string');
+    expect(fs.existsSync(electronPath)).to.be.equal(true);
   });
 };
 
