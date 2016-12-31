@@ -20,8 +20,8 @@ describe('rebuilder', () => {
     await new Promise((resolve, reject) => {
       const child = spawn('npm', ['install'], {
         cwd: testModulePath,
-        // stdio: 'inherit',
-        stdio: process.platform === 'win32' ? 'inherit' : 'pipe',
+        stdio: 'inherit',
+        // stdio: process.platform === 'win32' ? 'inherit' : 'pipe',
       });
       child.on('exit', (code) => {
         if (code === 0) resolve();
