@@ -43,8 +43,9 @@ describe('rebuilder', () => {
     });
 
     it('should have rebuilt children of top level prod dependencies', async () => {
-      const forgeMeta = path.resolve(testModulePath, 'node_modules', 'microtime', 'build', 'Release', '.forge-meta');
-      expect(await fs.exists(forgeMeta), 'microtime build meta should exist').to.equal(true);
+      const forgeMetaGoodNPM = path.resolve(testModulePath, 'node_modules', 'microtime', 'build', 'Release', '.forge-meta');
+      const forgeMetaBadNPM = path.resolve(testModulePath, 'node_modules', 'benchr', 'node_modules', 'microtime', 'build', 'Release', '.forge-meta');
+      expect(await fs.exists(forgeMetaGoodNPM) || await fs.exists(forgeMetaBadNPM), 'microtime build meta should exist').to.equal(true);
     });
 
     it('should have rebuilt children of scoped top level prod dependencies', async () => {
