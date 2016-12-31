@@ -1,9 +1,9 @@
-import _ from './support';
 import fs from 'fs';
 import path from 'path';
-import {spawn} from 'child_process';
+import { expect } from 'chai';
+import { spawn } from 'child_process';
 
-import {locateElectronPrebuilt} from '../lib/electron-locater';
+import { locateElectronPrebuilt } from '../lib/electron-locater';
 
 const packageCommand = (command, packageName) =>
   new Promise((resolve, reject) => {

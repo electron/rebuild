@@ -34,6 +34,7 @@ const _rebuild = async (lifecycle, buildPath, electronVersion, arch = process.ar
         if (meta === arch) {
           d(`skipping: ${path.basename(modulePath)} as it is already built`);
           lifecycle.emit('module-done');
+          lifecycle.emit('module-skip');
           return;
         }
       }
@@ -103,7 +104,6 @@ const _rebuild = async (lifecycle, buildPath, electronVersion, arch = process.ar
     const foundFns = [];
 
     while (targetDir !== buildPath) {
-      d(targetDir, buildPath);
       const testPath = path.resolve(targetDir, 'node_modules', moduleName);
       if (await fs.exists(testPath)) {
         foundFns.push(foundFn(testPath));
@@ -160,6 +160,7 @@ const _rebuild = async (lifecycle, buildPath, electronVersion, arch = process.ar
 
 const rebuild = (...args) => {
   const lifecycle = new EventEmitter();
+  d('rebuilding with args:', args);
   const rebuilder = _rebuild(lifecycle, ...args);
   rebuilder.lifecycle = lifecycle;
   return rebuilder;
