@@ -2,13 +2,16 @@ language: node_js
 node_js:
 - '6'
 - '4'
+
+sudo: false
+
 os:
 - linux
 - osx
 
-compiler:
-  - gcc
-  - clang
+env:
+  global:
+    - CC=clang CXX=clang++ npm_config_clang=1
 
 branches:
   only:
