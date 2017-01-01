@@ -2,6 +2,7 @@ import { spawnPromise } from 'spawn-rx';
 import debug from 'debug';
 import EventEmitter from 'events';
 import fs from 'fs-promise';
+import nodeAbi from 'node-abi';
 import os from 'os';
 import path from 'path';
 import readPackageJSON from './read-package-json';
@@ -17,6 +18,7 @@ const _rebuild = async (lifecycle, buildPath, electronVersion, arch = process.ar
   d('rebuilding with args:', buildPath, electronVersion, arch, extraModules, forceRebuild, headerURL, types);
   const prodDeps = {};
   const rebuilds = [];
+  const ABI = nodeAbi.getAbi(electronVersion, 'electron');
 
   (extraModules || []).forEach((moduleName) => {
     if (!moduleName) return;
@@ -72,6 +74,15 @@ const _rebuild = async (lifecycle, buildPath, electronVersion, arch = process.ar
       d('built:', path.basename(modulePath));
       await fs.mkdirs(path.dirname(metaPath));
       await fs.writeFile(metaPath, arch);
+
+      d('copying to prebuilt place:', path.basename(modulePath));
+      const moduleName = path.basename(modulePath);
+      const abiPath = path.resolve(modulePath, `bin/${process.platform}-${arch}-${ABI}`);
+      const nodePath = path.resolve(modulePath, `build/Release/${moduleName}.node`);
+      if (await fs.exists(nodePath)) {
+        await fs.mkdirs(abiPath);
+        await fs.copy(nodePath, path.resolve(abiPath, `${moduleName}.node`));
+      }
       lifecycle.emit('module-done');
     }
   };
