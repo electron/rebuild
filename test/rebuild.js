@@ -1,0 +1,89 @@
+import fs from 'fs-promise';
+import path from 'path';
+import os from 'os';
+import ora from 'ora';
+import { spawnPromise } from 'spawn-rx';
+
+import { expect } from 'chai';
+
+import rebuild from '../lib/rebuild';
+
+ora.ora = ora;
+
+describe('rebuilder', () => {
+  const testModulePath = path.resolve(os.tmpdir(), 'electron-forge-rebuild-test');
+
+  const resetTestModule = async () => {
+    await fs.remove(testModulePath);
+    await fs.mkdirs(testModulePath);
+    await fs.writeFile(path.resolve(testModulePath, 'package.json'), await fs.readFile(path.resolve(__dirname, '../test/fixture/native-app1/package.json'), 'utf8'));
+    await spawnPromise('npm', ['install'], {
+      cwd: testModulePath,
+      stdio: 'inherit',
+    });
+  };
+
+  describe('core behavior', () => {
+    before(resetTestModule);
+
+    before(async () => {
+      await rebuild(testModulePath, '1.4.12', process.arch);
+    });
+
+    it('should have rebuilt top level prod dependencies', async () => {
+      const forgeMeta = path.resolve(testModulePath, 'node_modules', 'ref', 'build', 'Release', '.forge-meta');
+      expect(await fs.exists(forgeMeta), 'ref build meta should exist').to.equal(true);
+    });
+
+    it('should have rebuilt children of top level prod dependencies', async () => {
+      const forgeMetaGoodNPM = path.resolve(testModulePath, 'node_modules', 'microtime', 'build', 'Release', '.forge-meta');
+      const forgeMetaBadNPM = path.resolve(testModulePath, 'node_modules', 'benchr', 'node_modules', 'microtime', 'build', 'Release', '.forge-meta');
+      expect(await fs.exists(forgeMetaGoodNPM) || await fs.exists(forgeMetaBadNPM), 'microtime build meta should exist').to.equal(true);
+    });
+
+    it('should have rebuilt children of scoped top level prod dependencies', async () => {
+      const forgeMeta = path.resolve(testModulePath, 'node_modules', '@newrelic/native-metrics', 'build', 'Release', '.forge-meta');
+      expect(await fs.exists(forgeMeta), '@newrelic/native-metrics build meta should exist').to.equal(true);
+    });
+
+    it('should have rebuilt top level optional dependencies', async () => {
+      const forgeMeta = path.resolve(testModulePath, 'node_modules', 'zipfile', 'build', 'Release', '.forge-meta');
+      expect(await fs.exists(forgeMeta), 'zipfile build meta should exist').to.equal(true);
+    });
+
+    it('should not have rebuilt top level devDependencies', async () => {
+      const forgeMeta = path.resolve(testModulePath, 'node_modules', 'ffi', 'build', 'Release', '.forge-meta');
+      expect(await fs.exists(forgeMeta), 'ffi build meta should not exist').to.equal(false);
+    });
+
+    after(async () => {
+      await fs.remove(testModulePath);
+    });
+  });
+
+  describe('force rebuild', () => {
+    before(resetTestModule);
+
+    it('should skip the rebuild step when disabled', async () => {
+      await rebuild(testModulePath, '1.4.12', process.arch);
+      const rebuilder = rebuild(testModulePath, '1.4.12', process.arch, [], false);
+      let skipped = 0;
+      rebuilder.lifecycle.on('module-skip', () => {
+        skipped++;
+      });
+      await rebuilder;
+      expect(skipped).to.equal(4);
+    });
+
+    it('should rebuild all modules again when enabled', async () => {
+      await rebuild(testModulePath, '1.4.12', process.arch);
+      const rebuilder = rebuild(testModulePath, '1.4.12', process.arch, [], true);
+      let skipped = 0;
+      rebuilder.lifecycle.on('module-skip', () => {
+        skipped++;
+      });
+      await rebuilder;
+      expect(skipped).to.equal(0);
+    });
+  });
+});

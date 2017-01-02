@@ -1,24 +1,15 @@
-import _ from './support';
 import fs from 'fs';
 import path from 'path';
-import {spawn} from 'child_process';
+import { expect } from 'chai';
+import { spawnPromise } from 'spawn-rx';
 
-import {locateElectronPrebuilt} from '../lib/electron-locater';
+import { locateElectronPrebuilt } from '../lib/electron-locater';
 
 const packageCommand = (command, packageName) =>
-  new Promise((resolve, reject) => {
-    const child = spawn(path.resolve(__dirname, '..', 'node_modules', '.bin', `npm${process.platform === 'win32' ? '.cmd' : ''}`), [command, packageName], {
-      cwd: path.resolve(__dirname, '..')
-    });
-
-    child.stdout.on('data', () => {});
-    child.stderr.on('data', () => {});
-
-    child.on('close', (code) => {
-      if (code === 0) return resolve();
-      reject(code);
-    });
-  })
+  spawnPromise('npm', [command, packageName], {
+    cwd: path.resolve(__dirname, '..'),
+    stdio: 'ignore',
+  });
 
 const install = packageCommand.bind(this, 'install');
 const uninstall = packageCommand.bind(this, 'uninstall');
@@ -26,8 +17,8 @@ const uninstall = packageCommand.bind(this, 'uninstall');
 const testElectronCanBeFound = () => {
   it('should return a valid path', () => {
     const electronPath = locateElectronPrebuilt();
-    electronPath.should.be.a('string');
-    fs.existsSync(electronPath).should.be.equal(true);
+    expect(electronPath).to.be.a('string');
+    expect(fs.existsSync(electronPath)).to.be.equal(true);
   });
 };
 
