@@ -70,9 +70,13 @@ process.on('unhandledRejection', handler);
     // NB: We assume here that we're going to rebuild the immediate parent's
     // node modules, which might not always be the case but it's at least a
     // good guess
-    rootDirectory = path.resolve(__dirname, '../..');
-    if (!await fs.exists(rootDirectory)) {
-      throw new Error('Unable to find parent node_modules directory, specify it via --module-dir');
+    rootDirectory = path.resolve(__dirname, '../../..');
+    if (!await fs.exists(rootDirectory) || !await fs.exists(path.resolve(rootDirectory, 'package.json'))) {
+      // Then we try the CWD
+      rootDirectory = process.cwd();
+      if (!await fs.exists(rootDirectory) || !await fs.exists(path.resolve(rootDirectory, 'package.json'))) {
+        throw new Error('Unable to find parent node_modules directory, specify it via --module-dir, E.g. "--module-dir ." for the current directory');
+      }
     }
   } else {
     rootDirectory = path.resolve(process.cwd(), rootDirectory);
