@@ -74,7 +74,7 @@ const _rebuild = async (lifecycle, buildPath, electronVersion, arch = process.ar
         rebuildArgs.push(`--${binaryKey}=${value}`);
       });
 
-      await spawnPromise(path.resolve(__dirname, `../node_modules/.bin/node-gyp${process.platform === 'win32' ? '.cmd' : ''}`), rebuildArgs, {
+      await spawnPromise(nodeGypPath, rebuildArgs, {
         cwd: modulePath,
         env: Object.assign({}, process.env, {
           HOME: path.resolve(os.homedir(), '.electron-gyp'),
