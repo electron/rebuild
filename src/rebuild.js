@@ -11,6 +11,18 @@ const d = debug('electron-rebuild');
 
 const defaultMode = process.platform === 'win32' ? 'sequential' : 'parallel';
 
+const locateNodeGyp = async () => {
+  let testPath = __dirname;
+  for (let upDir = 0; upDir <= 20; upDir++) {
+    const nodeGypTestPath = path.resolve(testPath, `node_modules/.bin/node-gyp${process.platform === 'win32' ? '.cmd' : ''}`);
+    if (await fs.exists(nodeGypTestPath)) {
+      return nodeGypTestPath;
+    }
+    testPath = path.resolve(testPath, '..');
+  }
+  return null;
+};
+
 const _rebuild = async (lifecycle, buildPath, electronVersion, arch = process.arch, extraModules = [], forceRebuild = false, headerURL = 'https://atom.io/download/electron', types = ['prod', 'optional'], mode = defaultMode) => {
   if (!path.isAbsolute(buildPath)) {
     throw new Error('Expected buildPath to be an absolute path');
@@ -19,6 +31,10 @@ const _rebuild = async (lifecycle, buildPath, electronVersion, arch = process.ar
   const prodDeps = {};
   const rebuilds = [];
   const ABI = nodeAbi.getAbi(electronVersion, 'electron');
+  const nodeGypPath = await locateNodeGyp();
+  if (!nodeGypPath) {
+    throw new Error('Could locate node-gyp');
+  }
 
   (extraModules || []).forEach((moduleName) => {
     if (!moduleName) return;
