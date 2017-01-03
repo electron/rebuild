@@ -2,7 +2,7 @@
   "name": "electron-rebuild",
   "version": "1.5.3",
   "description": "Electron supporting package to rebuild native node modules against the currently installed electron",
-  "main": "lib/index.js",
+  "main": "lib/main.js",
   "scripts": {
     "compile": "babel -d lib/ src/ && babel -d test-dist/ test/",
     "prepublish": "npm run compile",
