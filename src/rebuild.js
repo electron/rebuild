@@ -122,7 +122,7 @@ const _rebuild = async (lifecycle, buildPath, electronVersion, arch = process.ar
     let targetDir = fromDir;
     const foundFns = [];
 
-    while (targetDir !== buildPath) {
+    while (targetDir !== path.dirname(buildPath)) {
       const testPath = path.resolve(targetDir, 'node_modules', moduleName);
       if (await fs.exists(testPath)) {
         foundFns.push(foundFn(testPath));
@@ -134,6 +134,7 @@ const _rebuild = async (lifecycle, buildPath, electronVersion, arch = process.ar
 
   const markChildrenAsProdDeps = async (modulePath) => {
     if (!await fs.exists(modulePath)) return;
+    d('exploring', modulePath);
     const childPackageJSON = await readPackageJSON(modulePath);
     const moduleWait = [];
 
@@ -186,6 +187,9 @@ const rebuild = (...args) => {
 }
 
 export const rebuildNativeModules = (electronVersion, modulePath, whichModule='', headersDir=null, arch=process.arch, command, ignoreDevDeps=false, ignoreOptDeps=false, verbose=false) => {
+  if (path.basename(modulePath) === 'node_modules') {
+    modulePath = path.dirname(modulePath);
+  }
   d('rebuilding in:', modulePath);
   console.warn('You are using the old API, please read the new docs and update to thew new API');
   return rebuild(modulePath, electronVersion, arch, whichModule.split(','));
