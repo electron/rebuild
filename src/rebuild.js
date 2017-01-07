@@ -191,7 +191,7 @@ export const rebuildNativeModules = (electronVersion, modulePath, whichModule=''
     modulePath = path.dirname(modulePath);
   }
   d('rebuilding in:', modulePath);
-  console.warn('You are using the old API, please read the new docs and update to thew new API');
+  console.warn('You are using the old API, please read the new docs and update to the new API');
   return rebuild(modulePath, electronVersion, arch, whichModule.split(','));
 };
 
