@@ -71,9 +71,18 @@ const _rebuild = async (lifecycle, buildPath, electronVersion, arch = process.ar
         if (binaryKey === 'module_path') {
           value = path.resolve(modulePath, value);
         }
+        value = value.replace('{configuration}', 'Release')
+          .replace('{node_abi}', `electron-v${electronVersion.split('.').slice(0, 2).join('.')}`)
+          .replace('{platform}', process.platform)
+          .replace('{arch}', arch)
+          .replace('{version}', modulePackageJSON.version);
+        Object.keys(modulePackageJSON.binary).forEach((binaryReplaceKey) => {
+          value = value.replace(`{${binaryReplaceKey}}`, modulePackageJSON.binary[binaryReplaceKey]);
+        });
         rebuildArgs.push(`--${binaryKey}=${value}`);
       });
 
+      d('rebuilding', path.basename(modulePath), 'with args', rebuildArgs);
       await spawnPromise(nodeGypPath, rebuildArgs, {
         cwd: modulePath,
         env: Object.assign({}, process.env, {
@@ -91,11 +100,17 @@ const _rebuild = async (lifecycle, buildPath, electronVersion, arch = process.ar
       await fs.mkdirs(path.dirname(metaPath));
       await fs.writeFile(metaPath, arch);
 
-      d('copying to prebuilt place:', path.basename(modulePath));
       const moduleName = path.basename(modulePath);
+      d('searching for .node file', path.resolve(modulePath, 'build/Release'));
+      d('testing files', (await fs.readdir(path.resolve(modulePath, 'build/Release'))));
+      const nodePath = path.resolve(modulePath, 'build/Release',
+        (await fs.readdir(path.resolve(modulePath, 'build/Release')))
+          .find((file) => file !== '.node' && file.endsWith('.node'))
+        );
       const abiPath = path.resolve(modulePath, `bin/${process.platform}-${arch}-${ABI}`);
-      const nodePath = path.resolve(modulePath, `build/Release/${moduleName}.node`);
       if (await fs.exists(nodePath)) {
+        d('found .node file', nodePath);
+        d('copying to prebuilt place:', abiPath);
         await fs.mkdirs(abiPath);
         await fs.copy(nodePath, path.resolve(abiPath, `${moduleName}.node`));
       }
