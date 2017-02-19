@@ -75,6 +75,17 @@ describe('rebuilder', () => {
       expect(skipped).to.equal(4);
     });
 
+    it('should rebuild all modules again when disabled but the electron ABI bumped', async () => {
+      await rebuild(testModulePath, '1.4.12', process.arch);
+      const rebuilder = rebuild(testModulePath, '1.6.0', process.arch, [], false);
+      let skipped = 0;
+      rebuilder.lifecycle.on('module-skip', () => {
+        skipped++;
+      });
+      await rebuilder;
+      expect(skipped).to.equal(0);
+    });
+
     it('should rebuild all modules again when enabled', async () => {
       await rebuild(testModulePath, '1.4.12', process.arch);
       const rebuilder = rebuild(testModulePath, '1.4.12', process.arch, [], true);
