@@ -66,6 +66,23 @@ Options:
 Copyright 2016
 ```
 
+### Usage with electron-packager
+
+Using `electron-rebuild` in a packager hook is really simple, a basic example is given below.
+
+```js
+import electronPackager from 'electron-packager';
+import rebuild from 'electron-rebuild';
+
+electronPackager({
+  afterCopy: [(buildPath, electronVersion, platform, arch, done) => {
+    rebuild(buildPath, electronVersion, arch)
+      .then(() => done())
+      .catch((err) => done(err));
+  }],
+})
+```
+
 ### How can I integrate this into Grunt / Gulp / Whatever?
 
 electron-rebuild is also a library that you can just require into your app or
