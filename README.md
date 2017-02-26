@@ -66,21 +66,28 @@ Options:
 Copyright 2016
 ```
 
-### Usage with electron-packager
+### How can I use this with [Electron Forge](https://github.com/electron-userland/electron-forge)?
 
-Using `electron-rebuild` in a packager hook is really simple, a basic example is given below.
+This package is automatically used with Electron Forge when packaging an Electron app.
 
-```js
-import electronPackager from 'electron-packager';
+### How can I integrate this into [Electron Packager](https://github.com/electron-userland/electron-packager)?
+
+electron-rebuild provides a function compatible with the [`afterCopy` hook](https://github.com/electron-userland/electron-packager/blob/master/docs/api.md#aftercopy)
+for Electron Packager. For example:
+
+```javascript
+import packager from 'electron-packager';
 import rebuild from 'electron-rebuild';
 
-electronPackager({
-  afterCopy: [(buildPath, electronVersion, platform, arch, done) => {
+packager({
+  // … other options
+  afterCopy: [(buildPath, electronVersion, platform, arch, callback) => {
     rebuild(buildPath, electronVersion, arch)
-      .then(() => done())
-      .catch((err) => done(err));
+      .then(() => callback())
+      .catch((error) => callback(error));
   }],
-})
+  // … other options
+});
 ```
 
 ### How can I integrate this into Grunt / Gulp / Whatever?
