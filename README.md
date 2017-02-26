@@ -1,4 +1,4 @@
-## Electron-Rebuild
+## Electron Rebuild
 
 This executable rebuilds native Node.js modules against the version of Node.js
 that your Electron project is using. This allows you to use native Node.js
@@ -16,7 +16,7 @@ npm install --save-dev electron-rebuild
 Then, whenever you install a new npm package, rerun electron-rebuild:
 
 ```sh
-./node_modules/.bin/electron-rebuild
+$(npm bin)/electron-rebuild
 ```
 
 Or if you're on Windows:
@@ -24,11 +24,11 @@ Or if you're on Windows:
 ```sh
 .\node_modules\.bin\electron-rebuild.cmd
 ```
-If you have a good node-gyp config but you see an error about a missing element on Windows like "Could not load the Visual C++ component "VCBuild.exe" , try to launch electron-rebuild in an npm script:
+If you have a good node-gyp config but you see an error about a missing element on Windows like `Could not load the Visual C++ component "VCBuild.exe"`, try to launch electron-rebuild in an npm script:
 
 ```json
 "scripts": {
-  "rebuild" : "electron-rebuild -f -w yourmodule"
+  "rebuild": "electron-rebuild -f -w yourmodule"
 }
 ```
 
@@ -95,7 +95,7 @@ packager({
 electron-rebuild is also a library that you can just require into your app or
 build process. It has a very simple API:
 
-```js
+```javascript
 import rebuild from 'electron-rebuild';
 
 // Public: Rebuilds a node_modules directory with the given Electron version.
@@ -114,7 +114,7 @@ import rebuild from 'electron-rebuild';
 
 A full build process might look something like:
 
-```js
+```javascript
 let childProcess = require('child_process');
 let pathToElectron = require('electron-prebuilt');
 
