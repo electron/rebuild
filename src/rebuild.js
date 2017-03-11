@@ -46,10 +46,11 @@ const _rebuild = async (lifecycle, buildPath, electronVersion, arch = process.ar
   const rebuildModuleAt = async (modulePath) => {
     if (await fs.exists(path.resolve(modulePath, 'binding.gyp'))) {
       const metaPath = path.resolve(modulePath, 'build', 'Release', '.forge-meta');
+      const metaData = `${arch}--${ABI}`;
       lifecycle.emit('module-found', path.basename(modulePath));
       if (!forceRebuild && await fs.exists(metaPath)) {
         const meta = await fs.readFile(metaPath, 'utf8');
-        if (meta === arch) {
+        if (meta === metaData) {
           d(`skipping: ${path.basename(modulePath)} as it is already built`);
           lifecycle.emit('module-done');
           lifecycle.emit('module-skip');
@@ -98,7 +99,7 @@ const _rebuild = async (lifecycle, buildPath, electronVersion, arch = process.ar
 
       d('built:', path.basename(modulePath));
       await fs.mkdirs(path.dirname(metaPath));
-      await fs.writeFile(metaPath, arch);
+      await fs.writeFile(metaPath, metaData);
 
       const moduleName = path.basename(modulePath);
       d('searching for .node file', path.resolve(modulePath, 'build/Release'));
