@@ -115,7 +115,7 @@ import rebuild from 'electron-rebuild';
 A full build process might look something like:
 
 ```javascript
-const rebuild = require('electron-prebuilt');
+const rebuild = require('electron-rebuild').default;
 
 rebuild(__dirname, '1.4.12')
   .then(() => console.info('Rebuild Successful'))
