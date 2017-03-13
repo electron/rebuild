@@ -93,7 +93,7 @@ packager({
 ### How can I integrate this into Grunt / Gulp / Whatever?
 
 electron-rebuild is also a library that you can just require into your app or
-build process. It has a very simple API:
+build process. It has a very simple API.
 
 ```javascript
 import rebuild from 'electron-rebuild';
@@ -115,15 +115,14 @@ import rebuild from 'electron-rebuild';
 A full build process might look something like:
 
 ```javascript
-let childProcess = require('child_process');
-let pathToElectron = require('electron-prebuilt');
+const rebuild = require('electron-rebuild').default;
 
-  rebuild(__dirname, '1.4.12')
-    .then(() => console.info('Rebuild Successful'))
-    .catch((e) => {
-      console.error("Building modules didn't work!");
-      console.error(e);
-    });
+rebuild(__dirname, '1.4.12')
+  .then(() => console.info('Rebuild Successful'))
+  .catch((e) => {
+    console.error('Building modules did not work!');
+    console.error(e);
+  });
 ```
 
 ### Alternatives
