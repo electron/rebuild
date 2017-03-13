@@ -33,7 +33,7 @@ const _rebuild = async (lifecycle, buildPath, electronVersion, arch = process.ar
   const ABI = nodeAbi.getAbi(electronVersion, 'electron');
   const nodeGypPath = await locateNodeGyp();
   if (!nodeGypPath) {
-    throw new Error('Could locate node-gyp');
+    throw new Error('Could not locate node-gyp');
   }
 
   (extraModules || []).forEach((moduleName) => {
