@@ -5,7 +5,7 @@ import * as fs from 'fs-promise';
 import * as nodeAbi from 'node-abi';
 import * as os from 'os';
 import * as path from 'path';
-import { readPackageJson } from './read-package-Json';
+import { readPackageJson } from './read-package-json';
 
 const d = debug('electron-rebuild');
 
