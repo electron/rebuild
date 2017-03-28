@@ -243,7 +243,7 @@ export function rebuild(buildPath: string,
   const lifecycle = new EventEmitter();
   const rebuilder = new Rebuilder(lifecycle, buildPath, electronVersion, arch, extraModules, forceRebuild, headerURL, types, mode);
 
-  let ret: Promise<void> & { lifecycle: EventEmitter } = rebuilder.rebuild();
+  let ret = rebuilder.rebuild() as Promise<void> & { lifecycle: EventEmitter };
   ret.lifecycle = lifecycle;
 
   return ret;

@@ -1,4 +1,4 @@
-export { default, rebuildNativeModules } from './rebuild';
+export { rebuild, rebuildNativeModules } from './rebuild';
 
 export const installNodeHeaders = () => Promise.resolve();
 export const shouldRebuildNativeModules  = () => Promise.resolve(true);

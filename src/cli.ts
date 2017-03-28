@@ -5,7 +5,7 @@ import * as fs from 'fs-promise';
 import * as path from 'path';
 import * as ora from 'ora';
 
-import rebuild from './rebuild';
+import { rebuild } from './rebuild';
 import { locateElectronPrebuilt } from './electron-locater';
 
 const yargs = require('yargs')
@@ -57,6 +57,7 @@ process.on('unhandledRejection', handler);
 
   if (!electronPrebuiltVersion) {
     try {
+      if (!electronPrebuiltPath) throw new Error("electron-prebuilt not found");
       const pkgJson = require(path.join(electronPrebuiltPath, 'package.json'));
 
       electronPrebuiltVersion = pkgJson.version;
