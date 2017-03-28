@@ -14,7 +14,7 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "pretty": true,
-    "target": "es5",
+    "target": "ES2016",
     "outDir": "lib"
   },
   "formatCodeOptions": {

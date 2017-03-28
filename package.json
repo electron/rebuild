@@ -46,6 +46,7 @@
     "@types/colors": "^1.1.1",
     "@types/debug": "0.0.29",
     "@types/es6-promise": "0.0.32",
+    "@types/fs-promise": "^1.0.1",
     "@types/mocha": "^2.2.40",
     "@types/node": "^7.0.12",
     "@types/ora": "^0.3.31",
