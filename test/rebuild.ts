@@ -22,7 +22,9 @@ describe('rebuilder', () => {
     });
   };
 
-  describe('core behavior', () => {
+  describe('core behavior', function() {
+    this.timeout(2 * 60 * 1000);
+
     before(resetTestModule);
 
     before(async () => {
@@ -60,7 +62,9 @@ describe('rebuilder', () => {
     });
   });
 
-  describe('force rebuild', () => {
+  describe('force rebuild', function() {
+    this.timeout(2 * 60 * 1000);
+
     before(resetTestModule);
 
     it('should skip the rebuild step when disabled', async () => {

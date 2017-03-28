@@ -23,7 +23,9 @@ const testElectronCanBeFound = () => {
   });
 };
 
-describe('locateElectronPrebuilt', () => {
+describe('locateElectronPrebuilt', function() {
+  this.timeout(30*1000);
+
   before(() => uninstall('electron-prebuilt'));
 
   it('should return null when electron is not installed', () => {

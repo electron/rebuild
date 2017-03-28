@@ -7,7 +7,7 @@
   "scripts": {
     "compile": "tsc",
     "prepublish": "npm run compile",
-    "test": "mocha --compilers ts:ts-node/register ./test/*",
+    "test": "mocha --compilers ts:ts-node/register ./test/*.ts",
     "lint": "tslint \"src/**/*.ts\" \"test/**/*.ts\""
   },
   "bin": {
