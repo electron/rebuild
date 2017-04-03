@@ -1,12 +1,11 @@
-import fs from 'fs-promise';
-import path from 'path';
-import os from 'os';
-import ora from 'ora';
+import * as fs from 'fs-promise';
+import * as path from 'path';
+import * as os from 'os';
+import * as ora from 'ora';
+
 import { spawnPromise } from 'spawn-rx';
-
 import { expect } from 'chai';
-
-import rebuild from '../lib/rebuild';
+import { rebuild } from '../src/rebuild';
 
 ora.ora = ora;
 
@@ -23,7 +22,9 @@ describe('rebuilder', () => {
     });
   };
 
-  describe('core behavior', () => {
+  describe('core behavior', function() {
+    this.timeout(2 * 60 * 1000);
+
     before(resetTestModule);
 
     before(async () => {
@@ -61,7 +62,9 @@ describe('rebuilder', () => {
     });
   });
 
-  describe('force rebuild', () => {
+  describe('force rebuild', function() {
+    this.timeout(2 * 60 * 1000);
+
     before(resetTestModule);
 
     it('should skip the rebuild step when disabled', async () => {

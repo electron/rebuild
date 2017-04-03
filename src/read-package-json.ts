@@ -1,7 +1,7 @@
-import fs from 'fs-promise';
-import path from 'path';
+import * as fs from 'fs-promise';
+import * as path from 'path';
 
-export default async (dir, safe = false) => {
+export async function readPackageJson(dir: string, safe = false) {
   let packageData;
   try {
     packageData = await fs.readFile(path.resolve(dir, 'package.json'), 'utf8');
@@ -12,5 +12,6 @@ export default async (dir, safe = false) => {
       throw err;
     }
   }
+
   return JSON.parse(packageData);
 };

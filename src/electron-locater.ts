@@ -1,10 +1,10 @@
-import fs from 'fs';
-import path from 'path';
+import * as fs from 'fs';
+import * as path from 'path';
 
 const possibleModuleNames = ['electron', 'electron-prebuilt', 'electron-prebuilt-compile'];
 
 export function locateElectronPrebuilt() {
-  let electronPath;
+  let electronPath: string | null = null;
 
   // Attempt to locate modules by path
   let foundModule = possibleModuleNames.some((moduleName) => {
@@ -22,6 +22,7 @@ export function locateElectronPrebuilt() {
     } catch (e) {
       return false;
     }
+
     return fs.existsSync(electronPath);
   });
 

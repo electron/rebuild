@@ -1,28 +1,31 @@
-import fs from 'fs';
-import path from 'path';
+import * as fs from 'fs';
+import * as path from 'path';
 import { expect } from 'chai';
 import { spawnPromise } from 'spawn-rx';
 
-import { locateElectronPrebuilt } from '../lib/electron-locater';
+import { locateElectronPrebuilt } from '../src/electron-locater';
 
-const packageCommand = (command, packageName) =>
-  spawnPromise('npm', [command, packageName], {
+function packageCommand(command: string, packageName: string) {
+  return spawnPromise('npm', [command, packageName], {
     cwd: path.resolve(__dirname, '..'),
     stdio: 'ignore',
-  });
+  })
+}
 
-const install = packageCommand.bind(this, 'install');
-const uninstall = packageCommand.bind(this, 'uninstall');
+const install: ((s: string) => Promise<void>) = packageCommand.bind(null, 'install');
+const uninstall: ((s: string) => Promise<void>) = packageCommand.bind(null, 'uninstall');
 
 const testElectronCanBeFound = () => {
   it('should return a valid path', () => {
     const electronPath = locateElectronPrebuilt();
     expect(electronPath).to.be.a('string');
-    expect(fs.existsSync(electronPath)).to.be.equal(true);
+    expect(fs.existsSync(electronPath!)).to.be.equal(true);
   });
 };
 
-describe('locateElectronPrebuilt', () => {
+describe('locateElectronPrebuilt', function() {
+  this.timeout(30*1000);
+
   before(() => uninstall('electron-prebuilt'));
 
   it('should return null when electron is not installed', () => {

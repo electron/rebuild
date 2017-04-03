@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
 import 'colors';
-import fs from 'fs-promise';
-import path from 'path';
-import ora from 'ora';
+import * as fs from 'fs-promise';
+import * as path from 'path';
+import * as ora from 'ora';
 
-import rebuild from './rebuild.js';
+import { rebuild } from './rebuild';
 import { locateElectronPrebuilt } from './electron-locater';
 
 const yargs = require('yargs')
@@ -41,11 +41,12 @@ if (argv.h) {
   process.exit(0);
 }
 
-const handler = (err) => {
+const handler = (err: Error) => {
   console.error('An unhandled error occurred inside electron-rebuild'.red);
   console.error(`${err.message}\n\n${err.stack}`.red);
   process.exit(-1);
 };
+
 process.on('uncaughtException', handler);
 process.on('unhandledRejection', handler);
 
@@ -56,6 +57,7 @@ process.on('unhandledRejection', handler);
 
   if (!electronPrebuiltVersion) {
     try {
+      if (!electronPrebuiltPath) throw new Error("electron-prebuilt not found");
       const pkgJson = require(path.join(electronPrebuiltPath, 'package.json'));
 
       electronPrebuiltVersion = pkgJson.version;
@@ -85,8 +87,9 @@ process.on('unhandledRejection', handler);
   let modulesDone = 0;
   let moduleTotal = 0;
   const rebuildSpinner = ora('Searching dependency tree').start();
-  let lastModuleName;
-  const redraw = (moduleName) => {
+  let lastModuleName: string;
+
+  const redraw = (moduleName?: string) => {
     if (moduleName) lastModuleName = moduleName;
     if (argv.p) {
       rebuildSpinner.text = `Building modules: ${modulesDone}/${moduleTotal}`;
@@ -94,16 +97,21 @@ process.on('unhandledRejection', handler);
       rebuildSpinner.text = `Building module: ${lastModuleName}, Completed: ${modulesDone}`;
     }
   }
+
   const rebuilder = rebuild(rootDirectory, electronPrebuiltVersion, argv.a || process.arch, argv.w ? argv.w.split(',') : [], argv.f, argv.d, argv.t ? argv.t.split(',') : ['prod', 'dev'], argv.p ? 'parallel' : (argv.s ? 'sequential' : undefined));
+
   const lifecycle = rebuilder.lifecycle;
-  lifecycle.on('module-found', (moduleName) => {
+
+  lifecycle.on('module-found', (moduleName: string) => {
     moduleTotal += 1;
     redraw(moduleName);
   });
+
   lifecycle.on('module-done', () => {
     modulesDone += 1;
     redraw();
   });
+
   try {
     await rebuilder;
   } catch (err) {
@@ -111,6 +119,7 @@ process.on('unhandledRejection', handler);
     rebuildSpinner.fail();
     throw err;
   }
+
   rebuildSpinner.text = 'Rebuild Complete';
   rebuildSpinner.succeed();
 })();
