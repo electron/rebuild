@@ -30,14 +30,14 @@ class Rebuilder {
   rebuilds: (() => Promise<void>)[];
 
   constructor(
-      public lifecycle: EventEmitter, 
-      public buildPath: string, 
-      public electronVersion: string, 
-      public arch = process.arch, 
-      public extraModules: string[] = [], 
-      public forceRebuild = false, 
-      public headerURL = 'https://atom.io/download/electron', 
-      public types = ['prod', 'optional'], 
+      public lifecycle: EventEmitter,
+      public buildPath: string,
+      public electronVersion: string,
+      public arch = process.arch,
+      public extraModules: string[] = [],
+      public forceRebuild = false,
+      public headerURL = 'https://atom.io/download/electron',
+      public types = ['prod', 'optional'],
       public mode = defaultMode) {
     this.ABI = nodeAbi.getAbi(electronVersion, 'electron');
     this.prodDeps = extraModules.reduce((acc, x) => acc.add(x), new Set());
@@ -87,7 +87,9 @@ class Rebuilder {
   }
 
   async rebuildModuleAt(modulePath: string) {
-    if (!(await fs.exists(path.resolve(modulePath, 'binding.gyp')))) return;
+    if (!(await fs.exists(path.resolve(modulePath, 'binding.gyp')))) {
+      return;
+    }
 
     const nodeGypPath = await locateNodeGyp();
     if (!nodeGypPath) {
@@ -212,7 +214,9 @@ class Rebuilder {
   };
 
   async markChildrenAsProdDeps(modulePath: string) {
-    if (!await fs.exists(modulePath)) return;
+    if (!await fs.exists(modulePath)) {
+      return;
+    }
 
     d('exploring', modulePath);
     const childPackageJson = await readPackageJson(modulePath);
@@ -220,7 +224,10 @@ class Rebuilder {
 
     const callback = this.markChildrenAsProdDeps.bind(this);
     Object.keys(childPackageJson.dependencies || {}).concat(Object.keys(childPackageJson.optionalDependencies || {})).forEach((key) => {
-      if (this.prodDeps[key]) return;
+      if (this.prodDeps[key]) {
+        return;
+      }
+
       this.prodDeps[key] = true;
 
       moduleWait.push(this.findModule(key, modulePath, callback));
@@ -230,13 +237,14 @@ class Rebuilder {
   };
 }
 
-export function rebuild(buildPath: string, 
-    electronVersion: string, 
-    arch = process.arch, 
-    extraModules: string[] = [], 
-    forceRebuild = false, 
-    headerURL = 'https://atom.io/download/electron', 
-    types = ['prod', 'optional'], 
+export function rebuild(
+    buildPath: string,
+    electronVersion: string,
+    arch = process.arch,
+    extraModules: string[] = [],
+    forceRebuild = false,
+    headerURL = 'https://atom.io/download/electron',
+    types = ['prod', 'optional'],
     mode = defaultMode) {
 
   d('rebuilding with args:', arguments);
@@ -249,7 +257,16 @@ export function rebuild(buildPath: string,
   return ret;
 }
 
-export const rebuildNativeModules = (electronVersion: string, modulePath: string, whichModule='', _headersDir: string | null = null, arch=process.arch, _command: string, _ignoreDevDeps=false, _ignoreOptDeps=false, _verbose=false) => {
+export function rebuildNativeModules(
+    electronVersion: string,
+    modulePath: string,
+    whichModule= '',
+    _headersDir: string | null = null,
+    arch= process.arch,
+    _command: string,
+    _ignoreDevDeps= false,
+    _ignoreOptDeps= false,
+    _verbose= false) {
   if (path.basename(modulePath) === 'node_modules') {
     modulePath = path.dirname(modulePath);
   }
