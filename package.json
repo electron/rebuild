@@ -3,7 +3,7 @@
   "version": "1.5.7",
   "description": "Electron supporting package to rebuild native node modules against the currently installed electron",
   "main": "lib/src/main.js",
-  "typings": "lib/src/index.d.ts",
+  "typings": "lib/src/main.d.ts",
   "scripts": {
     "compile": "tsc",
     "prepublish": "npm run compile",
