@@ -110,6 +110,10 @@ class Rebuilder {
         return;
       }
     }
+    if (await fs.exists(path.resolve(modulePath, 'prebuilds', `${process.platform}-${this.arch}`, `electron-${this.ABI}.node`))) {
+      d(`skipping: ${path.basename(modulePath)} as it was prebuilt`);
+      return;
+    }
     d('rebuilding:', path.basename(modulePath));
     const rebuildArgs = [
       'rebuild',

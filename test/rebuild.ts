@@ -36,6 +36,11 @@ describe('rebuilder', () => {
       expect(await fs.exists(forgeMeta), 'ref build meta should exist').to.equal(true);
     });
 
+    it('should not have rebuild top level prod dependencies that are prebuilt', async () => {
+      const forgeMeta = path.resolve(testModulePath, 'node_modules', 'sodium-native', 'build', 'Release', '.forge-meta');
+      expect(await fs.exists(forgeMeta), 'ref build meta should exist').to.equal(false);
+    });
+
     it('should have rebuilt children of top level prod dependencies', async () => {
       const forgeMetaGoodNPM = path.resolve(testModulePath, 'node_modules', 'microtime', 'build', 'Release', '.forge-meta');
       const forgeMetaBadNPM = path.resolve(testModulePath, 'node_modules', 'benchr', 'node_modules', 'microtime', 'build', 'Release', '.forge-meta');
