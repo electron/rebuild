@@ -35,6 +35,7 @@
     "fs-promise": "^2.0.2",
     "node-abi": "^2.0.0",
     "node-gyp": "^3.6.0",
+    "node-pre-gyp": "^0.6.34",
     "ora": "^1.2.0",
     "rimraf": "^2.6.1",
     "spawn-rx": "^2.0.10",
