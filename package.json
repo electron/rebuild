@@ -11,7 +11,7 @@
     "lint": "tslint \"src/**/*.ts\" \"test/**/*.ts\""
   },
   "bin": {
-    "electron-rebuild": "lib/cli.js"
+    "electron-rebuild": "lib/src/cli.js"
   },
   "repository": {
     "type": "git",
