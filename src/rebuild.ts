@@ -175,7 +175,9 @@ class Rebuilder {
     });
 
     d('built:', moduleName);
-    await fs.mkdirs(path.dirname(metaPath));
+    if (!(await fs.exists(metaPath))) {
+      await fs.mkdirs(path.dirname(metaPath));
+    }
     await fs.writeFile(metaPath, metaData);
 
     d('searching for .node file', moduleBinaryPath);
@@ -189,7 +191,9 @@ class Rebuilder {
     if (await fs.exists(nodePath)) {
       d('found .node file', nodePath);
       d('copying to prebuilt place:', abiPath);
-      await fs.mkdirs(abiPath);
+      if (!(await fs.exists(abiPath))) {
+        await fs.mkdirs(abiPath);
+      }
       await fs.copy(nodePath, path.resolve(abiPath, `${moduleName}.node`));
     }
 
