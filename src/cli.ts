@@ -4,11 +4,12 @@ import 'colors';
 import * as fs from 'fs-promise';
 import * as path from 'path';
 import * as ora from 'ora';
+import * as yargs from 'yargs';
 
 import { rebuild } from './rebuild';
 import { locateElectronPrebuilt } from './electron-locater';
 
-const yargs = require('yargs')
+const args = yargs
   .usage('Usage: electron-rebuild --version [version] --module-dir [path]')
   .help('h')
   .alias('h', 'help')
@@ -36,7 +37,7 @@ const yargs = require('yargs')
   .alias('s', 'sequential')
   .epilog('Copyright 2016');
 
-const argv = yargs.argv;
+const argv = args.argv;
 
 if (argv.h) {
   yargs.showHelp();
@@ -59,7 +60,10 @@ process.on('unhandledRejection', handler);
 
   if (!electronPrebuiltVersion) {
     try {
-      if (!electronPrebuiltPath) throw new Error("electron-prebuilt not found");
+      if (!electronPrebuiltPath) {
+        throw new Error('electron-prebuilt not found');
+      }
+
       const pkgJson = require(path.join(electronPrebuiltPath, 'package.json'));
 
       electronPrebuiltVersion = pkgJson.version;
@@ -92,13 +96,16 @@ process.on('unhandledRejection', handler);
   let lastModuleName: string;
 
   const redraw = (moduleName?: string) => {
-    if (moduleName) lastModuleName = moduleName;
+    if (moduleName) {
+      lastModuleName = moduleName;
+    }
+
     if (argv.p) {
       rebuildSpinner.text = `Building modules: ${modulesDone}/${moduleTotal}`;
     } else {
       rebuildSpinner.text = `Building module: ${lastModuleName}, Completed: ${modulesDone}`;
     }
-  }
+  };
 
   const rebuilder = rebuild(
     rootDirectory,
