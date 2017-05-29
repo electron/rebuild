@@ -100,7 +100,15 @@ process.on('unhandledRejection', handler);
     }
   }
 
-  const rebuilder = rebuild(rootDirectory, electronPrebuiltVersion, argv.a || process.arch, argv.w ? argv.w.split(',') : [], argv.f, argv.d, argv.t ? argv.t.split(',') : ['prod', 'dev'], argv.p ? 'parallel' : (argv.s ? 'sequential' : undefined), argv.o ? argv.o.split(',') : []);
+  const rebuilder = rebuild(
+    rootDirectory,
+    electronPrebuiltVersion,
+    argv.a || process.arch,
+    argv.w ? argv.w.split(',') : [],
+    argv.o ? argv.o.split(',') : [],
+    argv.f, argv.d, argv.t ? argv.t.split(',') : ['prod', 'dev'],
+    argv.p ? 'parallel' : (argv.s ? 'sequential' : undefined)
+  );
 
   const lifecycle = rebuilder.lifecycle;
 

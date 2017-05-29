@@ -74,7 +74,7 @@ describe('rebuilder', () => {
 
     it('should skip the rebuild step when disabled', async () => {
       await rebuild(testModulePath, '1.4.12', process.arch);
-      const rebuilder = rebuild(testModulePath, '1.4.12', process.arch, [], false);
+      const rebuilder = rebuild(testModulePath, '1.4.12', process.arch, [], [], false);
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
         skipped++;
@@ -85,7 +85,7 @@ describe('rebuilder', () => {
 
     it('should rebuild all modules again when disabled but the electron ABI bumped', async () => {
       await rebuild(testModulePath, '1.4.12', process.arch);
-      const rebuilder = rebuild(testModulePath, '1.6.0', process.arch, [], false);
+      const rebuilder = rebuild(testModulePath, '1.6.0', process.arch, [], [], false);
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
         skipped++;
@@ -96,13 +96,36 @@ describe('rebuilder', () => {
 
     it('should rebuild all modules again when enabled', async () => {
       await rebuild(testModulePath, '1.4.12', process.arch);
-      const rebuilder = rebuild(testModulePath, '1.4.12', process.arch, [], true);
+      const rebuilder = rebuild(testModulePath, '1.4.12', process.arch, [], [], true);
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
         skipped++;
       });
       await rebuilder;
       expect(skipped).to.equal(0);
+    });
+  });
+
+  describe('only rebuild', function() {
+    this.timeout(2 * 60 * 1000);
+
+    beforeEach(resetTestModule);
+    afterEach(async () => await fs.remove(testModulePath));
+
+    it('should rebuild only specified module', async () => {
+      const rebuilder = rebuild(testModulePath, '1.4.12', process.arch, [], ['ffi'], true);
+      let builded = 0;
+      rebuilder.lifecycle.on('module-done', () => builded++);
+      await rebuilder;
+      expect(builded).to.equal(1);
+    });
+
+    it('should rebuild multiple specified module via --only option', async () => {
+      const rebuilder = rebuild(testModulePath, '1.4.12', process.arch, [], ['ffi', '@newrelic/native-metrics'], true);
+      let builded = 0;
+      rebuilder.lifecycle.on('module-done', () => builded++);
+      await rebuilder;
+      expect(builded).to.equal(2);
     });
   });
 });

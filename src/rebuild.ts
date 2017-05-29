@@ -35,11 +35,11 @@ class Rebuilder {
       public electronVersion: string,
       public arch = process.arch,
       public extraModules: string[] = [],
+      public onlyModules: string[] = [],
       public forceRebuild = false,
       public headerURL = 'https://atom.io/download/electron',
       public types = ['prod', 'optional'],
-      public mode = defaultMode,
-      public onlyModules: string[] = []) {
+      public mode = defaultMode) {
     this.ABI = nodeAbi.getAbi(electronVersion, 'electron');
     this.prodDeps = {};
     this.rebuilds = [];
@@ -255,15 +255,15 @@ export function rebuild(
     electronVersion: string,
     arch = process.arch,
     extraModules: string[] = [],
+    onlyModules: string[] = [],
     forceRebuild = false,
     headerURL = 'https://atom.io/download/electron',
     types = ['prod', 'optional'],
-    mode = defaultMode,
-    onlyModules: string[] = []) {
+    mode = defaultMode) {
 
   d('rebuilding with args:', arguments);
   const lifecycle = new EventEmitter();
-  const rebuilder = new Rebuilder(lifecycle, buildPath, electronVersion, arch, extraModules, forceRebuild, headerURL, types, mode, onlyModules);
+  const rebuilder = new Rebuilder(lifecycle, buildPath, electronVersion, arch, extraModules, onlyModules, forceRebuild, headerURL, types, mode);
 
   let ret = rebuilder.rebuild() as Promise<void> & { lifecycle: EventEmitter };
   ret.lifecycle = lifecycle;
