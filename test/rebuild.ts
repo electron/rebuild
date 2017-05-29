@@ -15,7 +15,9 @@ describe('rebuilder', () => {
   const resetTestModule = async () => {
     await fs.remove(testModulePath);
     await fs.mkdirs(testModulePath);
-    await fs.writeFile(path.resolve(testModulePath, 'package.json'), await fs.readFile(path.resolve(__dirname, '../test/fixture/native-app1/package.json'), 'utf8'));
+    await fs.writeFile(
+      path.resolve(testModulePath, 'package.json'), await fs.readFile(path.resolve(__dirname, '../test/fixture/native-app1/package.json'), 'utf8')
+    );
     await spawnPromise('npm', ['install'], {
       cwd: testModulePath,
       stdio: 'inherit',
