@@ -22,6 +22,8 @@ const yargs = require('yargs')
   .alias('m', 'module-dir')
   .describe('w', 'A specific module to build, or comma separated list of modules')
   .alias('w', 'which-module')
+  .describe('o', 'Only build specified module, or comma separated list of modules. All others are ignored.')
+  .alias('o', 'only')
   .describe('e', 'The path to electron-prebuilt')
   .alias('e', 'electron-prebuilt-dir')
   .describe('d', 'Custom header tarball URL')
@@ -53,7 +55,7 @@ process.on('unhandledRejection', handler);
 
 (async () => {
   const electronPrebuiltPath = argv.e ? path.resolve(process.cwd(), argv.e) : locateElectronPrebuilt();
-  let electronPrebuiltVersion = argv.v; 
+  let electronPrebuiltVersion = argv.v;
 
   if (!electronPrebuiltVersion) {
     try {
@@ -83,7 +85,7 @@ process.on('unhandledRejection', handler);
   } else {
     rootDirectory = path.resolve(process.cwd(), rootDirectory);
   }
-  
+
   let modulesDone = 0;
   let moduleTotal = 0;
   const rebuildSpinner = ora('Searching dependency tree').start();
@@ -98,7 +100,7 @@ process.on('unhandledRejection', handler);
     }
   }
 
-  const rebuilder = rebuild(rootDirectory, electronPrebuiltVersion, argv.a || process.arch, argv.w ? argv.w.split(',') : [], argv.f, argv.d, argv.t ? argv.t.split(',') : ['prod', 'dev'], argv.p ? 'parallel' : (argv.s ? 'sequential' : undefined));
+  const rebuilder = rebuild(rootDirectory, electronPrebuiltVersion, argv.a || process.arch, argv.w ? argv.w.split(',') : [], argv.f, argv.d, argv.t ? argv.t.split(',') : ['prod', 'dev'], argv.p ? 'parallel' : (argv.s ? 'sequential' : undefined), argv.o ? argv.o.split(',') : []);
 
   const lifecycle = rebuilder.lifecycle;
 
