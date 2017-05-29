@@ -4,11 +4,12 @@ import 'colors';
 import * as fs from 'fs-promise';
 import * as path from 'path';
 import * as ora from 'ora';
+import * as yargs from 'yargs';
 
 import { rebuild } from './rebuild';
 import { locateElectronPrebuilt } from './electron-locater';
 
-const yargs = require('yargs')
+const args = yargs
   .usage('Usage: electron-rebuild --version [version] --module-dir [path]')
   .help('h')
   .alias('h', 'help')
@@ -22,6 +23,8 @@ const yargs = require('yargs')
   .alias('m', 'module-dir')
   .describe('w', 'A specific module to build, or comma separated list of modules')
   .alias('w', 'which-module')
+  .describe('o', 'Only build specified module, or comma separated list of modules. All others are ignored.')
+  .alias('o', 'only')
   .describe('e', 'The path to electron-prebuilt')
   .alias('e', 'electron-prebuilt-dir')
   .describe('d', 'Custom header tarball URL')
@@ -34,7 +37,7 @@ const yargs = require('yargs')
   .alias('s', 'sequential')
   .epilog('Copyright 2016');
 
-const argv = yargs.argv;
+const argv = args.argv;
 
 if (argv.h) {
   yargs.showHelp();
@@ -53,11 +56,14 @@ process.on('unhandledRejection', handler);
 
 (async () => {
   const electronPrebuiltPath = argv.e ? path.resolve(process.cwd(), argv.e) : locateElectronPrebuilt();
-  let electronPrebuiltVersion = argv.v; 
+  let electronPrebuiltVersion = argv.v;
 
   if (!electronPrebuiltVersion) {
     try {
-      if (!electronPrebuiltPath) throw new Error("electron-prebuilt not found");
+      if (!electronPrebuiltPath) {
+        throw new Error('electron-prebuilt not found');
+      }
+
       const pkgJson = require(path.join(electronPrebuiltPath, 'package.json'));
 
       electronPrebuiltVersion = pkgJson.version;
@@ -83,22 +89,33 @@ process.on('unhandledRejection', handler);
   } else {
     rootDirectory = path.resolve(process.cwd(), rootDirectory);
   }
-  
+
   let modulesDone = 0;
   let moduleTotal = 0;
   const rebuildSpinner = ora('Searching dependency tree').start();
   let lastModuleName: string;
 
   const redraw = (moduleName?: string) => {
-    if (moduleName) lastModuleName = moduleName;
+    if (moduleName) {
+      lastModuleName = moduleName;
+    }
+
     if (argv.p) {
       rebuildSpinner.text = `Building modules: ${modulesDone}/${moduleTotal}`;
     } else {
       rebuildSpinner.text = `Building module: ${lastModuleName}, Completed: ${modulesDone}`;
     }
-  }
+  };
 
-  const rebuilder = rebuild(rootDirectory, electronPrebuiltVersion, argv.a || process.arch, argv.w ? argv.w.split(',') : [], argv.f, argv.d, argv.t ? argv.t.split(',') : ['prod', 'dev'], argv.p ? 'parallel' : (argv.s ? 'sequential' : undefined));
+  const rebuilder = rebuild(
+    rootDirectory,
+    electronPrebuiltVersion,
+    argv.a || process.arch,
+    argv.w ? argv.w.split(',') : [],
+    argv.o ? argv.o.split(',') : [],
+    argv.f, argv.d, argv.t ? argv.t.split(',') : ['prod', 'dev'],
+    argv.p ? 'parallel' : (argv.s ? 'sequential' : undefined)
+  );
 
   const lifecycle = rebuilder.lifecycle;
 

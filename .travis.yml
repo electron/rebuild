@@ -1,20 +1,21 @@
 language: node_js
-node_js:
-- '6'
-
 sudo: false
-
-os:
-- linux
-- osx
-
 env:
   global:
     - CC=clang CXX=clang++ npm_config_clang=1
 
-branches:
-  only:
-  - master
-  - /^v\d+\.\d+\.\d+/
+matrix:
+  fast_finish: true
+  include:
+    - node_js: "6"
+      os: linux
+      env: SCRIPT=lint
+    - node_js: "6"
+      os: linux
+      env: SCRIPT=test
+    - node_js: "6"
+      os: osx
+      env: SCRIPT=test
 
-script: npm run test
+script:
+  - if [[ "$SCRIPT" ]]; then npm run-script $SCRIPT; fi

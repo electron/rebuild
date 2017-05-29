@@ -26,7 +26,7 @@ const locateNodeGyp = async () => {
 class Rebuilder {
   ABI: string;
   nodeGypPath: string;
-  prodDeps: Set<string>;
+  prodDeps: { [key: string]: boolean };
   rebuilds: (() => Promise<void>)[];
 
   constructor(
@@ -35,12 +35,13 @@ class Rebuilder {
       public electronVersion: string,
       public arch = process.arch,
       public extraModules: string[] = [],
+      public onlyModules: string[] = [],
       public forceRebuild = false,
       public headerURL = 'https://atom.io/download/electron',
       public types = ['prod', 'optional'],
       public mode = defaultMode) {
     this.ABI = nodeAbi.getAbi(electronVersion, 'electron');
-    this.prodDeps = extraModules.reduce((acc, x) => acc.add(x), new Set());
+    this.prodDeps = {};
     this.rebuilds = [];
   }
 
@@ -53,7 +54,6 @@ class Rebuilder {
     this.lifecycle.emit('start');
 
     const rootPackageJson = await readPackageJson(this.buildPath);
-    const markWaiters: Promise<void>[] = [];
     const depKeys = [];
 
     if (this.types.indexOf('prod') !== -1) {
@@ -66,9 +66,18 @@ class Rebuilder {
       depKeys.push(...Object.keys(rootPackageJson.devDependencies || {}));
     }
 
-    depKeys.forEach((key) => {
-      this.prodDeps[key] = true;
-      markWaiters.push(this.markChildrenAsProdDeps(path.resolve(this.buildPath, 'node_modules', key)));
+    const markWaiters: Promise<void>[] = depKeys.map((key: string) => {
+      if (!this.onlyModules.length) {
+        this.prodDeps[key] = true;
+      } else {
+        if (this.onlyModules.indexOf(key) !== -1) {
+          this.prodDeps[key] = true;
+        } else {
+          this.prodDeps[key] = false;
+        }
+      }
+
+      return this.markChildrenAsProdDeps(path.resolve(this.buildPath, 'node_modules', key));
     });
 
     await Promise.all(markWaiters);
@@ -246,6 +255,7 @@ export function rebuild(
     electronVersion: string,
     arch = process.arch,
     extraModules: string[] = [],
+    onlyModules: string[] = [],
     forceRebuild = false,
     headerURL = 'https://atom.io/download/electron',
     types = ['prod', 'optional'],
@@ -253,7 +263,7 @@ export function rebuild(
 
   d('rebuilding with args:', arguments);
   const lifecycle = new EventEmitter();
-  const rebuilder = new Rebuilder(lifecycle, buildPath, electronVersion, arch, extraModules, forceRebuild, headerURL, types, mode);
+  const rebuilder = new Rebuilder(lifecycle, buildPath, electronVersion, arch, extraModules, onlyModules, forceRebuild, headerURL, types, mode);
 
   let ret = rebuilder.rebuild() as Promise<void> & { lifecycle: EventEmitter };
   ret.lifecycle = lifecycle;
