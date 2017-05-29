@@ -13,7 +13,9 @@ export function locateElectronPrebuilt() {
   });
 
   // Return a path if we found one
-  if (foundModule) return electronPath;
+  if (foundModule) {
+    return electronPath;
+  }
 
   // Attempt to locate modules by require
   foundModule = possibleModuleNames.some((moduleName) => {
@@ -27,6 +29,9 @@ export function locateElectronPrebuilt() {
   });
 
   // Return a path if we found one
-  if (foundModule) return electronPath;
+  if (foundModule) {
+    return electronPath;
+  }
+
   return null;
 }
