@@ -32,7 +32,7 @@
   "dependencies": {
     "colors": "^1.1.2",
     "debug": "^2.6.3",
-    "fs-promise": "^2.0.2",
+    "fs-extra": "^3.0.1",
     "node-abi": "^2.0.0",
     "node-gyp": "^3.6.0",
     "ora": "^1.2.0",
@@ -45,8 +45,7 @@
     "@types/chai-as-promised": "0.0.30",
     "@types/colors": "^1.1.1",
     "@types/debug": "0.0.29",
-    "@types/fs-extra": "^2.0.0",
-    "@types/fs-promise": "^1.0.1",
+    "@types/fs-extra": "^3.0.3",
     "@types/mocha": "^2.2.40",
     "@types/node": "^7.0.12",
     "@types/ora": "^0.3.31",

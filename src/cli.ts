@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import 'colors';
-import * as fs from 'fs-promise';
+import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as ora from 'ora';
 
@@ -53,7 +53,7 @@ process.on('unhandledRejection', handler);
 
 (async () => {
   const electronPrebuiltPath = argv.e ? path.resolve(process.cwd(), argv.e) : locateElectronPrebuilt();
-  let electronPrebuiltVersion = argv.v; 
+  let electronPrebuiltVersion = argv.v;
 
   if (!electronPrebuiltVersion) {
     try {
@@ -83,7 +83,7 @@ process.on('unhandledRejection', handler);
   } else {
     rootDirectory = path.resolve(process.cwd(), rootDirectory);
   }
-  
+
   let modulesDone = 0;
   let moduleTotal = 0;
   const rebuildSpinner = ora('Searching dependency tree').start();
