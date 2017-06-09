@@ -18,5 +18,6 @@ branches:
   - /^v\d+\.\d+\.\d+/
 
 before_script:
+  # remove "electron" folder for electron-locater tests
   - cd ../../ && mv ./electron/electron-rebuild/ ./electron-rebuild/ && rm -rf ./electron/ && cd ./electron-rebuild/
 script: npm run test
