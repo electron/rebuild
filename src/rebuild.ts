@@ -28,8 +28,8 @@ class Rebuilder {
   nodeGypPath: string;
   prodDeps: Set<string>;
   rebuilds: (() => Promise<void>)[];
-  realModulePaths: Array<string>;
-  realNodeModulesPaths: Array<string>;
+  realModulePaths: Set<string>;
+  realNodeModulesPaths: Set<string>;
 
   constructor(
       public lifecycle: EventEmitter,
@@ -44,8 +44,8 @@ class Rebuilder {
     this.ABI = nodeAbi.getAbi(electronVersion, 'electron');
     this.prodDeps = extraModules.reduce((acc, x) => acc.add(x), new Set());
     this.rebuilds = [];
-    this.realModulePaths = [];
-    this.realNodeModulesPaths = [];
+    this.realModulePaths = new Set();
+    this.realNodeModulesPaths = new Set();
   }
 
   async rebuild() {
@@ -191,11 +191,10 @@ class Rebuilder {
     // While we use `cnpm`, it will make a circle scanning the dep tree.
     // We also need to ensure that the `node_modules` which we are scanning has never came before.
     const realNodeModulesPath = fs.realpathSync(nodeModulesPath);
-    if (this.realNodeModulesPaths.indexOf(realNodeModulesPath) > -1) {
+    if (this.realNodeModulesPaths.has(realNodeModulesPath)) {
       return;
-    } else {
-      this.realNodeModulesPaths.push(realNodeModulesPath);
     }
+    this.realNodeModulesPaths.add(realNodeModulesPath);
 
     d('scanning:', realNodeModulesPath);
 
@@ -206,11 +205,10 @@ class Rebuilder {
       const finalPath = path.resolve(nodeModulesPath, modulePath);
       const realPath = fs.realpathSync(finalPath);
 
-      if (this.realModulePaths.indexOf(realPath) > -1) {
+      if (this.realModulePaths.has(realPath)) {
         continue;
-      } else {
-        this.realModulePaths.push(realPath);
       }
+      this.realModulePaths.add(realPath);
 
       if (this.prodDeps[`${prefix}${modulePath}`]) {
         this.rebuilds.push(() => this.rebuildModuleAt(realPath));
@@ -305,4 +303,3 @@ export function rebuildNativeModules(
 
   return rebuild(modulePath, electronVersion, arch, whichModule.split(','));
 };
-
