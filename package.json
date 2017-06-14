@@ -6,6 +6,7 @@
   "typings": "lib/src/main.d.ts",
   "scripts": {
     "compile": "tsc",
+    "watch": "tsc -w",
     "prepublish": "npm run compile",
     "test": "mocha --compilers ts:ts-node/register ./test/*.ts",
     "lint": "tslint \"src/**/*.ts\" \"test/**/*.ts\""
@@ -54,7 +55,7 @@
     "@types/yargs": "^6.6.0",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
-    "electron-prebuilt": "^1.4.13",
+    "electron": "^1.4.13",
     "mocha": "^3.2.0",
     "ts-node": "^3.0.2",
     "tslint": "^4.5.1",
