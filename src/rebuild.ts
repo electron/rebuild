@@ -7,9 +7,28 @@ import * as os from 'os';
 import * as path from 'path';
 import { readPackageJson } from './read-package-json';
 
+export type ModuleType = 'prod' | 'dev' | 'optional';
+export type RebuildMode = 'sequential' | 'parallel';
+
+export interface RebuildOptions {
+  buildPath: string;
+  electronVersion: string;
+  arch?: string;
+  extraModules?: string[];
+  force?: boolean;
+  headerURL?: string;
+  types?: ModuleType[];
+  mode?: RebuildMode;
+}
+
+export interface RebuilderOptions extends RebuildOptions {
+  lifecycle: EventEmitter;
+}
+
 const d = debug('electron-rebuild');
 
-const defaultMode = process.platform === 'win32' ? 'sequential' : 'parallel';
+const defaultMode: RebuildMode = process.platform === 'win32' ? 'sequential' : 'parallel';
+const defaultTypes: ModuleType[] = ['prod', 'optional'];
 
 const locateNodeGyp = async () => {
   let testPath = __dirname;
@@ -29,18 +48,29 @@ class Rebuilder {
   prodDeps: Set<string>;
   rebuilds: (() => Promise<void>)[];
 
-  constructor(
-      public lifecycle: EventEmitter,
-      public buildPath: string,
-      public electronVersion: string,
-      public arch = process.arch,
-      public extraModules: string[] = [],
-      public forceRebuild = false,
-      public headerURL = 'https://atom.io/download/electron',
-      public types = ['prod', 'optional'],
-      public mode = defaultMode) {
-    this.ABI = nodeAbi.getAbi(electronVersion, 'electron');
-    this.prodDeps = extraModules.reduce((acc, x) => acc.add(x), new Set());
+  public lifecycle: EventEmitter;
+  public buildPath: string;
+  public electronVersion: string;
+  public arch: string;
+  public extraModules: string[];
+  public force: boolean;
+  public headerURL: string;
+  public types: ModuleType[];
+  public mode: RebuildMode;
+
+  constructor(options: RebuilderOptions) {
+    this.lifecycle = options.lifecycle;
+    this.buildPath = options.buildPath;
+    this.electronVersion = options.electronVersion;
+    this.arch = options.arch || process.arch;
+    this.extraModules = options.extraModules || [];
+    this.force = options.force || false;
+    this.headerURL = options.headerURL || 'https://atom.io/download/electron';
+    this.types = options.types || defaultTypes;
+    this.mode = options.mode || defaultMode;
+
+    this.ABI = nodeAbi.getAbi(this.electronVersion, 'electron');
+    this.prodDeps = this.extraModules.reduce((acc, x) => acc.add(x), new Set());
     this.rebuilds = [];
   }
 
@@ -48,7 +78,7 @@ class Rebuilder {
     if (!path.isAbsolute(this.buildPath)) {
       throw new Error('Expected buildPath to be an absolute path');
     }
-    d('rebuilding with args:', this.buildPath, this.electronVersion, this.arch, this.extraModules, this.forceRebuild, this.headerURL, this.types);
+    d('rebuilding with args:', this.buildPath, this.electronVersion, this.arch, this.extraModules, this.force, this.headerURL, this.types);
 
     this.lifecycle.emit('start');
 
@@ -101,7 +131,7 @@ class Rebuilder {
 
     this.lifecycle.emit('module-found', path.basename(modulePath));
 
-    if (!this.forceRebuild && await fs.exists(metaPath)) {
+    if (!this.force && await fs.exists(metaPath)) {
       const meta = await fs.readFile(metaPath, 'utf8');
       if (meta === metaData) {
         d(`skipping: ${path.basename(modulePath)} as it is already built`);
@@ -241,24 +271,62 @@ class Rebuilder {
   };
 }
 
-export function rebuild(
-    buildPath: string,
-    electronVersion: string,
-    arch = process.arch,
-    extraModules: string[] = [],
-    forceRebuild = false,
-    headerURL = 'https://atom.io/download/electron',
-    types = ['prod', 'optional'],
-    mode = defaultMode) {
-
+function rebuildWithOptions(options: RebuildOptions) {
   d('rebuilding with args:', arguments);
   const lifecycle = new EventEmitter();
-  const rebuilder = new Rebuilder(lifecycle, buildPath, electronVersion, arch, extraModules, forceRebuild, headerURL, types, mode);
+  const rebuilderOptions: RebuilderOptions = Object.assign({}, options, { lifecycle });
+  const rebuilder = new Rebuilder(rebuilderOptions);
 
   let ret = rebuilder.rebuild() as Promise<void> & { lifecycle: EventEmitter };
   ret.lifecycle = lifecycle;
 
   return ret;
+}
+
+function doRebuild(options: any, ...args: any[]) {
+  if (typeof options === 'object') {
+    return rebuildWithOptions(options as RebuildOptions);
+  }
+  console.warn('You are using the depreceated electron-rebuild API, please switch to using the options object instead');
+  return rebuildWithOptions((<Function>createOptions)(options, ...args));
+}
+
+export type RebuilderResult = Promise<void> & { lifecycle: EventEmitter };
+export type RebuildFunctionWithOptions = (options: RebuildOptions) => RebuilderResult;
+export type RebuildFunctionWithArgs = (
+  buildPath: string,
+  electronVersion: string,
+  arch?: string,
+  extraModules?: string[],
+  force?: boolean,
+  headerURL?: string,
+  types?: ModuleType[],
+  mode?: RebuildMode
+) => RebuilderResult;
+export type RebuildFunction = RebuildFunctionWithArgs & RebuildFunctionWithOptions;
+
+export const rebuild = (doRebuild as RebuildFunction);;
+
+export function createOptions(
+    buildPath: string,
+    electronVersion: string,
+    arch: string,
+    extraModules: string[],
+    force: boolean,
+    headerURL: string,
+    types: ModuleType[],
+    mode: RebuildMode): RebuildOptions {
+
+  return {
+    buildPath,
+    electronVersion,
+    arch,
+    extraModules,
+    force,
+    headerURL,
+    types,
+    mode,
+  };
 }
 
 export function rebuildNativeModules(

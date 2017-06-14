@@ -4,11 +4,12 @@ import 'colors';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as ora from 'ora';
+import * as argParser from 'yargs';
 
 import { rebuild } from './rebuild';
 import { locateElectronPrebuilt } from './electron-locater';
 
-const yargs = require('yargs')
+const yargs = argParser
   .usage('Usage: electron-rebuild --version [version] --module-dir [path]')
   .help('h')
   .alias('h', 'help')
@@ -57,7 +58,7 @@ process.on('unhandledRejection', handler);
 
   if (!electronPrebuiltVersion) {
     try {
-      if (!electronPrebuiltPath) throw new Error("electron-prebuilt not found");
+      if (!electronPrebuiltPath) throw new Error('electron-prebuilt not found');
       const pkgJson = require(path.join(electronPrebuiltPath, 'package.json'));
 
       electronPrebuiltVersion = pkgJson.version;
@@ -96,9 +97,18 @@ process.on('unhandledRejection', handler);
     } else {
       rebuildSpinner.text = `Building module: ${lastModuleName}, Completed: ${modulesDone}`;
     }
-  }
+  };
 
-  const rebuilder = rebuild(rootDirectory, electronPrebuiltVersion, argv.a || process.arch, argv.w ? argv.w.split(',') : [], argv.f, argv.d, argv.t ? argv.t.split(',') : ['prod', 'optional'], argv.p ? 'parallel' : (argv.s ? 'sequential' : undefined));
+  const rebuilder = rebuild({
+    buildPath: rootDirectory,
+    electronVersion: electronPrebuiltVersion,
+    arch: argv.a || process.arch,
+    extraModules: argv.w ? argv.w.split(',') : [],
+    force: argv.f,
+    headerURL: argv.d,
+    types: argv.t ? argv.t.split(',') : ['prod', 'optional'],
+    mode: argv.p ? 'parallel' : (argv.s ? 'sequential' : undefined)
+  });
 
   const lifecycle = rebuilder.lifecycle;
 
