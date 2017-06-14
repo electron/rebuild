@@ -1,4 +1,4 @@
-import * as fs from 'fs-promise';
+import * as fs from 'fs-extra';
 import * as path from 'path';
 
 export async function readPackageJson(dir: string, safe = false) {

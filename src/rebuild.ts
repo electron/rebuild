@@ -1,7 +1,7 @@
 import { spawnPromise } from 'spawn-rx';
 import * as debug from 'debug';
 import * as EventEmitter from 'events';
-import * as fs from 'fs-promise';
+import * as fs from 'fs-extra';
 import * as nodeAbi from 'node-abi';
 import * as os from 'os';
 import * as path from 'path';
