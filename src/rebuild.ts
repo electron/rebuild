@@ -79,7 +79,8 @@ class Rebuilder {
 
     d('identified prod deps:', this.prodDeps);
 
-    this.rebuildAllModulesIn(path.resolve(this.buildPath, 'node_modules'));
+    await this.rebuildAllModulesIn(path.resolve(this.buildPath, 'node_modules'));
+    this.rebuilds.push(() => this.rebuildModuleAt(this.buildPath));
 
     if (this.mode !== 'sequential') {
       await Promise.all(this.rebuilds.map(fn => fn()));
@@ -187,10 +188,11 @@ class Rebuilder {
     this.lifecycle.emit('module-done');
   }
 
-  rebuildAllModulesIn(nodeModulesPath: string, prefix = '') {
-    // While we use `cnpm`, it will make a circle scanning the dep tree.
-    // We also need to ensure that the `node_modules` which we are scanning has never came before.
-    const realNodeModulesPath = fs.realpathSync(nodeModulesPath);
+  async rebuildAllModulesIn(nodeModulesPath: string, prefix = '') {
+    // Some package managers use symbolic links when installing node modules
+    // we need to be sure we've never tested the a package before by resolving
+    // all symlinks in the path and testing against a set
+    const realNodeModulesPath = await fs.realpath(nodeModulesPath);
     if (this.realNodeModulesPaths.has(realNodeModulesPath)) {
       return;
     }
@@ -198,12 +200,10 @@ class Rebuilder {
 
     d('scanning:', realNodeModulesPath);
 
-    for (const modulePath of fs.readdirSync(realNodeModulesPath)) {
-      // If we use `cnpm` to install mudules, it will be rebuilded failed,
-      // because of some same modules rebuilded twice or more.
-      // Need to ensure one dep only be rebuilded once.
-      const finalPath = path.resolve(nodeModulesPath, modulePath);
-      const realPath = fs.realpathSync(finalPath);
+    for (const modulePath of await fs.readdir(realNodeModulesPath)) {
+      // Ensure that we don't mark modules as needing to be rebuilt more than once
+      // by ignoring / resolving symlinks
+      const realPath = await fs.realpath(path.resolve(nodeModulesPath, modulePath));
 
       if (this.realModulePaths.has(realPath)) {
         continue;
@@ -215,11 +215,11 @@ class Rebuilder {
       }
 
       if (modulePath.startsWith('@')) {
-        this.rebuildAllModulesIn(realPath, `${modulePath}/`);
+        await this.rebuildAllModulesIn(realPath, `${modulePath}/`);
       }
 
-      if (fs.existsSync(path.resolve(nodeModulesPath, modulePath, 'node_modules'))) {
-        this.rebuildAllModulesIn(path.resolve(realPath, 'node_modules'));
+      if (await fs.exists(path.resolve(nodeModulesPath, modulePath, 'node_modules'))) {
+        await this.rebuildAllModulesIn(path.resolve(realPath, 'node_modules'));
       }
     }
   };
