@@ -28,6 +28,8 @@ class Rebuilder {
   nodeGypPath: string;
   prodDeps: Set<string>;
   rebuilds: (() => Promise<void>)[];
+  realModulePaths: Set<string>;
+  realNodeModulesPaths: Set<string>;
 
   constructor(
       public lifecycle: EventEmitter,
@@ -42,6 +44,8 @@ class Rebuilder {
     this.ABI = nodeAbi.getAbi(electronVersion, 'electron');
     this.prodDeps = extraModules.reduce((acc, x) => acc.add(x), new Set());
     this.rebuilds = [];
+    this.realModulePaths = new Set();
+    this.realNodeModulesPaths = new Set();
   }
 
   async rebuild() {
@@ -184,19 +188,38 @@ class Rebuilder {
   }
 
   rebuildAllModulesIn(nodeModulesPath: string, prefix = '') {
-    d('scanning:', nodeModulesPath);
+    // While we use `cnpm`, it will make a circle scanning the dep tree.
+    // We also need to ensure that the `node_modules` which we are scanning has never came before.
+    const realNodeModulesPath = fs.realpathSync(nodeModulesPath);
+    if (this.realNodeModulesPaths.has(realNodeModulesPath)) {
+      return;
+    }
+    this.realNodeModulesPaths.add(realNodeModulesPath);
 
-    for (const modulePath of fs.readdirSync(nodeModulesPath)) {
+    d('scanning:', realNodeModulesPath);
+
+    for (const modulePath of fs.readdirSync(realNodeModulesPath)) {
+      // If we use `cnpm` to install mudules, it will be rebuilded failed,
+      // because of some same modules rebuilded twice or more.
+      // Need to ensure one dep only be rebuilded once.
+      const finalPath = path.resolve(nodeModulesPath, modulePath);
+      const realPath = fs.realpathSync(finalPath);
+
+      if (this.realModulePaths.has(realPath)) {
+        continue;
+      }
+      this.realModulePaths.add(realPath);
+
       if (this.prodDeps[`${prefix}${modulePath}`]) {
-        this.rebuilds.push(() => this.rebuildModuleAt(path.resolve(nodeModulesPath, modulePath)));
+        this.rebuilds.push(() => this.rebuildModuleAt(realPath));
       }
 
       if (modulePath.startsWith('@')) {
-        this.rebuildAllModulesIn(path.resolve(nodeModulesPath, modulePath), `${modulePath}/`);
+        this.rebuildAllModulesIn(realPath, `${modulePath}/`);
       }
 
       if (fs.existsSync(path.resolve(nodeModulesPath, modulePath, 'node_modules'))) {
-        this.rebuildAllModulesIn(path.resolve(nodeModulesPath, modulePath, 'node_modules'));
+        this.rebuildAllModulesIn(path.resolve(realPath, 'node_modules'));
       }
     }
   };
@@ -280,4 +303,3 @@ export function rebuildNativeModules(
 
   return rebuild(modulePath, electronVersion, arch, whichModule.split(','));
 };
-
