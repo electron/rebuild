@@ -6,21 +6,30 @@ import * as nodeAbi from 'node-abi';
 import * as os from 'os';
 import * as path from 'path';
 import { readPackageJson } from './read-package-json';
+import {isNullOrUndefined} from 'util';
 
 const d = debug('electron-rebuild');
 
 const defaultMode = process.platform === 'win32' ? 'sequential' : 'parallel';
 
-const locateNodeGyp = async () => {
+const locateGypModule = async(cli: string) => {
   let testPath = __dirname;
   for (let upDir = 0; upDir <= 20; upDir++) {
-    const nodeGypTestPath = path.resolve(testPath, `node_modules/.bin/node-gyp${process.platform === 'win32' ? '.cmd' : ''}`);
+    const nodeGypTestPath = path.resolve(testPath, `node_modules/.bin/${cli}${process.platform === 'win32' ? '.cmd' : ''}`);
     if (await fs.exists(nodeGypTestPath)) {
       return nodeGypTestPath;
     }
     testPath = path.resolve(testPath, '..');
   }
   return null;
+};
+
+const locateNodeGyp = async () => {
+  return await locateGypModule('node-gyp');
+};
+
+const locateNodePreGyp = async () => {
+  return await locateGypModule('node-pre-gyp');
 };
 
 class Rebuilder {
@@ -97,8 +106,9 @@ class Rebuilder {
     }
 
     const nodeGypPath = await locateNodeGyp();
-    if (!nodeGypPath) {
-      throw new Error('Could not locate node-gyp');
+    const nodePreGypPath = await locateNodePreGyp();
+    if (!nodeGypPath || !nodePreGypPath) {
+      throw new Error('Could not locate node-gyp or node-pre-gyp');
     }
 
     const metaPath = path.resolve(modulePath, 'build', 'Release', '.forge-meta');
@@ -120,28 +130,33 @@ class Rebuilder {
       return;
     }
     d('rebuilding:', path.basename(modulePath));
+    const modulePackageJson = await readPackageJson(modulePath);
+    const moduleName = path.basename(modulePath);
+    let moduleBinaryPath = path.resolve(modulePath, 'build/Release');
+    const preGypReady = !isNullOrUndefined(modulePackageJson.binary);
+
     const rebuildArgs = [
-      'rebuild',
+      preGypReady ? 'reinstall' : 'rebuild',
       `--target=${this.electronVersion}`,
       `--arch=${this.arch}`,
       `--dist-url=${this.headerURL}`,
-      '--build-from-source',
+      preGypReady ? '--fallback-to-build' : '--build-from-source',
     ];
-
-    const modulePackageJson = await readPackageJson(modulePath);
 
     Object.keys(modulePackageJson.binary || {}).forEach((binaryKey) => {
       let value = modulePackageJson.binary[binaryKey];
-
-      if (binaryKey === 'module_path') {
-        value = path.resolve(modulePath, value);
-      }
 
       value = value.replace('{configuration}', 'Release')
         .replace('{node_abi}', `electron-v${this.electronVersion.split('.').slice(0, 2).join('.')}`)
         .replace('{platform}', process.platform)
         .replace('{arch}', this.arch)
-        .replace('{version}', modulePackageJson.version);
+        .replace('{version}', modulePackageJson.version)
+        .replace('{name}', modulePackageJson.name);
+
+      if (binaryKey === 'module_path') {
+        value = path.resolve(modulePath, value);
+        moduleBinaryPath = value;
+      }
 
       Object.keys(modulePackageJson.binary).forEach((binaryReplaceKey) => {
         value = value.replace(`{${binaryReplaceKey}}`, modulePackageJson.binary[binaryReplaceKey]);
@@ -150,8 +165,8 @@ class Rebuilder {
       rebuildArgs.push(`--${binaryKey}=${value}`);
     });
 
-    d('rebuilding', path.basename(modulePath), 'with args', rebuildArgs);
-    await spawnPromise(nodeGypPath, rebuildArgs, {
+    d('rebuilding', moduleName, 'with args', rebuildArgs);
+    await spawnPromise(preGypReady ? nodePreGypPath : nodeGypPath, rebuildArgs, {
       cwd: modulePath,
       env: Object.assign({}, process.env, {
         HOME: path.resolve(os.homedir(), '.electron-gyp'),
@@ -160,20 +175,20 @@ class Rebuilder {
         npm_config_runtime: 'electron',
         npm_config_arch: this.arch,
         npm_config_target_arch: this.arch,
-        npm_config_build_from_source: true,
+        npm_config_build_from_source: !preGypReady,
       }),
     });
 
-    d('built:', path.basename(modulePath));
-    await fs.mkdirs(path.dirname(metaPath));
+    d('built:', moduleName);
+    if (!(await fs.exists(metaPath))) {
+      await fs.mkdirs(path.dirname(metaPath));
+    }
     await fs.writeFile(metaPath, metaData);
 
-    const moduleName = path.basename(modulePath);
-
-    d('searching for .node file', path.resolve(modulePath, 'build/Release'));
-    d('testing files', (await fs.readdir(path.resolve(modulePath, 'build/Release'))));
-    const nodePath = path.resolve(modulePath, 'build/Release',
-      (await fs.readdir(path.resolve(modulePath, 'build/Release')))
+    d('searching for .node file', moduleBinaryPath);
+    d('testing files', (await fs.readdir(moduleBinaryPath)));
+    const nodePath = path.resolve(moduleBinaryPath,
+      (await fs.readdir(moduleBinaryPath))
         .find((file) => file !== '.node' && file.endsWith('.node'))
       );
 
@@ -181,7 +196,9 @@ class Rebuilder {
     if (await fs.exists(nodePath)) {
       d('found .node file', nodePath);
       d('copying to prebuilt place:', abiPath);
-      await fs.mkdirs(abiPath);
+      if (!(await fs.exists(abiPath))) {
+        await fs.mkdirs(abiPath);
+      }
       await fs.copy(nodePath, path.resolve(abiPath, `${moduleName}.node`));
     }
 
