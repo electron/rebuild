@@ -9,7 +9,7 @@ function packageCommand(command: string, packageName: string) {
   return spawnPromise('npm', [command, packageName], {
     cwd: path.resolve(__dirname, '..'),
     stdio: 'ignore',
-  })
+  });
 }
 
 const install: ((s: string) => Promise<void>) = packageCommand.bind(null, 'install');
@@ -24,9 +24,9 @@ const testElectronCanBeFound = () => {
 };
 
 describe('locateElectronPrebuilt', function() {
-  this.timeout(30*1000);
+  this.timeout(30 * 1000);
 
-  before(() => uninstall('electron-prebuilt'));
+  before(() => uninstall('electron'));
 
   it('should return null when electron is not installed', () => {
     expect(locateElectronPrebuilt()).to.be.equal(null);
@@ -48,5 +48,5 @@ describe('locateElectronPrebuilt', function() {
     after(() => uninstall('electron'));
   });
 
-  after(() => install('electron-prebuilt'));
+  after(() => install('electron'));
 });
