@@ -82,7 +82,7 @@ import rebuild from 'electron-rebuild';
 packager({
   // … other options
   afterCopy: [(buildPath, electronVersion, platform, arch, callback) => {
-    rebuild(buildPath, electronVersion, arch)
+    rebuild({ buildPath, electronVersion, arch })
       .then(() => callback())
       .catch((error) => callback(error));
   }],
@@ -100,14 +100,15 @@ import rebuild from 'electron-rebuild';
 
 // Public: Rebuilds a node_modules directory with the given Electron version.
 //
-// appPath - An absolute path to your app's directory.  (The directory that contains your node_modules)
-// electronVersion - The version of Electron to rebuild for
-// arch (optional) - Default: process.arch - The arch to rebuild for
-// extraModules (optional) - Default: [] - An array of modules to rebuild as well as the detected modules
-// forceRebuild (optional) - Default: false - Force a rebuild of modules regardless of their current build state
-// headerURL (optional) - Default: atom.io/download/electron - The URL to download Electron header files from
-// types (optional) - Default: ['prod', 'optional'] - The types of modules to rebuild
-// mode (optional) - The rebuild mode, either 'sequential' or 'parallel' - Default varies per platform (probably shouldn't mess with this one)
+// options: Object with the following properties
+//     appPath - An absolute path to your app's directory.  (The directory that contains your node_modules)
+//     electronVersion - The version of Electron to rebuild for
+//     arch (optional) - Default: process.arch - The arch to rebuild for
+//     extraModules (optional) - Default: [] - An array of modules to rebuild as well as the detected modules
+//     force (optional) - Default: false - Force a rebuild of modules regardless of their current build state
+//     headerURL (optional) - Default: atom.io/download/electron - The URL to download Electron header files from
+//     types (optional) - Default: ['prod', 'optional'] - The types of modules to rebuild
+//     mode (optional) - The rebuild mode, either 'sequential' or 'parallel' - Default varies per platform (probably shouldn't mess with this one)
 
 // Returns a Promise indicating whether the operation succeeded or not
 ```
@@ -118,7 +119,10 @@ A full build process might look something like:
 let childProcess = require('child_process');
 let pathToElectron = require('electron-prebuilt');
 
-  rebuild(__dirname, '1.4.12')
+  rebuild({
+    buildPath: __dirname,
+    electronVersion: '1.4.12'
+  })
     .then(() => console.info('Rebuild Successful'))
     .catch((e) => {
       console.error("Building modules didn't work!");
