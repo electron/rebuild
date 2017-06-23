@@ -172,13 +172,13 @@ class Rebuilder {
 
     d('searching for .node file', path.resolve(modulePath, 'build/Release'));
     d('testing files', (await fs.readdir(path.resolve(modulePath, 'build/Release'))));
-    const nodePath = path.resolve(modulePath, 'build/Release',
-      (await fs.readdir(path.resolve(modulePath, 'build/Release')))
-        .find((file) => file !== '.node' && file.endsWith('.node'))
-      );
+
+    const nodeFile = (await fs.readdir(path.resolve(modulePath, 'build/Release')))
+      .find((file) => file !== '.node' && file.endsWith('.node'));
+    const nodePath = nodeFile ? path.resolve(modulePath, 'build/Release', nodeFile) : undefined;
 
     const abiPath = path.resolve(modulePath, `bin/${process.platform}-${this.arch}-${this.ABI}`);
-    if (await fs.exists(nodePath)) {
+    if (nodePath && await fs.exists(nodePath)) {
       d('found .node file', nodePath);
       d('copying to prebuilt place:', abiPath);
       await fs.mkdirs(abiPath);
