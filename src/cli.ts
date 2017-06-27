@@ -23,6 +23,8 @@ const yargs = argParser
   .alias('m', 'module-dir')
   .describe('w', 'A specific module to build, or comma separated list of modules')
   .alias('w', 'which-module')
+  .describe('o', 'Only build specified module, or comma separated list of modules. All others are ignored.')
+  .alias('o', 'only')
   .describe('e', 'The path to electron-prebuilt')
   .alias('e', 'electron-prebuilt-dir')
   .describe('d', 'Custom header tarball URL')
@@ -92,6 +94,7 @@ process.on('unhandledRejection', handler);
 
   const redraw = (moduleName?: string) => {
     if (moduleName) lastModuleName = moduleName;
+
     if (argv.p) {
       rebuildSpinner.text = `Building modules: ${modulesDone}/${moduleTotal}`;
     } else {
@@ -104,6 +107,7 @@ process.on('unhandledRejection', handler);
     electronVersion: electronPrebuiltVersion,
     arch: argv.a || process.arch,
     extraModules: argv.w ? argv.w.split(',') : [],
+    onlyModules: argv.o ? argv.o.split(',') : [],
     force: argv.f,
     headerURL: argv.d,
     types: argv.t ? argv.t.split(',') : ['prod', 'optional'],

@@ -62,6 +62,8 @@ Options:
                                on macOS and Linux
   -s, --sequential             Rebuild modules sequentially, this is enabled by
                                default on Windows
+  -o, --only                   Only build specified module, or comma separated
+                               list of modules. All others are ignored.
 
 Copyright 2016
 ```

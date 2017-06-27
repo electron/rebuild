@@ -15,6 +15,7 @@ export interface RebuildOptions {
   electronVersion: string;
   arch?: string;
   extraModules?: string[];
+  onlyModules?: string[];
   force?: boolean;
   headerURL?: string;
   types?: ModuleType[];
@@ -55,6 +56,7 @@ class Rebuilder {
   public electronVersion: string;
   public arch: string;
   public extraModules: string[];
+  public onlyModules: string[];
   public force: boolean;
   public headerURL: string;
   public types: ModuleType[];
@@ -66,6 +68,7 @@ class Rebuilder {
     this.electronVersion = options.electronVersion;
     this.arch = options.arch || process.arch;
     this.extraModules = options.extraModules || [];
+    this.onlyModules = options.onlyModules || [];
     this.force = options.force || false;
     this.headerURL = options.headerURL || 'https://atom.io/download/electron';
     this.types = options.types || defaultTypes;
@@ -240,7 +243,8 @@ class Rebuilder {
       }
       this.realModulePaths.add(realPath);
 
-      if (this.prodDeps[`${prefix}${modulePath}`]) {
+      if (this.prodDeps[`${prefix}${modulePath}`] &&
+          this.onlyModules.length === 0 || this.onlyModules.includes(modulePath)) {
         this.rebuilds.push(() => this.rebuildModuleAt(realPath));
       }
 
@@ -310,7 +314,7 @@ function doRebuild(options: any, ...args: any[]) {
   if (typeof options === 'object') {
     return rebuildWithOptions(options as RebuildOptions);
   }
-  console.warn('You are using the depreceated electron-rebuild API, please switch to using the options object instead');
+  console.warn('You are using the deprecated electron-rebuild API, please switch to using the options object instead');
   return rebuildWithOptions((<Function>createOptions)(options, ...args));
 }
 
@@ -321,6 +325,7 @@ export type RebuildFunctionWithArgs = (
   electronVersion: string,
   arch?: string,
   extraModules?: string[],
+  onlyModules?: string[],
   force?: boolean,
   headerURL?: string,
   types?: ModuleType[],
@@ -335,6 +340,7 @@ export function createOptions(
     electronVersion: string,
     arch: string,
     extraModules: string[],
+    onlyModules: string[],
     force: boolean,
     headerURL: string,
     types: ModuleType[],
@@ -345,6 +351,7 @@ export function createOptions(
     electronVersion,
     arch,
     extraModules,
+    onlyModules,
     force,
     headerURL,
     types,
