@@ -141,7 +141,7 @@ describe('rebuilder', () => {
     });
 
     it('should rebuild multiple specified modules via --only option', async () => {
-      const rebuilder = rebuild(testModulePath, '1.4.12', process.arch, [], ['ffi', '@newrelic/native-metrics'], true);
+      const rebuilder = rebuild(testModulePath, '1.4.12', process.arch, [], ['ffi', 'ref'], true);
       let built = 0;
       rebuilder.lifecycle.on('module-done', () => built++);
       await rebuilder;
