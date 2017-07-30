@@ -44,6 +44,15 @@ if (argv.h) {
   process.exit(0);
 }
 
+if (process.argv.length === 3 && process.argv[2] === '--version') {
+  try {
+    /* tslint:disable */ console.log('Electron Rebuild Version:', require(path.resolve(__dirname, '../../package.json')).version); /* tslint:enable */
+  } catch (err) {
+    /* tslint:disable */ console.log('Electron Rebuild Version:', require(path.resolve(__dirname, '../package.json')).version); /* tslint:enable */
+  }
+  process.exit(0);
+}
+
 const handler = (err: Error) => {
   console.error('An unhandled error occurred inside electron-rebuild'.red);
   console.error(`${err.message}\n\n${err.stack}`.red);
