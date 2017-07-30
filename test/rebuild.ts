@@ -62,7 +62,9 @@ describe('rebuilder', () => {
 
       it('should have rebuilt children of top level prod dependencies', async () => {
         const forgeMetaGoodNPM = path.resolve(testModulePath, 'node_modules', 'microtime', 'build', 'Release', '.forge-meta');
-        const forgeMetaBadNPM = path.resolve(testModulePath, 'node_modules', 'benchr', 'node_modules', 'microtime', 'build', 'Release', '.forge-meta');
+        const forgeMetaBadNPM = path.resolve(
+          testModulePath, 'node_modules', 'benchr', 'node_modules', 'microtime', 'build', 'Release', '.forge-meta'
+        );
         expect(await fs.exists(forgeMetaGoodNPM) || await fs.exists(forgeMetaBadNPM), 'microtime build meta should exist').to.equal(true);
       });
 
@@ -123,6 +125,41 @@ describe('rebuilder', () => {
       });
       await rebuilder;
       expect(skipped).to.equal(0);
+    });
+  });
+
+  describe('only rebuild', function() {
+    this.timeout(2 * 60 * 1000);
+
+    beforeEach(resetTestModule);
+    afterEach(async () => await fs.remove(testModulePath));
+
+    it('should rebuild only specified modules', async () => {
+      const rebuilder = rebuild({
+        buildPath: testModulePath,
+        electronVersion: '1.4.12',
+        arch: process.arch,
+        onlyModules: ['ffi'],
+        force: true
+      });
+      let built = 0;
+      rebuilder.lifecycle.on('module-done', () => built++);
+      await rebuilder;
+      expect(built).to.equal(1);
+    });
+
+    it('should rebuild multiple specified modules via --only option', async () => {
+      const rebuilder = rebuild({
+        buildPath: testModulePath,
+        electronVersion: '1.4.12',
+        arch: process.arch,
+        onlyModules: ['ffi', 'ref'],
+        force: true
+      });
+      let built = 0;
+      rebuilder.lifecycle.on('module-done', () => built++);
+      await rebuilder;
+      expect(built).to.equal(2);
     });
   });
 });
