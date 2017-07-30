@@ -107,6 +107,8 @@ import rebuild from 'electron-rebuild';
 //     electronVersion - The version of Electron to rebuild for
 //     arch (optional) - Default: process.arch - The arch to rebuild for
 //     extraModules (optional) - Default: [] - An array of modules to rebuild as well as the detected modules
+//     onlyModules (optional) - Default: null - An array of modules to rebuild, ONLY these module names will be rebuilt.
+//                                              The "types" property will be ignored if this option is set.
 //     force (optional) - Default: false - Force a rebuild of modules regardless of their current build state
 //     headerURL (optional) - Default: atom.io/download/electron - The URL to download Electron header files from
 //     types (optional) - Default: ['prod', 'optional'] - The types of modules to rebuild
