@@ -107,7 +107,7 @@ process.on('unhandledRejection', handler);
     electronVersion: electronPrebuiltVersion,
     arch: argv.a || process.arch,
     extraModules: argv.w ? argv.w.split(',') : [],
-    onlyModules: argv.o ? argv.o.split(',') : [],
+    onlyModules: argv.o ? argv.o.split(',') : null,
     force: argv.f,
     headerURL: argv.d,
     types: argv.t ? argv.t.split(',') : ['prod', 'optional'],

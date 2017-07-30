@@ -62,7 +62,9 @@ describe('rebuilder', () => {
 
       it('should have rebuilt children of top level prod dependencies', async () => {
         const forgeMetaGoodNPM = path.resolve(testModulePath, 'node_modules', 'microtime', 'build', 'Release', '.forge-meta');
-        const forgeMetaBadNPM = path.resolve(testModulePath, 'node_modules', 'benchr', 'node_modules', 'microtime', 'build', 'Release', '.forge-meta');
+        const forgeMetaBadNPM = path.resolve(
+          testModulePath, 'node_modules', 'benchr', 'node_modules', 'microtime', 'build', 'Release', '.forge-meta'
+        );
         expect(await fs.exists(forgeMetaGoodNPM) || await fs.exists(forgeMetaBadNPM), 'microtime build meta should exist').to.equal(true);
       });
 
@@ -94,7 +96,7 @@ describe('rebuilder', () => {
 
     it('should skip the rebuild step when disabled', async () => {
       await rebuild(testModulePath, '1.4.12', process.arch);
-      const rebuilder = rebuild(testModulePath, '1.4.12', process.arch, [], [], false);
+      const rebuilder = rebuild(testModulePath, '1.4.12', process.arch, [], false);
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
         skipped++;
@@ -105,7 +107,7 @@ describe('rebuilder', () => {
 
     it('should rebuild all modules again when disabled but the electron ABI bumped', async () => {
       await rebuild(testModulePath, '1.4.12', process.arch);
-      const rebuilder = rebuild(testModulePath, '1.6.0', process.arch, [], [], false);
+      const rebuilder = rebuild(testModulePath, '1.6.0', process.arch, [], false);
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
         skipped++;
@@ -116,7 +118,7 @@ describe('rebuilder', () => {
 
     it('should rebuild all modules again when enabled', async () => {
       await rebuild(testModulePath, '1.4.12', process.arch);
-      const rebuilder = rebuild(testModulePath, '1.4.12', process.arch, [], [], true);
+      const rebuilder = rebuild(testModulePath, '1.4.12', process.arch, [], true);
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
         skipped++;
@@ -133,7 +135,13 @@ describe('rebuilder', () => {
     afterEach(async () => await fs.remove(testModulePath));
 
     it('should rebuild only specified modules', async () => {
-      const rebuilder = rebuild(testModulePath, '1.4.12', process.arch, [], ['ffi'], true);
+      const rebuilder = rebuild({
+        buildPath: testModulePath,
+        electronVersion: '1.4.12',
+        arch: process.arch,
+        onlyModules: ['ffi'],
+        force: true
+      });
       let built = 0;
       rebuilder.lifecycle.on('module-done', () => built++);
       await rebuilder;
@@ -141,7 +149,13 @@ describe('rebuilder', () => {
     });
 
     it('should rebuild multiple specified modules via --only option', async () => {
-      const rebuilder = rebuild(testModulePath, '1.4.12', process.arch, [], ['ffi', 'ref'], true);
+      const rebuilder = rebuild({
+        buildPath: testModulePath,
+        electronVersion: '1.4.12',
+        arch: process.arch,
+        onlyModules: ['ffi', 'ref'],
+        force: true
+      });
       let built = 0;
       rebuilder.lifecycle.on('module-done', () => built++);
       await rebuilder;

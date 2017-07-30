@@ -15,7 +15,7 @@ export interface RebuildOptions {
   electronVersion: string;
   arch?: string;
   extraModules?: string[];
-  onlyModules?: string[];
+  onlyModules?: string[] | null;
   force?: boolean;
   headerURL?: string;
   types?: ModuleType[];
@@ -56,7 +56,7 @@ class Rebuilder {
   public electronVersion: string;
   public arch: string;
   public extraModules: string[];
-  public onlyModules: string[];
+  public onlyModules: string[] | null;
   public force: boolean;
   public headerURL: string;
   public types: ModuleType[];
@@ -68,7 +68,7 @@ class Rebuilder {
     this.electronVersion = options.electronVersion;
     this.arch = options.arch || process.arch;
     this.extraModules = options.extraModules || [];
-    this.onlyModules = options.onlyModules || [];
+    this.onlyModules = options.onlyModules || null;
     this.force = options.force || false;
     this.headerURL = options.headerURL || 'https://atom.io/download/electron';
     this.types = options.types || defaultTypes;
@@ -93,13 +93,13 @@ class Rebuilder {
     const markWaiters: Promise<void>[] = [];
     const depKeys = [];
 
-    if (this.types.indexOf('prod') !== -1) {
+    if (this.types.indexOf('prod') !== -1 || this.onlyModules) {
       depKeys.push(...Object.keys(rootPackageJson.dependencies || {}));
     }
-    if (this.types.indexOf('optional') !== -1) {
+    if (this.types.indexOf('optional') !== -1 || this.onlyModules) {
       depKeys.push(...Object.keys(rootPackageJson.optionalDependencies || {}));
     }
-    if (this.types.indexOf('dev') !== -1) {
+    if (this.types.indexOf('dev') !== -1 || this.onlyModules) {
       depKeys.push(...Object.keys(rootPackageJson.devDependencies || {}));
     }
 
@@ -234,6 +234,8 @@ class Rebuilder {
     d('scanning:', realNodeModulesPath);
 
     for (const modulePath of await fs.readdir(realNodeModulesPath)) {
+      // Ignore the magical .bin directory
+      if (modulePath === '.bin') continue;
       // Ensure that we don't mark modules as needing to be rebuilt more than once
       // by ignoring / resolving symlinks
       const realPath = await fs.realpath(path.resolve(nodeModulesPath, modulePath));
@@ -243,8 +245,7 @@ class Rebuilder {
       }
       this.realModulePaths.add(realPath);
 
-      if (this.prodDeps[`${prefix}${modulePath}`] &&
-          this.onlyModules.length === 0 || this.onlyModules.includes(modulePath)) {
+      if (this.prodDeps[`${prefix}${modulePath}`] && (!this.onlyModules || this.onlyModules.includes(modulePath))) {
         this.rebuilds.push(() => this.rebuildModuleAt(realPath));
       }
 
@@ -325,11 +326,11 @@ export type RebuildFunctionWithArgs = (
   electronVersion: string,
   arch?: string,
   extraModules?: string[],
-  onlyModules?: string[],
   force?: boolean,
   headerURL?: string,
   types?: ModuleType[],
-  mode?: RebuildMode
+  mode?: RebuildMode,
+  onlyModules?: string[] | null
 ) => RebuilderResult;
 export type RebuildFunction = RebuildFunctionWithArgs & RebuildFunctionWithOptions;
 
@@ -340,11 +341,11 @@ export function createOptions(
     electronVersion: string,
     arch: string,
     extraModules: string[],
-    onlyModules: string[],
     force: boolean,
     headerURL: string,
     types: ModuleType[],
-    mode: RebuildMode): RebuildOptions {
+    mode: RebuildMode,
+    onlyModules: string[] | null): RebuildOptions {
 
   return {
     buildPath,
