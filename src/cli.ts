@@ -54,7 +54,7 @@ if (process.argv.length === 3 && process.argv[2] === '--version') {
 }
 
 const handler = (err: Error) => {
-  console.error('An unhandled error occurred inside electron-rebuild'.red);
+  console.error('\nAn unhandled error occurred inside electron-rebuild'.red);
   console.error(`${err.message}\n\n${err.stack}`.red);
   process.exit(-1);
 };

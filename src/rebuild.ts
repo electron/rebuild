@@ -74,6 +74,17 @@ class Rebuilder {
     this.types = options.types || defaultTypes;
     this.mode = options.mode || defaultMode;
 
+    if (typeof this.electronVersion === 'number') {
+      if (`${this.electronVersion}`.split('.').length === 1) {
+        this.electronVersion = `${this.electronVersion}.0.0`;
+      } else {
+        this.electronVersion = `${this.electronVersion}.0`;
+      }
+    }
+    if (typeof this.electronVersion !== 'string') {
+      throw new Error(`Expected a string version for electron version, got a "${typeof this.electronVersion}"`);
+    }
+
     this.ABI = nodeAbi.getAbi(this.electronVersion, 'electron');
     this.prodDeps = this.extraModules.reduce((acc, x) => acc.add(x), new Set());
     this.rebuilds = [];
