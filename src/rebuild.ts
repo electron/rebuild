@@ -315,7 +315,7 @@ function doRebuild(options: any, ...args: any[]) {
   if (typeof options === 'object') {
     return rebuildWithOptions(options as RebuildOptions);
   }
-  console.warn('You are using the deprecated electron-rebuild API, please switch to using the options object instead');
+  console.warn('You are using the depreceated electron-rebuild API, please switch to using the options object instead');
   return rebuildWithOptions((<Function>createOptions)(options, ...args));
 }
 
