@@ -29,7 +29,7 @@ possible with your report. If you can, please include:
 
 * Include screenshots and animated GIFs in your pull request whenever possible.
 * Write documentation in [Markdown](https://daringfireball.net/projects/markdown).
-* Use short, present tense commit messages. See [Commit Message Styleguide](#git-commit-messages).
+* Use short, present terse commit messages. See [Commit Message Styleguide](#git-commit-messages).
 
 ## Git Commit Messages
 
