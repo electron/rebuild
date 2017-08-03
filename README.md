@@ -103,7 +103,7 @@ import rebuild from 'electron-rebuild';
 // Public: Rebuilds a node_modules directory with the given Electron version.
 //
 // options: Object with the following properties
-//     appPath - An absolute path to your app's directory.  (The directory that contains your node_modules)
+//     buildPath - An absolute path to your app's directory.  (The directory that contains your node_modules)
 //     electronVersion - The version of Electron to rebuild for
 //     arch (optional) - Default: process.arch - The arch to rebuild for
 //     extraModules (optional) - Default: [] - An array of modules to rebuild as well as the detected modules
