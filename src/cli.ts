@@ -35,6 +35,8 @@ const yargs = argParser
   .alias('p', 'parallel')
   .describe('s', 'Rebuild modules sequentially, this is enabled by default on Windows')
   .alias('s', 'sequential')
+  .describe('b', 'Build debug version of modules')
+  .alias('b','debug')
   .epilog('Copyright 2016');
 
 const argv = yargs.argv;
@@ -120,7 +122,8 @@ process.on('unhandledRejection', handler);
     force: argv.f,
     headerURL: argv.d,
     types: argv.t ? argv.t.split(',') : ['prod', 'optional'],
-    mode: argv.p ? 'parallel' : (argv.s ? 'sequential' : undefined)
+    mode: argv.p ? 'parallel' : (argv.s ? 'sequential' : undefined),
+    debug: argv.b
   });
 
   const lifecycle = rebuilder.lifecycle;

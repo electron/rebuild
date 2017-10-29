@@ -20,6 +20,7 @@ export interface RebuildOptions {
   headerURL?: string;
   types?: ModuleType[];
   mode?: RebuildMode;
+  debug?: boolean;
 }
 
 export interface RebuilderOptions extends RebuildOptions {
@@ -61,6 +62,7 @@ class Rebuilder {
   public headerURL: string;
   public types: ModuleType[];
   public mode: RebuildMode;
+  public debug: boolean;
 
   constructor(options: RebuilderOptions) {
     this.lifecycle = options.lifecycle;
@@ -73,6 +75,7 @@ class Rebuilder {
     this.headerURL = options.headerURL || 'https://atom.io/download/electron';
     this.types = options.types || defaultTypes;
     this.mode = options.mode || defaultMode;
+    this.debug = options.debug || false;
 
     if (typeof this.electronVersion === 'number') {
       if (`${this.electronVersion}`.split('.').length === 1) {
@@ -96,7 +99,7 @@ class Rebuilder {
     if (!path.isAbsolute(this.buildPath)) {
       throw new Error('Expected buildPath to be an absolute path');
     }
-    d('rebuilding with args:', this.buildPath, this.electronVersion, this.arch, this.extraModules, this.force, this.headerURL, this.types);
+    d('rebuilding with args:', this.buildPath, this.electronVersion, this.arch, this.extraModules, this.force, this.headerURL, this.types, this.debug);
 
     this.lifecycle.emit('start');
 
@@ -145,7 +148,9 @@ class Rebuilder {
       throw new Error('Could not locate node-gyp');
     }
 
-    const metaPath = path.resolve(modulePath, 'build', 'Release', '.forge-meta');
+    const buildType = this.debug ? 'Debug' : 'Release';
+
+    const metaPath = path.resolve(modulePath, 'build', buildType, '.forge-meta');
     const metaData = `${this.arch}--${this.ABI}`;
 
     this.lifecycle.emit('module-found', path.basename(modulePath));
@@ -159,6 +164,7 @@ class Rebuilder {
         return;
       }
     }
+    // How to indentify Debug build prebuilds
     if (await fs.exists(path.resolve(modulePath, 'prebuilds', `${process.platform}-${this.arch}`, `electron-${this.ABI}.node`))) {
       d(`skipping: ${path.basename(modulePath)} as it was prebuilt`);
       return;
@@ -172,6 +178,10 @@ class Rebuilder {
       '--build-from-source',
     ];
 
+    if (this.debug) {
+      rebuildArgs.push('--debug')
+    }
+
     const modulePackageJson = await readPackageJson(modulePath);
 
     Object.keys(modulePackageJson.binary || {}).forEach((binaryKey) => {
@@ -181,7 +191,7 @@ class Rebuilder {
         value = path.resolve(modulePath, value);
       }
 
-      value = value.replace('{configuration}', 'Release')
+      value = value.replace('{configuration}', buildType)
         .replace('{node_abi}', `electron-v${this.electronVersion.split('.').slice(0, 2).join('.')}`)
         .replace('{platform}', process.platform)
         .replace('{arch}', this.arch)
@@ -204,7 +214,8 @@ class Rebuilder {
         npm_config_runtime: 'electron',
         npm_config_arch: this.arch,
         npm_config_target_arch: this.arch,
-        npm_config_build_from_source: true,
+        npm_config_build_from_source: 'true',
+        npm_config_debug: this.debug ? 'true' : 'false',
       }),
     });
 
@@ -213,13 +224,14 @@ class Rebuilder {
     await fs.writeFile(metaPath, metaData);
 
     const moduleName = path.basename(modulePath);
+    const buildLocation = 'build/' + buildType;
 
-    d('searching for .node file', path.resolve(modulePath, 'build/Release'));
-    d('testing files', (await fs.readdir(path.resolve(modulePath, 'build/Release'))));
+    d('searching for .node file', path.resolve(modulePath, buildLocation));
+    d('testing files', (await fs.readdir(path.resolve(modulePath, buildLocation))));
 
-    const nodeFile = (await fs.readdir(path.resolve(modulePath, 'build/Release')))
+    const nodeFile = (await fs.readdir(path.resolve(modulePath, buildLocation)))
       .find((file) => file !== '.node' && file.endsWith('.node'));
-    const nodePath = nodeFile ? path.resolve(modulePath, 'build/Release', nodeFile) : undefined;
+    const nodePath = nodeFile ? path.resolve(modulePath, buildLocation, nodeFile) : undefined;
 
     const abiPath = path.resolve(modulePath, `bin/${process.platform}-${this.arch}-${this.ABI}`);
     if (nodePath && await fs.exists(nodePath)) {
@@ -341,7 +353,8 @@ export type RebuildFunctionWithArgs = (
   headerURL?: string,
   types?: ModuleType[],
   mode?: RebuildMode,
-  onlyModules?: string[] | null
+  onlyModules?: string[] | null,
+  debug?: boolean
 ) => RebuilderResult;
 export type RebuildFunction = RebuildFunctionWithArgs & RebuildFunctionWithOptions;
 
@@ -356,7 +369,8 @@ export function createOptions(
     headerURL: string,
     types: ModuleType[],
     mode: RebuildMode,
-    onlyModules: string[] | null): RebuildOptions {
+    onlyModules: string[] | null,
+    debug: boolean ): RebuildOptions {
 
   return {
     buildPath,
@@ -368,6 +382,7 @@ export function createOptions(
     headerURL,
     types,
     mode,
+    debug
   };
 }
 
