@@ -162,4 +162,27 @@ describe('rebuilder', () => {
       expect(built).to.equal(2);
     });
   });
+
+  describe('debug rebuild', function() {
+    this.timeout(10 * 60 * 1000);
+
+    before(resetTestModule);
+    afterEach(async () => await fs.remove(testModulePath));
+
+    it('should have rebuilt ffi module in Debug mode', async () => {
+      const rebuilder = rebuild({
+        buildPath: testModulePath,
+        electronVersion: '1.4.12',
+        arch: process.arch,
+        onlyModules: ['ffi'],
+        force: true,
+        debug: true
+      });
+      await rebuilder;
+      const forgeMetaDebug = path.resolve(testModulePath, 'node_modules', 'ffi', 'build', 'Debug', '.forge-meta');
+      expect(await fs.exists(forgeMetaDebug), 'ffi debug build meta should exist').to.equal(true);
+      const forgeMetaRelease = path.resolve(testModulePath, 'node_modules', 'ffi', 'build', 'Release', '.forge-meta');
+      expect(await fs.exists(forgeMetaRelease), 'ffi release build meta should not exist').to.equal(false);
+    });
+  });
 });
