@@ -215,7 +215,7 @@ class Rebuilder {
         npm_config_arch: this.arch,
         npm_config_target_arch: this.arch,
         npm_config_build_from_source: 'true',
-        npm_config_debug: this.debug ? 'true' : 'false',
+        npm_config_debug: this.debug ? 'true' : '',
       }),
     });
 
