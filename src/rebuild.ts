@@ -1,5 +1,6 @@
 import { spawnPromise } from 'spawn-rx';
 import * as debug from 'debug';
+import * as detectLibc from 'detect-libc';
 import * as EventEmitter from 'events';
 import * as fs from 'fs-extra';
 import * as nodeAbi from 'node-abi';
@@ -195,7 +196,8 @@ class Rebuilder {
         .replace('{node_abi}', `electron-v${this.electronVersion.split('.').slice(0, 2).join('.')}`)
         .replace('{platform}', process.platform)
         .replace('{arch}', this.arch)
-        .replace('{version}', modulePackageJson.version);
+        .replace('{version}', modulePackageJson.version)
+        .replace('{libc}', detectLibc.family || 'unknown');
 
       Object.keys(modulePackageJson.binary).forEach((binaryReplaceKey) => {
         value = value.replace(`{${binaryReplaceKey}}`, modulePackageJson.binary[binaryReplaceKey]);
