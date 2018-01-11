@@ -306,7 +306,12 @@ class Rebuilder {
     }
 
     d('exploring', modulePath);
-    const childPackageJson = await readPackageJson(modulePath);
+    let childPackageJson: any;
+    try {
+      childPackageJson = await readPackageJson(modulePath, true)
+    } catch (err) {
+      return;
+    }
     const moduleWait: Promise<void>[] = [];
 
     const callback = this.markChildrenAsProdDeps.bind(this);
