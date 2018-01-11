@@ -100,7 +100,17 @@ class Rebuilder {
     if (!path.isAbsolute(this.buildPath)) {
       throw new Error('Expected buildPath to be an absolute path');
     }
-    d('rebuilding with args:', this.buildPath, this.electronVersion, this.arch, this.extraModules, this.force, this.headerURL, this.types, this.debug);
+    d(
+      'rebuilding with args:',
+      this.buildPath,
+      this.electronVersion,
+      this.arch,
+      this.extraModules,
+      this.force,
+      this.headerURL,
+      this.types,
+      this.debug
+    );
 
     this.lifecycle.emit('start');
 
@@ -180,7 +190,7 @@ class Rebuilder {
     ];
 
     if (this.debug) {
-      rebuildArgs.push('--debug')
+      rebuildArgs.push('--debug');
     }
 
     const modulePackageJson = await readPackageJson(modulePath);
@@ -308,7 +318,7 @@ class Rebuilder {
     d('exploring', modulePath);
     let childPackageJson: any;
     try {
-      childPackageJson = await readPackageJson(modulePath, true)
+      childPackageJson = await readPackageJson(modulePath, true);
     } catch (err) {
       return;
     }
