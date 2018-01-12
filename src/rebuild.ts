@@ -33,16 +33,24 @@ const d = debug('electron-rebuild');
 const defaultMode: RebuildMode = process.platform === 'win32' ? 'sequential' : 'parallel';
 const defaultTypes: ModuleType[] = ['prod', 'optional'];
 
-const locateNodeGyp = async () => {
-  let testPath = __dirname;
-  for (let upDir = 0; upDir <= 20; upDir++) {
-    const nodeGypTestPath = path.resolve(testPath, `node_modules/.bin/node-gyp${process.platform === 'win32' ? '.cmd' : ''}`);
-    if (await fs.exists(nodeGypTestPath)) {
-      return nodeGypTestPath;
+const locateBinary = async (basePath: string, binaryName: string) => {
+  let testPath = basePath;
+  for (let upDir = 0; upDir <= 20; upDir ++) {
+    const checkPath = path.resolve(testPath, `node_modules/.bin/${binaryName}${process.platform === 'win32' ? '.cmd' : ''}`);
+    if (await fs.exists(checkPath)) {
+      return checkPath;
     }
     testPath = path.resolve(testPath, '..');
   }
   return null;
+};
+
+const locateNodeGyp = async () => {
+  return await locateBinary(__dirname, 'node-gyp');
+};
+
+const locatePrebuild = async (modulePath: string) => {
+  return await locateBinary(modulePath, 'prebuild-install');
 };
 
 class Rebuilder {
@@ -175,10 +183,47 @@ class Rebuilder {
         return;
       }
     }
-    // How to indentify Debug build prebuilds
+
+    // prebuild already exists
     if (await fs.exists(path.resolve(modulePath, 'prebuilds', `${process.platform}-${this.arch}`, `electron-${this.ABI}.node`))) {
       d(`skipping: ${path.basename(modulePath)} as it was prebuilt`);
       return;
+    }
+
+    const modulePackageJson = await readPackageJson(modulePath);
+
+    if ((modulePackageJson.dependencies || {})['prebuild-install']) {
+      d(`assuming is prebuild powered: ${path.basename(modulePath)}`);
+      const prebuildInstallPath = await locatePrebuild(modulePath);
+      if (prebuildInstallPath) {
+        d(`triggering prebuild download step: ${path.basename(modulePath)}`);
+        let success = false;
+        try {
+          await spawnPromise(
+            prebuildInstallPath,
+            [
+              `--arch=${this.arch}`,
+              `--platform=${process.platform}`,
+              '--runtime=electron',
+              `--target=${this.electronVersion}`
+            ],
+            {
+              cwd: modulePath,
+            }
+          );
+          success = true;
+        } catch (err) {
+          d('failed to use prebuild-install:', err);
+        }
+        if (success) {
+          d('built:', path.basename(modulePath));
+          await fs.mkdirs(path.dirname(metaPath));
+          await fs.writeFile(metaPath, metaData);
+          return;
+        }
+      } else {
+        d(`could not find prebuild-install relative to: ${modulePath}`);
+      }
     }
     d('rebuilding:', path.basename(modulePath));
     const rebuildArgs = [
@@ -192,8 +237,6 @@ class Rebuilder {
     if (this.debug) {
       rebuildArgs.push('--debug');
     }
-
-    const modulePackageJson = await readPackageJson(modulePath);
 
     Object.keys(modulePackageJson.binary || {}).forEach((binaryKey) => {
       let value = modulePackageJson.binary[binaryKey];
