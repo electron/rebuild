@@ -33,10 +33,10 @@ const d = debug('electron-rebuild');
 const defaultMode: RebuildMode = process.platform === 'win32' ? 'sequential' : 'parallel';
 const defaultTypes: ModuleType[] = ['prod', 'optional'];
 
-const locateBinary = async (basePath: string, binaryName: string) => {
+const locateBinary = async (basePath: string, suffix: string) => {
   let testPath = basePath;
   for (let upDir = 0; upDir <= 20; upDir ++) {
-    const checkPath = path.resolve(testPath, `node_modules/.bin/${binaryName}${process.platform === 'win32' ? '.cmd' : ''}`);
+    const checkPath = path.resolve(testPath, suffix);
     if (await fs.exists(checkPath)) {
       return checkPath;
     }
@@ -46,11 +46,11 @@ const locateBinary = async (basePath: string, binaryName: string) => {
 };
 
 const locateNodeGyp = async () => {
-  return await locateBinary(__dirname, 'node-gyp');
+  return await locateBinary(__dirname, `node_modules/.bin/node-gyp${process.platform === 'win32' ? '.cmd' : ''}`);
 };
 
 const locatePrebuild = async (modulePath: string) => {
-  return await locateBinary(modulePath, 'prebuild-install');
+  return await locateBinary(modulePath, 'node_modules/prebuild-install/bin.js');
 };
 
 class Rebuilder {
