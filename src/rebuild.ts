@@ -200,8 +200,10 @@ class Rebuilder {
         let success = false;
         try {
           await spawnPromise(
-            prebuildInstallPath,
+            process.execPath,
             [
+              path.resolve(__dirname, 'prebuild-shim.js'),
+              prebuildInstallPath,
               `--arch=${this.arch}`,
               `--platform=${process.platform}`,
               '--runtime=electron',
