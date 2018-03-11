@@ -93,6 +93,10 @@ packager({
 });
 ```
 
+### How can I integrate this with [prebuild](https://github.com/prebuild/prebuild)?
+
+If your module uses [prebuild](https://github.com/prebuild/prebuild) for creating prebuilt binaries it also uses [prebuild-install](https://github.com/prebuild/prebuild-install) to download them. If this is the case then `electron-rebuild` will run `prebuild-install` to download the correct binaries from github instead of rebuilding them.
+
 ### How can I integrate this into Grunt / Gulp / Whatever?
 
 electron-rebuild is also a library that you can just require into your app or
