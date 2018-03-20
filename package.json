@@ -31,7 +31,7 @@
     "node": ">=6.0.0"
   },
   "dependencies": {
-    "colors": "^1.1.2",
+    "colors": "^1.2.0",
     "debug": "^2.6.3",
     "detect-libc": "^1.0.3",
     "fs-extra": "^3.0.1",
@@ -45,7 +45,6 @@
   "devDependencies": {
     "@types/chai": "^3.4.35",
     "@types/chai-as-promised": "0.0.30",
-    "@types/colors": "^1.1.1",
     "@types/debug": "0.0.29",
     "@types/fs-extra": "^3.0.3",
     "@types/mocha": "^2.2.40",
