@@ -8,7 +8,7 @@ import * as nodeAbi from 'node-abi';
 import * as os from 'os';
 import * as path from 'path';
 import { readPackageJson } from './read-package-json';
-import { lookup, cacheModuleState } from './cache';
+import { lookupModuleState, cacheModuleState } from './cache';
 
 export type ModuleType = 'prod' | 'dev' | 'optional';
 export type RebuildMode = 'sequential' | 'parallel';
@@ -261,7 +261,7 @@ class Rebuilder {
         modulePath,
       });
 
-      const applyDiffFn = await lookup(this.cachePath, cacheKey);
+      const applyDiffFn = await lookupModuleState(this.cachePath, cacheKey);
       if (applyDiffFn) {
         await applyDiffFn(modulePath);
         this.lifecycle.emit('module-done');
