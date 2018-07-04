@@ -227,6 +227,12 @@ class Rebuilder {
         d(`could not find prebuild-install relative to: ${modulePath}`);
       }
     }
+    if (modulePath.indexOf(' ') !== -1) {
+      console.error('Attempted to build a module with a space in the path');
+      console.error('See https://github.com/nodejs/node-gyp/issues/65#issuecomment-368820565 for reasons why this will not work');
+      throw new Error(`node-gyp does not support building modules with spaces in their path, tried to build: ${modulePath}`);
+      return;
+    }
     d('rebuilding:', path.basename(modulePath));
     const rebuildArgs = [
       'rebuild',
