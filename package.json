@@ -1,6 +1,6 @@
 {
   "name": "electron-rebuild",
-  "version": "1.7.3",
+  "version": "1.8.0",
   "description": "Electron supporting package to rebuild native node modules against the currently installed electron",
   "main": "lib/src/main.js",
   "typings": "lib/src/main.d.ts",
