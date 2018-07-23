@@ -21,6 +21,7 @@ export interface RebuildOptions {
   headerURL?: string;
   types?: ModuleType[];
   mode?: RebuildMode;
+  proxy: string;
   debug?: boolean;
 }
 
@@ -71,6 +72,7 @@ class Rebuilder {
   public headerURL: string;
   public types: ModuleType[];
   public mode: RebuildMode;
+  public proxy: string;
   public debug: boolean;
 
   constructor(options: RebuilderOptions) {
@@ -84,6 +86,7 @@ class Rebuilder {
     this.headerURL = options.headerURL || 'https://atom.io/download/electron';
     this.types = options.types || defaultTypes;
     this.mode = options.mode || defaultMode;
+    this.proxy = options.proxy;
     this.debug = options.debug || false;
 
     if (typeof this.electronVersion === 'number') {
@@ -241,6 +244,9 @@ class Rebuilder {
       '--build-from-source',
     ];
 
+    if (this.proxy) {
+      rebuildArgs.push(`--proxy=${this.proxy}`)
+    }
     if (this.debug) {
       rebuildArgs.push('--debug');
     }
@@ -437,6 +443,7 @@ export function createOptions(
     types: ModuleType[],
     mode: RebuildMode,
     onlyModules: string[] | null,
+    proxy: string,
     debug: boolean ): RebuildOptions {
 
   return {
@@ -449,6 +456,7 @@ export function createOptions(
     headerURL,
     types,
     mode,
+    proxy,
     debug
   };
 }

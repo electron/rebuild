@@ -64,6 +64,7 @@ Options:
                                default on Windows
   -o, --only                   Only build specified module, or comma separated
                                list of modules. All others are ignored.
+  -x, --proxy                  Proxy for node-gyp to use        
   -b, --debug                  Build debug version of modules
 
 Copyright 2016
