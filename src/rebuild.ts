@@ -21,7 +21,7 @@ export interface RebuildOptions {
   headerURL?: string;
   types?: ModuleType[];
   mode?: RebuildMode;
-  proxy: string;
+  proxy?: string;
   debug?: boolean;
 }
 
@@ -72,7 +72,7 @@ class Rebuilder {
   public headerURL: string;
   public types: ModuleType[];
   public mode: RebuildMode;
-  public proxy: string;
+  public proxy: string | null;
   public debug: boolean;
 
   constructor(options: RebuilderOptions) {
@@ -86,7 +86,7 @@ class Rebuilder {
     this.headerURL = options.headerURL || 'https://atom.io/download/electron';
     this.types = options.types || defaultTypes;
     this.mode = options.mode || defaultMode;
-    this.proxy = options.proxy;
+    this.proxy = options.proxy || null;
     this.debug = options.debug || false;
 
     if (typeof this.electronVersion === 'number') {
@@ -427,7 +427,8 @@ export type RebuildFunctionWithArgs = (
   types?: ModuleType[],
   mode?: RebuildMode,
   onlyModules?: string[] | null,
-  debug?: boolean
+  proxy?: string,
+  debug?: boolean,
 ) => RebuilderResult;
 export type RebuildFunction = RebuildFunctionWithArgs & RebuildFunctionWithOptions;
 
