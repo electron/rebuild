@@ -228,9 +228,10 @@ class Rebuilder {
       }
     }
     if (modulePath.indexOf(' ') !== -1) {
-      console.error('Attempted to build a module with a space in the path');
-      console.error('See https://github.com/nodejs/node-gyp/issues/65#issuecomment-368820565 for reasons why this will not work');
-      throw new Error(`node-gyp does not support building modules with spaces in their path, tried to build: ${modulePath}`);
+      console.error('Attempting to build a module with a space in the path');
+      console.error('See https://github.com/nodejs/node-gyp/issues/65#issuecomment-368820565 for reasons why this may not work');
+      // FIXME: Re-enable the throw when more research has been done
+      // throw new Error(`node-gyp does not support building modules with spaces in their path, tried to build: ${modulePath}`);
     }
     d('rebuilding:', path.basename(modulePath));
     const rebuildArgs = [
