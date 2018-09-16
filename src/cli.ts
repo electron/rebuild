@@ -8,6 +8,7 @@ import * as argParser from 'yargs';
 
 import { rebuild } from './rebuild';
 import { locateElectronPrebuilt } from './electron-locater';
+import { getProjectRootPath } from './search-module';
 
 const yargs = argParser
   .usage('Usage: electron-rebuild --version [version] --module-dir [path]')
@@ -66,7 +67,10 @@ process.on('unhandledRejection', handler);
 
 
 (async () => {
-  const electronPrebuiltPath = argv.e ? path.resolve(process.cwd(), argv.e) : locateElectronPrebuilt();
+  const projectRootPath = getProjectRootPath(process.cwd());
+  console.log(`projectRootPath: ${projectRootPath}`);
+
+  const electronPrebuiltPath = argv.e ? path.resolve(process.cwd(), argv.e) : locateElectronPrebuilt(projectRootPath);
   let electronPrebuiltVersion = argv.v;
 
   if (!electronPrebuiltVersion) {
@@ -79,6 +83,8 @@ process.on('unhandledRejection', handler);
       throw new Error('Unable to find electron-prebuilt\'s version number, either install it or specify an explicit version');
     }
   }
+
+  console.log(`Electron Version: ${electronPrebuiltVersion}`);
 
   let rootDirectory = argv.m;
 
