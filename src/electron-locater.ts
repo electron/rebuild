@@ -17,7 +17,7 @@ export function locateElectronPrebuilt(projectRootPath?: string) {
     if (electronPath) {
       return fs.existsSync(path.join(electronPath,'package.json'));
     } else {
-      return false
+      return false;
     }
   });
 
