@@ -7,6 +7,7 @@ import * as nodeAbi from 'node-abi';
 import * as os from 'os';
 import * as path from 'path';
 import { readPackageJson } from './read-package-json';
+import { searchModule, searchNodeModules } from './search-module';
 
 export type ModuleType = 'prod' | 'dev' | 'optional';
 export type RebuildMode = 'sequential' | 'parallel';
@@ -22,6 +23,7 @@ export interface RebuildOptions {
   types?: ModuleType[];
   mode?: RebuildMode;
   debug?: boolean;
+  projectRootPath?: string | undefined;
 }
 
 export interface RebuilderOptions extends RebuildOptions {
@@ -72,6 +74,7 @@ class Rebuilder {
   public types: ModuleType[];
   public mode: RebuildMode;
   public debug: boolean;
+  public projectRootPath: string | undefined;
 
   constructor(options: RebuilderOptions) {
     this.lifecycle = options.lifecycle;
@@ -85,6 +88,7 @@ class Rebuilder {
     this.types = options.types || defaultTypes;
     this.mode = options.mode || defaultMode;
     this.debug = options.debug || false;
+    this.projectRootPath = options.projectRootPath || undefined;
 
     if (typeof this.electronVersion === 'number') {
       if (`${this.electronVersion}`.split('.').length === 1) {
@@ -136,16 +140,30 @@ class Rebuilder {
       depKeys.push(...Object.keys(rootPackageJson.devDependencies || {}));
     }
 
-    depKeys.forEach((key) => {
+    for (let key of depKeys) {
       this.prodDeps[key] = true;
-      markWaiters.push(this.markChildrenAsProdDeps(path.resolve(this.buildPath, 'node_modules', key)));
-    });
+      const modulePaths: string[] = await searchModule(
+        this.buildPath,
+        key,
+        this.projectRootPath
+      );
+      for (let modulePath of modulePaths) {
+        markWaiters.push(this.markChildrenAsProdDeps(modulePath));
+      }
+    }
 
     await Promise.all(markWaiters);
 
     d('identified prod deps:', this.prodDeps);
 
-    await this.rebuildAllModulesIn(path.resolve(this.buildPath, 'node_modules'));
+    let nodeModulesPaths = await searchNodeModules(
+      this.buildPath,
+      this.projectRootPath
+    );
+    for (let nodeModulesPath of nodeModulesPaths) {
+      await this.rebuildAllModulesIn(nodeModulesPath);
+    }
+
     this.rebuilds.push(() => this.rebuildModuleAt(this.buildPath));
 
     if (this.mode !== 'sequential') {
@@ -349,13 +367,13 @@ class Rebuilder {
     let targetDir = fromDir;
     const foundFns = [];
 
-    while (targetDir !== path.dirname(this.buildPath)) {
-      const testPath = path.resolve(targetDir, 'node_modules', moduleName);
-      if (await fs.exists(testPath)) {
-        foundFns.push(foundFn(testPath));
-      }
-
-      targetDir = path.dirname(targetDir);
+    let testPaths = await searchModule(
+      targetDir,
+      moduleName,
+      this.projectRootPath
+    );
+    for (let testPath of testPaths) {
+      foundFns.push(foundFn(testPath));
     }
 
     await Promise.all(foundFns);
