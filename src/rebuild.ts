@@ -95,7 +95,7 @@ class Rebuilder {
     this.types = options.types || defaultTypes;
     this.mode = options.mode || defaultMode;
     this.debug = options.debug || false;
-    this.useCache = typeof options.useCache === 'undefined' ? true : options.useCache;
+    this.useCache = options.useCache || false;
     this.cachePath = options.cachePath || path.resolve(os.homedir(), '.electron-rebuild-cache');
 
     if (this.useCache && this.force) {
