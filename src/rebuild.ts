@@ -1,4 +1,5 @@
 import { spawnPromise } from 'spawn-rx';
+import * as crypto from 'crypto';
 import * as debug from 'debug';
 import * as detectLibc from 'detect-libc';
 import * as EventEmitter from 'events';
@@ -7,6 +8,7 @@ import * as nodeAbi from 'node-abi';
 import * as os from 'os';
 import * as path from 'path';
 import { readPackageJson } from './read-package-json';
+import { lookupModuleState, cacheModuleState } from './cache';
 
 export type ModuleType = 'prod' | 'dev' | 'optional';
 export type RebuildMode = 'sequential' | 'parallel';
@@ -22,7 +24,11 @@ export interface RebuildOptions {
   types?: ModuleType[];
   mode?: RebuildMode;
   debug?: boolean;
+  useCache?: boolean;
+  cachePath?: string;
 }
+
+export type HashTree = { [path: string]: string | HashTree };
 
 export interface RebuilderOptions extends RebuildOptions {
   lifecycle: EventEmitter;
@@ -32,6 +38,8 @@ const d = debug('electron-rebuild');
 
 const defaultMode: RebuildMode = process.platform === 'win32' ? 'sequential' : 'parallel';
 const defaultTypes: ModuleType[] = ['prod', 'optional'];
+// Update this number if you change the caching logic to ensure no bad cache hits
+const ELECTRON_REBUILD_CACHE_ID = 1;
 
 const locateBinary = async (basePath: string, suffix: string) => {
   let testPath = basePath;
@@ -72,6 +80,8 @@ class Rebuilder {
   public types: ModuleType[];
   public mode: RebuildMode;
   public debug: boolean;
+  public useCache: boolean;
+  public cachePath: string;
 
   constructor(options: RebuilderOptions) {
     this.lifecycle = options.lifecycle;
@@ -85,6 +95,13 @@ class Rebuilder {
     this.types = options.types || defaultTypes;
     this.mode = options.mode || defaultMode;
     this.debug = options.debug || false;
+    this.useCache = options.useCache || false;
+    this.cachePath = options.cachePath || path.resolve(os.homedir(), '.electron-rebuild-cache');
+
+    if (this.useCache && this.force) {
+      console.warn('[WARNING]: Electron Rebuild has force enabled and cache enabled, force take precedence and the cache will not be used.');
+      this.useCache = false;
+    }
 
     if (typeof this.electronVersion === 'number') {
       if (`${this.electronVersion}`.split('.').length === 1) {
@@ -157,6 +174,54 @@ class Rebuilder {
     }
   }
 
+  private hashDirectory = async (dir: string, relativeTo = dir) => {
+    d('hashing dir', dir);
+    const dirTree: HashTree = {};
+    await Promise.all((await fs.readdir(dir)).map(async (child) => {
+      d('found child', child, 'in dir', dir);
+      // Ignore output directories
+      if (dir === relativeTo && (child === 'build' || child === 'bin')) return;
+      // Don't hash nested node_modules
+      if (child === 'node_modules') return;
+
+      const childPath = path.resolve(dir, child);
+      const relative = path.relative(relativeTo, childPath);
+      if ((await fs.stat(childPath)).isDirectory()) {
+        dirTree[relative] = await this.hashDirectory(childPath, relativeTo);
+      } else {
+        dirTree[relative] = crypto.createHash('SHA256').update(await fs.readFile(childPath)).digest('hex');
+      }
+    }));
+    return dirTree;
+  }
+
+  private dHashTree = (tree: HashTree, hash: crypto.Hash) => {
+    for (const key of Object.keys(tree).sort()) {
+      hash.update(key);
+      if (typeof tree[key] === 'string') {
+        hash.update(tree[key] as string);
+      } else {
+        this.dHashTree(tree[key] as HashTree, hash);
+      }
+    }
+  }
+
+  private generateCacheKey = async (opts: { modulePath: string }) => {
+    const tree = await this.hashDirectory(opts.modulePath);
+    const hasher = crypto.createHash('SHA256')
+      .update(`${ELECTRON_REBUILD_CACHE_ID}`)
+      .update(path.basename(opts.modulePath))
+      .update(this.ABI)
+      .update(this.arch)
+      .update(this.debug ? 'debug' : 'not debug')
+      .update(this.headerURL)
+      .update(this.electronVersion);
+    this.dHashTree(tree, hasher);
+    const hash = hasher.digest('hex');
+    d('calculated hash of', opts.modulePath, 'to be', hash);
+    return hash;
+  }
+
   async rebuildModuleAt(modulePath: string) {
     if (!(await fs.exists(path.resolve(modulePath, 'binding.gyp')))) {
       return;
@@ -190,6 +255,20 @@ class Rebuilder {
       return;
     }
 
+    let cacheKey!: string;
+    if (this.useCache) {
+      cacheKey = await this.generateCacheKey({
+        modulePath,
+      });
+
+      const applyDiffFn = await lookupModuleState(this.cachePath, cacheKey);
+      if (applyDiffFn) {
+        await applyDiffFn(modulePath);
+        this.lifecycle.emit('module-done');
+        return;
+      }
+    }
+
     const modulePackageJson = await readPackageJson(modulePath);
 
     if ((modulePackageJson.dependencies || {})['prebuild-install']) {
@@ -221,6 +300,10 @@ class Rebuilder {
           d('built:', path.basename(modulePath));
           await fs.mkdirs(path.dirname(metaPath));
           await fs.writeFile(metaPath, metaData);
+          if (this.useCache) {
+            await cacheModuleState(modulePath, this.cachePath, cacheKey);
+          }
+          this.lifecycle.emit('module-done');
           return;
         }
       } else {
@@ -267,6 +350,10 @@ class Rebuilder {
       rebuildArgs.push(`--${binaryKey}=${value}`);
     });
 
+    if (process.env.GYP_MSVS_VERSION) {
+      rebuildArgs.push(`--msvs_version=${process.env.GYP_MSVS_VERSION}`);
+    }
+
     d('rebuilding', path.basename(modulePath), 'with args', rebuildArgs);
     await spawnPromise(nodeGypPath, rebuildArgs, {
       cwd: modulePath,
@@ -304,6 +391,9 @@ class Rebuilder {
       await fs.copy(nodePath, path.resolve(abiPath, `${moduleName}.node`));
     }
 
+    if (this.useCache) {
+      await cacheModuleState(modulePath, this.cachePath, cacheKey);
+    }
     this.lifecycle.emit('module-done');
   }
 
