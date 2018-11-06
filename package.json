@@ -35,7 +35,7 @@
     "debug": "^2.6.3",
     "detect-libc": "^1.0.3",
     "fs-extra": "^3.0.1",
-    "node-abi": "^2.0.0",
+    "node-abi": "^2.5.0",
     "node-gyp": "^3.6.0",
     "ora": "^1.2.0",
     "rimraf": "^2.6.1",
