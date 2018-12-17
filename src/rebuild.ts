@@ -26,6 +26,7 @@ export interface RebuildOptions {
   debug?: boolean;
   useCache?: boolean;
   cachePath?: string;
+  tagPrefix?: string;
 }
 
 export type HashTree = { [path: string]: string | HashTree };
@@ -82,6 +83,7 @@ class Rebuilder {
   public debug: boolean;
   public useCache: boolean;
   public cachePath: string;
+  public tagPrefix: string;
 
   constructor(options: RebuilderOptions) {
     this.lifecycle = options.lifecycle;
@@ -97,6 +99,7 @@ class Rebuilder {
     this.debug = options.debug || false;
     this.useCache = options.useCache || false;
     this.cachePath = options.cachePath || path.resolve(os.homedir(), '.electron-rebuild-cache');
+    this.tagPrefix = options.tagPrefix || 'v';
 
     if (this.useCache && this.force) {
       console.warn('[WARNING]: Electron Rebuild has force enabled and cache enabled, force take precedence and the cache will not be used.');
@@ -288,7 +291,8 @@ class Rebuilder {
               `--arch=${this.arch}`,
               `--platform=${process.platform}`,
               '--runtime=electron',
-              `--target=${this.electronVersion}`
+              `--target=${this.electronVersion}`,
+              `--tag-prefix=${this.tagPrefix}`
             ],
             {
               cwd: modulePath,
