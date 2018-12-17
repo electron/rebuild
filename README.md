@@ -74,6 +74,7 @@ Options:
   -o, --only                   Only build specified module, or comma separated
                                list of modules. All others are ignored.
   -b, --debug                  Build debug version of modules
+  -tp, --prebuild-tag-prefix   github tag prefix, default is "v", passed to prebuild-install
 
 Copyright 2016
 ```
