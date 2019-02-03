@@ -38,6 +38,11 @@ and then
 npm run rebuild
 ```
 
+### What versions of Node does it work with?
+
+Node v6.0.0 or higher is required.
+
+
 ### CLI Arguments
 
 ```
