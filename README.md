@@ -38,7 +38,7 @@ and then
 npm run rebuild
 ```
 
-### What versions of node does it work with?
+### What versions of Node does it work with?
 
 Node v6.0.0 or higher is required.
 
