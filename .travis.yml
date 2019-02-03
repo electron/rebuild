@@ -1,12 +1,10 @@
 language: node_js
-node_js:
-- '6'
-
-sudo: false
+node_js: '6'
 
 os:
 - linux
 - osx
+dist: xenial
 
 env:
   global:
@@ -20,4 +18,3 @@ branches:
 before_script:
   # remove "electron" folder for electron-locater tests
   - cd ../../ && mv ./electron/electron-rebuild/ ./electron-rebuild/ && rm -rf ./electron/ && cd ./electron-rebuild/
-script: npm run test
