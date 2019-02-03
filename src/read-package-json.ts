@@ -11,4 +11,4 @@ export async function readPackageJson(dir: string, safe = false) {
       throw err;
     }
   }
-};
+}

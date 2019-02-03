@@ -1,13 +1,10 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as os from 'os';
-import * as ora from 'ora';
 
 import { spawnPromise } from 'spawn-rx';
 import { expect } from 'chai';
 import { rebuild, RebuildOptions } from '../src/rebuild';
-
-ora.ora = ora;
 
 describe('rebuilder', () => {
   const testModulePath = path.resolve(os.tmpdir(), 'electron-forge-rebuild-test');

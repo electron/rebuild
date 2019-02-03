@@ -6,7 +6,7 @@ import * as path from 'path';
 import * as ora from 'ora';
 import * as argParser from 'yargs';
 
-import { rebuild } from './rebuild';
+import { rebuild, ModuleType } from './rebuild';
 import { locateElectronPrebuilt } from './electron-locater';
 
 const yargs = argParser
@@ -66,8 +66,8 @@ process.on('unhandledRejection', handler);
 
 
 (async () => {
-  const electronPrebuiltPath = argv.e ? path.resolve(process.cwd(), argv.e) : locateElectronPrebuilt();
-  let electronPrebuiltVersion = argv.v;
+  const electronPrebuiltPath = argv.e ? path.resolve(process.cwd(), (argv.e as string)) : locateElectronPrebuilt();
+  let electronPrebuiltVersion = argv.v as string;
 
   if (!electronPrebuiltVersion) {
     try {
@@ -80,7 +80,7 @@ process.on('unhandledRejection', handler);
     }
   }
 
-  let rootDirectory = argv.m;
+  let rootDirectory = argv.m as string;
 
   if (!rootDirectory) {
     // NB: We assume here that we're going to rebuild the immediate parent's
@@ -116,14 +116,14 @@ process.on('unhandledRejection', handler);
   const rebuilder = rebuild({
     buildPath: rootDirectory,
     electronVersion: electronPrebuiltVersion,
-    arch: argv.a || process.arch,
-    extraModules: argv.w ? argv.w.split(',') : [],
-    onlyModules: argv.o ? argv.o.split(',') : null,
-    force: argv.f,
-    headerURL: argv.d,
-    types: argv.t ? argv.t.split(',') : ['prod', 'optional'],
+    arch: (argv.a as string) || process.arch,
+    extraModules: argv.w ? (argv.w as string).split(',') : [],
+    onlyModules: argv.o ? (argv.o as string).split(',') : null,
+    force: argv.f as boolean,
+    headerURL: argv.d as string,
+    types: argv.t ? (argv.t as string).split(',') as ModuleType[] : ['prod', 'optional'],
     mode: argv.p ? 'parallel' : (argv.s ? 'sequential' : undefined),
-    debug: argv.b
+    debug: argv.b as boolean
   });
 
   const lifecycle = rebuilder.lifecycle;

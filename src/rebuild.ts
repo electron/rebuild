@@ -433,7 +433,7 @@ class Rebuilder {
         await this.rebuildAllModulesIn(path.resolve(realPath, 'node_modules'));
       }
     }
-  };
+  }
 
   async findModule(moduleName: string, fromDir: string, foundFn: ((p: string) => Promise<void>)) {
     let targetDir = fromDir;
@@ -449,7 +449,7 @@ class Rebuilder {
     }
 
     await Promise.all(foundFns);
-  };
+  }
 
   async markChildrenAsProdDeps(modulePath: string) {
     if (!await fs.pathExists(modulePath)) {
@@ -477,7 +477,7 @@ class Rebuilder {
     });
 
     await Promise.all(moduleWait);
-  };
+  }
 }
 
 function rebuildWithOptions(options: RebuildOptions) {
@@ -516,7 +516,7 @@ export type RebuildFunctionWithArgs = (
 ) => RebuilderResult;
 export type RebuildFunction = RebuildFunctionWithArgs & RebuildFunctionWithOptions;
 
-export const rebuild = (doRebuild as RebuildFunction);;
+export const rebuild = (doRebuild as RebuildFunction);
 
 export function createOptions(
     buildPath: string,
@@ -562,4 +562,4 @@ export function rebuildNativeModules(
   console.warn('You are using the old API, please read the new docs and update to the new API');
 
   return rebuild(modulePath, electronVersion, arch, whichModule.split(','));
-};
+}
