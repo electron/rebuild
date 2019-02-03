@@ -28,4 +28,7 @@ before_install:
 
 before_script:
   # remove "electron" folder for electron-locater tests
-  - cd ../../ && mv ./electron/electron-rebuild/ ./electron-rebuild/ && rm -rf ./electron/ && cd ./electron-rebuild/
+  - |
+      if [[ "$TRAVIS_REPO_SLUG" = "electron/electron-rebuild" ]]; then
+        cd ../../ && mv ./$TRAVIS_REPO_SLUG ./electron-rebuild && rm -rf ./electron && cd ./electron-rebuild/
+      fi
