@@ -11,6 +11,7 @@ ora.ora = ora;
 
 describe('rebuilder', () => {
   const testModulePath = path.resolve(os.tmpdir(), 'electron-forge-rebuild-test');
+  const timeoutSeconds = process.platform === 'win32' ? 5 : 2;
 
   const resetTestModule = async () => {
     await fs.remove(testModulePath);
@@ -38,7 +39,7 @@ describe('rebuilder', () => {
   ];
   for (const options of optionSets) {
     describe(`core behavior -- ${options.name}`, function() {
-      this.timeout(2 * 60 * 1000);
+      this.timeout(timeoutSeconds * 60 * 1000);
 
       before(resetTestModule);
 
@@ -90,7 +91,7 @@ describe('rebuilder', () => {
   }
 
   describe('force rebuild', function() {
-    this.timeout(2 * 60 * 1000);
+    this.timeout(timeoutSeconds * 60 * 1000);
 
     before(resetTestModule);
 
