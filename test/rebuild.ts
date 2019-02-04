@@ -27,10 +27,10 @@ describe('rebuilder', () => {
     name: string,
     args: RebuildOptions | string[]
   }[] = [
-    { args: [testModulePath, '1.4.12', process.arch], name: 'sequential args' },
+    { args: [testModulePath, '2.0.17', process.arch], name: 'sequential args' },
     { args: {
       buildPath: testModulePath,
-      electronVersion: '1.4.12',
+      electronVersion: '2.0.17',
       arch: process.arch
     }, name: 'options object' }
   ];
@@ -93,8 +93,8 @@ describe('rebuilder', () => {
     before(resetTestModule);
 
     it('should skip the rebuild step when disabled', async () => {
-      await rebuild(testModulePath, '1.4.12', process.arch);
-      const rebuilder = rebuild(testModulePath, '1.4.12', process.arch, [], false);
+      await rebuild(testModulePath, '2.0.17', process.arch);
+      const rebuilder = rebuild(testModulePath, '2.0.17', process.arch, [], false);
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
         skipped++;
@@ -104,7 +104,7 @@ describe('rebuilder', () => {
     });
 
     it('should rebuild all modules again when disabled but the electron ABI bumped', async () => {
-      await rebuild(testModulePath, '1.4.12', process.arch);
+      await rebuild(testModulePath, '2.0.17', process.arch);
       const rebuilder = rebuild(testModulePath, '1.6.0', process.arch, [], false);
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
@@ -115,8 +115,8 @@ describe('rebuilder', () => {
     });
 
     it('should rebuild all modules again when enabled', async () => {
-      await rebuild(testModulePath, '1.4.12', process.arch);
-      const rebuilder = rebuild(testModulePath, '1.4.12', process.arch, [], true);
+      await rebuild(testModulePath, '2.0.17', process.arch);
+      const rebuilder = rebuild(testModulePath, '2.0.17', process.arch, [], true);
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
         skipped++;
@@ -135,7 +135,7 @@ describe('rebuilder', () => {
     it('should rebuild only specified modules', async () => {
       const rebuilder = rebuild({
         buildPath: testModulePath,
-        electronVersion: '1.4.12',
+        electronVersion: '2.0.17',
         arch: process.arch,
         onlyModules: ['ffi'],
         force: true
@@ -149,7 +149,7 @@ describe('rebuilder', () => {
     it('should rebuild multiple specified modules via --only option', async () => {
       const rebuilder = rebuild({
         buildPath: testModulePath,
-        electronVersion: '1.4.12',
+        electronVersion: '2.0.17',
         arch: process.arch,
         onlyModules: ['ffi', 'ref'],
         force: true
@@ -170,7 +170,7 @@ describe('rebuilder', () => {
     it('should have rebuilt ffi module in Debug mode', async () => {
       const rebuilder = rebuild({
         buildPath: testModulePath,
-        electronVersion: '1.4.12',
+        electronVersion: '2.0.17',
         arch: process.arch,
         onlyModules: ['ffi'],
         force: true,

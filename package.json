@@ -53,7 +53,7 @@
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "cross-env": "^5.2.0",
-    "electron": "1.4.12",
+    "electron": "^2.0.17",
     "mocha": "^5.2.0",
     "ts-node": "^8.0.2",
     "tslint": "^5.12.1",
