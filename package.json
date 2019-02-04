@@ -8,8 +8,9 @@
     "compile": "tsc",
     "watch": "tsc -w",
     "prepublish": "npm run compile",
-    "test": "cross-env TS_NODE_FILES=true mocha --require ts-node/register ./test/*.ts",
-    "lint": "tslint --project tsconfig.json --exclude \"test/**/node_modules/**/*.ts\" \"src/**/*.ts\" \"test/**/*.ts\""
+    "mocha": "cross-env TS_NODE_FILES=true mocha --require ts-node/register ./test/*.ts",
+    "lint": "tslint --project tsconfig.json --exclude \"test/**/node_modules/**/*.ts\" \"src/**/*.ts\" \"test/**/*.ts\"",
+    "test": "npm run lint && npm run mocha"
   },
   "bin": {
     "electron-rebuild": "lib/src/cli.js"
