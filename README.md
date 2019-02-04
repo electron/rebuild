@@ -1,5 +1,8 @@
 ## Electron Rebuild
 
+[![Build Status](https://travis-ci.org/electron/electron-rebuild.svg?branch=master)](https://travis-ci.org/electron/electron-rebuild)
+![NPM](https://img.shields.io/npm/v/electron-rebuild.svg?style=flat)
+
 This executable rebuilds native Node.js modules against the version of Node.js
 that your Electron project is using. This allows you to use native Node.js
 modules in Electron apps without your system version of Node.js matching exactly
