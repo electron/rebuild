@@ -45,7 +45,7 @@ const locateBinary = async (basePath: string, suffix: string) => {
   let testPath = basePath;
   for (let upDir = 0; upDir <= 20; upDir ++) {
     const checkPath = path.resolve(testPath, suffix);
-    if (await fs.exists(checkPath)) {
+    if (await fs.pathExists(checkPath)) {
       return checkPath;
     }
     testPath = path.resolve(testPath, '..');
@@ -223,7 +223,7 @@ class Rebuilder {
   }
 
   async rebuildModuleAt(modulePath: string) {
-    if (!(await fs.exists(path.resolve(modulePath, 'binding.gyp')))) {
+    if (!(await fs.pathExists(path.resolve(modulePath, 'binding.gyp')))) {
       return;
     }
 
@@ -239,7 +239,7 @@ class Rebuilder {
 
     this.lifecycle.emit('module-found', path.basename(modulePath));
 
-    if (!this.force && await fs.exists(metaPath)) {
+    if (!this.force && await fs.pathExists(metaPath)) {
       const meta = await fs.readFile(metaPath, 'utf8');
       if (meta === metaData) {
         d(`skipping: ${path.basename(modulePath)} as it is already built`);
@@ -250,7 +250,7 @@ class Rebuilder {
     }
 
     // prebuild already exists
-    if (await fs.exists(path.resolve(modulePath, 'prebuilds', `${process.platform}-${this.arch}`, `electron-${this.ABI}.node`))) {
+    if (await fs.pathExists(path.resolve(modulePath, 'prebuilds', `${process.platform}-${this.arch}`, `electron-${this.ABI}.node`))) {
       d(`skipping: ${path.basename(modulePath)} as it was prebuilt`);
       return;
     }
@@ -384,7 +384,7 @@ class Rebuilder {
     const nodePath = nodeFile ? path.resolve(modulePath, buildLocation, nodeFile) : undefined;
 
     const abiPath = path.resolve(modulePath, `bin/${process.platform}-${this.arch}-${this.ABI}`);
-    if (nodePath && await fs.exists(nodePath)) {
+    if (nodePath && await fs.pathExists(nodePath)) {
       d('found .node file', nodePath);
       d('copying to prebuilt place:', abiPath);
       await fs.mkdirs(abiPath);
@@ -429,7 +429,7 @@ class Rebuilder {
         await this.rebuildAllModulesIn(realPath, `${modulePath}/`);
       }
 
-      if (await fs.exists(path.resolve(nodeModulesPath, modulePath, 'node_modules'))) {
+      if (await fs.pathExists(path.resolve(nodeModulesPath, modulePath, 'node_modules'))) {
         await this.rebuildAllModulesIn(path.resolve(realPath, 'node_modules'));
       }
     }
@@ -441,7 +441,7 @@ class Rebuilder {
 
     while (targetDir !== path.dirname(this.buildPath)) {
       const testPath = path.resolve(targetDir, 'node_modules', moduleName);
-      if (await fs.exists(testPath)) {
+      if (await fs.pathExists(testPath)) {
         foundFns.push(foundFn(testPath));
       }
 
@@ -452,7 +452,7 @@ class Rebuilder {
   };
 
   async markChildrenAsProdDeps(modulePath: string) {
-    if (!await fs.exists(modulePath)) {
+    if (!await fs.pathExists(modulePath)) {
       return;
     }
 

@@ -16,9 +16,9 @@ describe('rebuilder', () => {
   const resetTestModule = async () => {
     await fs.remove(testModulePath);
     await fs.mkdirs(testModulePath);
-    await fs.writeFile(
-      path.resolve(testModulePath, 'package.json'),
-      await fs.readFile(path.resolve(__dirname, '../test/fixture/native-app1/package.json'), 'utf8')
+    await fs.copy(
+      path.resolve(__dirname, '../test/fixture/native-app1/package.json'),
+      path.resolve(testModulePath, 'package.json')
     );
     await spawnPromise('npm', ['install'], {
       cwd: testModulePath,
@@ -53,12 +53,12 @@ describe('rebuilder', () => {
 
       it('should have rebuilt top level prod dependencies', async () => {
         const forgeMeta = path.resolve(testModulePath, 'node_modules', 'ref', 'build', 'Release', '.forge-meta');
-        expect(await fs.exists(forgeMeta), 'ref build meta should exist').to.equal(true);
+        expect(await fs.pathExists(forgeMeta), 'ref build meta should exist').to.equal(true);
       });
 
       it('should not have rebuild top level prod dependencies that are prebuilt', async () => {
         const forgeMeta = path.resolve(testModulePath, 'node_modules', 'sodium-native', 'build', 'Release', '.forge-meta');
-        expect(await fs.exists(forgeMeta), 'ref build meta should exist').to.equal(false);
+        expect(await fs.pathExists(forgeMeta), 'ref build meta should exist').to.equal(false);
       });
 
       it('should have rebuilt children of top level prod dependencies', async () => {
@@ -66,22 +66,22 @@ describe('rebuilder', () => {
         const forgeMetaBadNPM = path.resolve(
           testModulePath, 'node_modules', 'benchr', 'node_modules', 'microtime', 'build', 'Release', '.forge-meta'
         );
-        expect(await fs.exists(forgeMetaGoodNPM) || await fs.exists(forgeMetaBadNPM), 'microtime build meta should exist').to.equal(true);
+        expect(await fs.pathExists(forgeMetaGoodNPM) || await fs.pathExists(forgeMetaBadNPM), 'microtime build meta should exist').to.equal(true);
       });
 
       it('should have rebuilt children of scoped top level prod dependencies', async () => {
         const forgeMeta = path.resolve(testModulePath, 'node_modules', '@newrelic/native-metrics', 'build', 'Release', '.forge-meta');
-        expect(await fs.exists(forgeMeta), '@newrelic/native-metrics build meta should exist').to.equal(true);
+        expect(await fs.pathExists(forgeMeta), '@newrelic/native-metrics build meta should exist').to.equal(true);
       });
 
       it('should have rebuilt top level optional dependencies', async () => {
         const forgeMeta = path.resolve(testModulePath, 'node_modules', 'zipfile', 'build', 'Release', '.forge-meta');
-        expect(await fs.exists(forgeMeta), 'zipfile build meta should exist').to.equal(true);
+        expect(await fs.pathExists(forgeMeta), 'zipfile build meta should exist').to.equal(true);
       });
 
       it('should not have rebuilt top level devDependencies', async () => {
         const forgeMeta = path.resolve(testModulePath, 'node_modules', 'ffi', 'build', 'Release', '.forge-meta');
-        expect(await fs.exists(forgeMeta), 'ffi build meta should not exist').to.equal(false);
+        expect(await fs.pathExists(forgeMeta), 'ffi build meta should not exist').to.equal(false);
       });
 
       after(async () => {
@@ -181,9 +181,9 @@ describe('rebuilder', () => {
       });
       await rebuilder;
       const forgeMetaDebug = path.resolve(testModulePath, 'node_modules', 'ffi', 'build', 'Debug', '.forge-meta');
-      expect(await fs.exists(forgeMetaDebug), 'ffi debug build meta should exist').to.equal(true);
+      expect(await fs.pathExists(forgeMetaDebug), 'ffi debug build meta should exist').to.equal(true);
       const forgeMetaRelease = path.resolve(testModulePath, 'node_modules', 'ffi', 'build', 'Release', '.forge-meta');
-      expect(await fs.exists(forgeMetaRelease), 'ffi release build meta should not exist').to.equal(false);
+      expect(await fs.pathExists(forgeMetaRelease), 'ffi release build meta should not exist').to.equal(false);
     });
   });
 });
