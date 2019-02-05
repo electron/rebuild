@@ -1,13 +1,10 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as os from 'os';
-import * as ora from 'ora';
 
 import { spawnPromise } from 'spawn-rx';
 import { expect } from 'chai';
 import { rebuild, RebuildOptions } from '../src/rebuild';
-
-ora.ora = ora;
 
 describe('rebuilder', () => {
   const testModulePath = path.resolve(os.tmpdir(), 'electron-forge-rebuild-test');
@@ -16,9 +13,9 @@ describe('rebuilder', () => {
   const resetTestModule = async () => {
     await fs.remove(testModulePath);
     await fs.mkdirs(testModulePath);
-    await fs.writeFile(
-      path.resolve(testModulePath, 'package.json'),
-      await fs.readFile(path.resolve(__dirname, '../test/fixture/native-app1/package.json'), 'utf8')
+    await fs.copy(
+      path.resolve(__dirname, '../test/fixture/native-app1/package.json'),
+      path.resolve(testModulePath, 'package.json')
     );
     await spawnPromise('npm', ['install'], {
       cwd: testModulePath,
@@ -30,10 +27,10 @@ describe('rebuilder', () => {
     name: string,
     args: RebuildOptions | string[]
   }[] = [
-    { args: [testModulePath, '1.4.12', process.arch], name: 'sequential args' },
+    { args: [testModulePath, '2.0.17', process.arch], name: 'sequential args' },
     { args: {
       buildPath: testModulePath,
-      electronVersion: '1.4.12',
+      electronVersion: '2.0.17',
       arch: process.arch
     }, name: 'options object' }
   ];
@@ -53,12 +50,12 @@ describe('rebuilder', () => {
 
       it('should have rebuilt top level prod dependencies', async () => {
         const forgeMeta = path.resolve(testModulePath, 'node_modules', 'ref', 'build', 'Release', '.forge-meta');
-        expect(await fs.exists(forgeMeta), 'ref build meta should exist').to.equal(true);
+        expect(await fs.pathExists(forgeMeta), 'ref build meta should exist').to.equal(true);
       });
 
       it('should not have rebuild top level prod dependencies that are prebuilt', async () => {
         const forgeMeta = path.resolve(testModulePath, 'node_modules', 'sodium-native', 'build', 'Release', '.forge-meta');
-        expect(await fs.exists(forgeMeta), 'ref build meta should exist').to.equal(false);
+        expect(await fs.pathExists(forgeMeta), 'ref build meta should exist').to.equal(false);
       });
 
       it('should have rebuilt children of top level prod dependencies', async () => {
@@ -66,22 +63,22 @@ describe('rebuilder', () => {
         const forgeMetaBadNPM = path.resolve(
           testModulePath, 'node_modules', 'benchr', 'node_modules', 'microtime', 'build', 'Release', '.forge-meta'
         );
-        expect(await fs.exists(forgeMetaGoodNPM) || await fs.exists(forgeMetaBadNPM), 'microtime build meta should exist').to.equal(true);
+        expect(await fs.pathExists(forgeMetaGoodNPM) || await fs.pathExists(forgeMetaBadNPM), 'microtime build meta should exist').to.equal(true);
       });
 
       it('should have rebuilt children of scoped top level prod dependencies', async () => {
         const forgeMeta = path.resolve(testModulePath, 'node_modules', '@newrelic/native-metrics', 'build', 'Release', '.forge-meta');
-        expect(await fs.exists(forgeMeta), '@newrelic/native-metrics build meta should exist').to.equal(true);
+        expect(await fs.pathExists(forgeMeta), '@newrelic/native-metrics build meta should exist').to.equal(true);
       });
 
       it('should have rebuilt top level optional dependencies', async () => {
         const forgeMeta = path.resolve(testModulePath, 'node_modules', 'zipfile', 'build', 'Release', '.forge-meta');
-        expect(await fs.exists(forgeMeta), 'zipfile build meta should exist').to.equal(true);
+        expect(await fs.pathExists(forgeMeta), 'zipfile build meta should exist').to.equal(true);
       });
 
       it('should not have rebuilt top level devDependencies', async () => {
         const forgeMeta = path.resolve(testModulePath, 'node_modules', 'ffi', 'build', 'Release', '.forge-meta');
-        expect(await fs.exists(forgeMeta), 'ffi build meta should not exist').to.equal(false);
+        expect(await fs.pathExists(forgeMeta), 'ffi build meta should not exist').to.equal(false);
       });
 
       after(async () => {
@@ -96,8 +93,8 @@ describe('rebuilder', () => {
     before(resetTestModule);
 
     it('should skip the rebuild step when disabled', async () => {
-      await rebuild(testModulePath, '1.4.12', process.arch);
-      const rebuilder = rebuild(testModulePath, '1.4.12', process.arch, [], false);
+      await rebuild(testModulePath, '2.0.17', process.arch);
+      const rebuilder = rebuild(testModulePath, '2.0.17', process.arch, [], false);
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
         skipped++;
@@ -107,7 +104,7 @@ describe('rebuilder', () => {
     });
 
     it('should rebuild all modules again when disabled but the electron ABI bumped', async () => {
-      await rebuild(testModulePath, '1.4.12', process.arch);
+      await rebuild(testModulePath, '2.0.17', process.arch);
       const rebuilder = rebuild(testModulePath, '1.6.0', process.arch, [], false);
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
@@ -118,8 +115,8 @@ describe('rebuilder', () => {
     });
 
     it('should rebuild all modules again when enabled', async () => {
-      await rebuild(testModulePath, '1.4.12', process.arch);
-      const rebuilder = rebuild(testModulePath, '1.4.12', process.arch, [], true);
+      await rebuild(testModulePath, '2.0.17', process.arch);
+      const rebuilder = rebuild(testModulePath, '2.0.17', process.arch, [], true);
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
         skipped++;
@@ -138,7 +135,7 @@ describe('rebuilder', () => {
     it('should rebuild only specified modules', async () => {
       const rebuilder = rebuild({
         buildPath: testModulePath,
-        electronVersion: '1.4.12',
+        electronVersion: '2.0.17',
         arch: process.arch,
         onlyModules: ['ffi'],
         force: true
@@ -152,7 +149,7 @@ describe('rebuilder', () => {
     it('should rebuild multiple specified modules via --only option', async () => {
       const rebuilder = rebuild({
         buildPath: testModulePath,
-        electronVersion: '1.4.12',
+        electronVersion: '2.0.17',
         arch: process.arch,
         onlyModules: ['ffi', 'ref'],
         force: true
@@ -173,7 +170,7 @@ describe('rebuilder', () => {
     it('should have rebuilt ffi module in Debug mode', async () => {
       const rebuilder = rebuild({
         buildPath: testModulePath,
-        electronVersion: '1.4.12',
+        electronVersion: '2.0.17',
         arch: process.arch,
         onlyModules: ['ffi'],
         force: true,
@@ -181,9 +178,9 @@ describe('rebuilder', () => {
       });
       await rebuilder;
       const forgeMetaDebug = path.resolve(testModulePath, 'node_modules', 'ffi', 'build', 'Debug', '.forge-meta');
-      expect(await fs.exists(forgeMetaDebug), 'ffi debug build meta should exist').to.equal(true);
+      expect(await fs.pathExists(forgeMetaDebug), 'ffi debug build meta should exist').to.equal(true);
       const forgeMetaRelease = path.resolve(testModulePath, 'node_modules', 'ffi', 'build', 'Release', '.forge-meta');
-      expect(await fs.exists(forgeMetaRelease), 'ffi release build meta should not exist').to.equal(false);
+      expect(await fs.pathExists(forgeMetaRelease), 'ffi release build meta should not exist').to.equal(false);
     });
   });
 });

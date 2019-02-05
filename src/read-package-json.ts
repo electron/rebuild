@@ -2,16 +2,13 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 
 export async function readPackageJson(dir: string, safe = false) {
-  let packageData;
   try {
-    packageData = await fs.readFile(path.resolve(dir, 'package.json'), 'utf8');
+    return await fs.readJson(path.resolve(dir, 'package.json'));
   } catch (err) {
     if (safe) {
-      packageData = '{}';
+      return {};
     } else {
       throw err;
     }
   }
-
-  return JSON.parse(packageData);
-};
+}
