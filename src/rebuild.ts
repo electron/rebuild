@@ -358,7 +358,6 @@ class Rebuilder {
     await spawnPromise(nodeGypPath, rebuildArgs, {
       cwd: modulePath,
       env: Object.assign({}, process.env, {
-        HOME: path.resolve(os.homedir(), '.electron-gyp'),
         USERPROFILE: path.resolve(os.homedir(), '.electron-gyp'),
         npm_config_disturl: 'https://atom.io/download/electron',
         npm_config_runtime: 'electron',
@@ -366,6 +365,7 @@ class Rebuilder {
         npm_config_target_arch: this.arch,
         npm_config_build_from_source: 'true',
         npm_config_debug: this.debug ? 'true' : '',
+        npm_config_devdir: path.resolve(os.homedir(), '.electron-gyp'),
       }),
     });
 
