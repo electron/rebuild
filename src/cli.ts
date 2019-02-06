@@ -13,6 +13,7 @@ const yargs = argParser
   .usage('Usage: electron-rebuild --version [version] --module-dir [path]')
   .help('h')
   .alias('h', 'help')
+  .version(false)
   .describe('v', 'The version of Electron to build against')
   .alias('v', 'version')
   .describe('f', 'Force rebuilding modules, even if we would skip it otherwise')
