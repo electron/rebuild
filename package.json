@@ -48,15 +48,15 @@
     "@types/debug": "^4.1.2",
     "@types/fs-extra": "^5.0.4",
     "@types/mocha": "^5.2.5",
-    "@types/node": "^11.11.1",
-    "@types/yargs": "^12.0.8",
+    "@types/node": "^11.11.5",
+    "@types/yargs": "^12.0.10",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "cross-env": "^5.2.0",
     "electron": "^2.0.18",
     "mocha": "^6.0.2",
     "ts-node": "^8.0.3",
-    "tslint": "^5.12.1",
-    "typescript": "^3.3.1"
+    "tslint": "^5.14.0",
+    "typescript": "^3.3.4000"
   }
 }
