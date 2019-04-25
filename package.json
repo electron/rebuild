@@ -36,28 +36,27 @@
     "debug": "^4.1.1",
     "detect-libc": "^1.0.3",
     "fs-extra": "^7.0.1",
-    "node-abi": "^2.7.0",
-    "node-gyp": "^3.8.0",
-    "ora": "^3.0.0",
+    "node-abi": "^2.8.0",
+    "node-gyp": "^4.0.0",
+    "ora": "^3.4.0",
     "spawn-rx": "^3.0.0",
-    "yargs": "^12.0.5"
+    "yargs": "^13.2.2"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
     "@types/chai-as-promised": "7.1.0",
-    "@types/debug": "0.0.31",
+    "@types/debug": "^4.1.4",
     "@types/fs-extra": "^5.0.4",
     "@types/mocha": "^5.2.5",
-    "@types/node": "^10.12.21",
-    "@types/ora": "^3.0.0",
-    "@types/yargs": "^12.0.8",
+    "@types/node": "^11.13.7",
+    "@types/yargs": "^13.0.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "cross-env": "^5.2.0",
-    "electron": "^2.0.17",
-    "mocha": "^5.2.0",
-    "ts-node": "^8.0.2",
-    "tslint": "^5.12.1",
-    "typescript": "^3.3.1"
+    "electron": "^2.0.18",
+    "mocha": "^6.1.4",
+    "ts-node": "^8.1.0",
+    "tslint": "^5.16.0",
+    "typescript": "^3.4.5"
   }
 }
