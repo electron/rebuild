@@ -1,6 +1,7 @@
 ## Electron Rebuild
 
-[![Build Status](https://travis-ci.org/electron/electron-rebuild.svg?branch=master)](https://travis-ci.org/electron/electron-rebuild)
+[![CircleCI](https://circleci.com/gh/electron/electron-rebuild.svg?style=svg)](https://circleci.com/gh/electron/electron-rebuild)
+[![Travis CI](https://travis-ci.org/electron/electron-rebuild.svg?branch=master)](https://travis-ci.org/electron/electron-rebuild)
 [![NPM](https://img.shields.io/npm/v/electron-rebuild.svg?style=flat)](https://npm.im/electron-rebuild)
 
 This executable rebuilds native Node.js modules against the version of Node.js
