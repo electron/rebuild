@@ -91,7 +91,7 @@ class Rebuilder {
     this.extraModules = options.extraModules || [];
     this.onlyModules = options.onlyModules || null;
     this.force = options.force || false;
-    this.headerURL = options.headerURL || 'https://atom.io/download/electron';
+    this.headerURL = options.headerURL || 'https://electronjs.org/headers';
     this.types = options.types || defaultTypes;
     this.mode = options.mode || defaultMode;
     this.debug = options.debug || false;
@@ -359,7 +359,7 @@ class Rebuilder {
       cwd: modulePath,
       env: Object.assign({}, process.env, {
         USERPROFILE: path.resolve(os.homedir(), '.electron-gyp'),
-        npm_config_disturl: 'https://atom.io/download/electron',
+        npm_config_disturl: 'https://electronjs.org/headers',
         npm_config_runtime: 'electron',
         npm_config_arch: this.arch,
         npm_config_target_arch: this.arch,
