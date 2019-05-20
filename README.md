@@ -64,7 +64,7 @@ Options:
   -e, --electron-prebuilt-dir  The path to electron-prebuilt
   -d, --dist-url               Custom header tarball URL
   -t, --types                  The types of dependencies to rebuild.  Comma
-                               seperated list of "prod", "dev" and "optional".
+                               separated list of "prod", "dev" and "optional".
                                Default is "prod,optional"
   -p, --parallel               Rebuild in parallel, this is enabled by default
                                on macOS and Linux
