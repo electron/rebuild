@@ -115,7 +115,7 @@ class Rebuilder {
     }
 
     this.ABI = nodeAbi.getAbi(this.electronVersion, 'electron');
-    this.prodDeps = this.extraModules.reduce((acc, x) => acc.add(x), new Set());
+    this.prodDeps = this.extraModules.reduce((acc, x) => acc.add(x), new Set<string>());
     this.rebuilds = [];
     this.realModulePaths = new Set();
     this.realNodeModulesPaths = new Set();
