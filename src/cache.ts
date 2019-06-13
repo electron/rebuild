@@ -87,7 +87,7 @@ export const lookupModuleState = async (cachePath: string, key: string) => {
   if (await fs.pathExists(path.resolve(cachePath, key))) {
     return async function applyDiff(dir: string) {
       const zipped = await fs.readFile(path.resolve(cachePath, key));
-      const unzipped = await new Promise(resolve => zlib.gunzip(zipped, (_, result) => resolve(result)));
+      const unzipped: Buffer = await new Promise(resolve => { zlib.gunzip(zipped, (_, result) => resolve(result)); });
       const diff = unserialize(JSON.parse(unzipped.toString()));
       await writeSnapshot(diff, dir);
     };
