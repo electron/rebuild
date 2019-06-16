@@ -8,6 +8,7 @@ import * as argParser from 'yargs';
 
 import { rebuild, ModuleType } from './rebuild';
 import { locateElectronPrebuilt } from './electron-locater';
+import { getProjectRootPath } from './search-module';
 
 const yargs = argParser
   .usage('Usage: electron-rebuild --version [version] --module-dir [path]')
@@ -67,7 +68,8 @@ process.on('unhandledRejection', handler);
 
 
 (async () => {
-  const electronPrebuiltPath = argv.e ? path.resolve(process.cwd(), (argv.e as string)) : locateElectronPrebuilt();
+  const projectRootPath = getProjectRootPath(process.cwd());
+  const electronPrebuiltPath = argv.e ? path.resolve(process.cwd(), (argv.e as string)) : locateElectronPrebuilt(projectRootPath);
   let electronPrebuiltVersion = argv.v as string;
 
   if (!electronPrebuiltVersion) {
@@ -124,7 +126,8 @@ process.on('unhandledRejection', handler);
     headerURL: argv.d as string,
     types: argv.t ? (argv.t as string).split(',') as ModuleType[] : ['prod', 'optional'],
     mode: argv.p ? 'parallel' : (argv.s ? 'sequential' : undefined),
-    debug: argv.b as boolean
+    debug: argv.b as boolean,
+    projectRootPath
   });
 
   const lifecycle = rebuilder.lifecycle;

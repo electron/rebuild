@@ -25,6 +25,7 @@ before_install:
       npm install -g npm@6
       npm config set msvs_version 2015 --global
     fi
+    npm install -g yarn
 
 before_script:
   # remove "electron" folder for electron-locater tests

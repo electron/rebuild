@@ -9,6 +9,7 @@ import * as os from 'os';
 import * as path from 'path';
 import { readPackageJson } from './read-package-json';
 import { lookupModuleState, cacheModuleState } from './cache';
+import { searchModule, searchNodeModules } from './search-module';
 
 export type ModuleType = 'prod' | 'dev' | 'optional';
 export type RebuildMode = 'sequential' | 'parallel';
@@ -26,6 +27,7 @@ export interface RebuildOptions {
   debug?: boolean;
   useCache?: boolean;
   cachePath?: string;
+  projectRootPath?: string | undefined;
 }
 
 export type HashTree = { [path: string]: string | HashTree };
@@ -82,6 +84,7 @@ class Rebuilder {
   public debug: boolean;
   public useCache: boolean;
   public cachePath: string;
+  public projectRootPath: string | undefined;
 
   constructor(options: RebuilderOptions) {
     this.lifecycle = options.lifecycle;
@@ -102,6 +105,7 @@ class Rebuilder {
       console.warn('[WARNING]: Electron Rebuild has force enabled and cache enabled, force take precedence and the cache will not be used.');
       this.useCache = false;
     }
+    this.projectRootPath = options.projectRootPath || undefined;
 
     if (typeof this.electronVersion === 'number') {
       if (`${this.electronVersion}`.split('.').length === 1) {
@@ -115,7 +119,7 @@ class Rebuilder {
     }
 
     this.ABI = nodeAbi.getAbi(this.electronVersion, 'electron');
-    this.prodDeps = this.extraModules.reduce((acc, x) => acc.add(x), new Set());
+    this.prodDeps = this.extraModules.reduce((acc: Set<string>, x: string) => acc.add(x), new Set());
     this.rebuilds = [];
     this.realModulePaths = new Set();
     this.realNodeModulesPaths = new Set();
@@ -153,16 +157,30 @@ class Rebuilder {
       depKeys.push(...Object.keys(rootPackageJson.devDependencies || {}));
     }
 
-    depKeys.forEach((key) => {
+    for (const key of depKeys) {
       this.prodDeps[key] = true;
-      markWaiters.push(this.markChildrenAsProdDeps(path.resolve(this.buildPath, 'node_modules', key)));
-    });
+      const modulePaths: string[] = await searchModule(
+        this.buildPath,
+        key,
+        this.projectRootPath
+      );
+      for (const modulePath of modulePaths) {
+        markWaiters.push(this.markChildrenAsProdDeps(modulePath));
+      }
+    }
 
     await Promise.all(markWaiters);
 
     d('identified prod deps:', this.prodDeps);
 
-    await this.rebuildAllModulesIn(path.resolve(this.buildPath, 'node_modules'));
+    const nodeModulesPaths = await searchNodeModules(
+      this.buildPath,
+      this.projectRootPath
+    );
+    for (const nodeModulesPath of nodeModulesPaths) {
+      await this.rebuildAllModulesIn(nodeModulesPath);
+    }
+
     this.rebuilds.push(() => this.rebuildModuleAt(this.buildPath));
 
     if (this.mode !== 'sequential') {
@@ -437,16 +455,13 @@ class Rebuilder {
 
   async findModule(moduleName: string, fromDir: string, foundFn: ((p: string) => Promise<void>)) {
     let targetDir = fromDir;
-    const foundFns = [];
 
-    while (targetDir !== path.dirname(this.buildPath)) {
-      const testPath = path.resolve(targetDir, 'node_modules', moduleName);
-      if (await fs.pathExists(testPath)) {
-        foundFns.push(foundFn(testPath));
-      }
-
-      targetDir = path.dirname(targetDir);
-    }
+    let testPaths = await searchModule(
+      targetDir,
+      moduleName,
+      this.projectRootPath
+    );
+    const foundFns = testPaths.map(testPath => foundFn(testPath));
 
     await Promise.all(foundFns);
   }
