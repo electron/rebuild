@@ -3,7 +3,7 @@ import * as path from 'path';
 import { expect } from 'chai';
 import { spawnPromise } from 'spawn-rx';
 
-import { locateElectronPrebuilt } from '../src/electron-locater';
+import { locateElectronPrebuilt } from '../src/electron-locator';
 
 function packageCommand(command: string, packageName: string) {
   return spawnPromise('npm', [command, packageName], {

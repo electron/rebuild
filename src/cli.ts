@@ -7,7 +7,7 @@ import ora from 'ora';
 import * as argParser from 'yargs';
 
 import { rebuild, ModuleType } from './rebuild';
-import { locateElectronPrebuilt } from './electron-locater';
+import { locateElectronPrebuilt } from './electron-locator';
 
 const yargs = argParser
   .usage('Usage: electron-rebuild --version [version] --module-dir [path]')
