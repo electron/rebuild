@@ -7,7 +7,7 @@ import ora from 'ora';
 import * as argParser from 'yargs';
 
 import { rebuild, ModuleType } from './rebuild';
-import { locateElectronPrebuilt } from './electron-locator';
+import { locateElectronModule } from './electron-locator';
 
 const yargs = argParser
   .usage('Usage: electron-rebuild --version [version] --module-dir [path]')
@@ -26,7 +26,7 @@ const yargs = argParser
   .alias('w', 'which-module')
   .describe('o', 'Only build specified module, or comma separated list of modules. All others are ignored.')
   .alias('o', 'only')
-  .describe('e', 'The path to electron-prebuilt')
+  .describe('e', 'The path to prebuilt electron module')
   .alias('e', 'electron-prebuilt-dir')
   .describe('d', 'Custom header tarball URL')
   .alias('d', 'dist-url')
@@ -67,17 +67,17 @@ process.on('unhandledRejection', handler);
 
 
 (async () => {
-  const electronPrebuiltPath = argv.e ? path.resolve(process.cwd(), (argv.e as string)) : locateElectronPrebuilt();
-  let electronPrebuiltVersion = argv.v as string;
+  const electronModulePath = argv.e ? path.resolve(process.cwd(), (argv.e as string)) : locateElectronModule();
+  let electronModuleVersion = argv.v as string;
 
-  if (!electronPrebuiltVersion) {
+  if (!electronModuleVersion) {
     try {
-      if (!electronPrebuiltPath) throw new Error('electron-prebuilt not found');
-      const pkgJson = require(path.join(electronPrebuiltPath, 'package.json'));
+      if (!electronModulePath) throw new Error('Prebuilt electron module not found');
+      const pkgJson = require(path.join(electronModulePath, 'package.json'));
 
-      electronPrebuiltVersion = pkgJson.version;
+      electronModuleVersion = pkgJson.version;
     } catch (e) {
-      throw new Error('Unable to find electron-prebuilt\'s version number, either install it or specify an explicit version');
+      throw new Error(`Unable to find electron's version number, either install it or specify an explicit version`);
     }
   }
 
@@ -116,7 +116,7 @@ process.on('unhandledRejection', handler);
 
   const rebuilder = rebuild({
     buildPath: rootDirectory,
-    electronVersion: electronPrebuiltVersion,
+    electronVersion: electronModuleVersion,
     arch: (argv.a as string) || process.arch,
     extraModules: argv.w ? (argv.w as string).split(',') : [],
     onlyModules: argv.o ? (argv.o as string).split(',') : null,

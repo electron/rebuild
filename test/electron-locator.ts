@@ -3,7 +3,7 @@ import * as path from 'path';
 import { expect } from 'chai';
 import { spawnPromise } from 'spawn-rx';
 
-import { locateElectronPrebuilt } from '../src/electron-locator';
+import { locateElectronModule } from '../src/electron-locator';
 
 function packageCommand(command: string, packageName: string) {
   return spawnPromise('npm', [command, packageName], {
@@ -17,19 +17,19 @@ const uninstall: ((s: string) => Promise<void>) = packageCommand.bind(null, 'uni
 
 const testElectronCanBeFound = () => {
   it('should return a valid path', () => {
-    const electronPath = locateElectronPrebuilt();
+    const electronPath = locateElectronModule();
     expect(electronPath).to.be.a('string');
     expect(fs.existsSync(electronPath!)).to.be.equal(true);
   });
 };
 
-describe('locateElectronPrebuilt', function() {
+describe('locateElectronModule', function() {
   this.timeout(30 * 1000);
 
   before(() => uninstall('electron'));
 
   it('should return null when electron is not installed', () => {
-    expect(locateElectronPrebuilt()).to.be.equal(null);
+    expect(locateElectronModule()).to.be.equal(null);
   });
 
   describe('with electron-prebuilt installed', () => {
