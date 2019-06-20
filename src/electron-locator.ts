@@ -16,7 +16,7 @@ function locateSiblingModules() {
 function locateModulesByRequire() {
   return locateModules((moduleName) => {
     try {
-      return path.join(require.resolve(moduleName), '..');
+      return path.resolve(require.resolve(path.join(moduleName, 'package.json')), '..');
     } catch (error) {
       return null;
     }
