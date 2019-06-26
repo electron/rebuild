@@ -6,7 +6,7 @@ import { spawnPromise } from 'spawn-rx';
 import { locateElectronModule } from '../src/electron-locator';
 
 function packageCommand(command: string, packageName: string) {
-  return spawnPromise('npm', [command, packageName], {
+  return spawnPromise('npm', [command, '--no-save', packageName], {
     cwd: path.resolve(__dirname, '..'),
     stdio: 'ignore',
   });
