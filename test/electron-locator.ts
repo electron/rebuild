@@ -1,4 +1,4 @@
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
 import * as path from 'path';
 import { expect } from 'chai';
 import { spawnPromise } from 'spawn-rx';
@@ -28,7 +28,8 @@ describe('locateElectronModule', function() {
 
   before(() => uninstall('electron'));
 
-  it('should return null when electron is not installed', () => {
+  it('should return null when electron is not installed', async () => {
+    await fs.remove(path.resolve(__dirname, '..', 'node_modules', 'electron'));
     expect(locateElectronModule()).to.be.equal(null);
   });
 
