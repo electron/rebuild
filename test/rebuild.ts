@@ -19,7 +19,7 @@ describe('rebuilder', () => {
     );
     await spawnPromise('npm', ['install'], {
       cwd: testModulePath,
-      stdio: 'ignore',
+      stdio: 'inherit',
     });
   };
 

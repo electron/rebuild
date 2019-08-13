@@ -11,17 +11,21 @@ steps-test: &steps-test
     - run:
         name: Install Node
         command: |
-          if [[ $(uname -s) = Darwin ]]; then
-            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            nvm install 8
-            nvm alias default 8
-            echo 'export NVM_DIR=${HOME}/.nvm' >> $BASH_ENV
-            echo "[ -s '${NVM_DIR}/nvm.sh' ] && . '${NVM_DIR}/nvm.sh'" >> $BASH_ENV
-          fi
-          node --version
-          npm --version
+          case "$(uname -s)" in
+            Darwin)
+              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+              export NVM_DIR="$HOME/.nvm"
+              [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+              nvm install 8
+              nvm alias default 8
+              echo 'export NVM_DIR=${HOME}/.nvm' >> $BASH_ENV
+              echo "[ -s '${NVM_DIR}/nvm.sh' ] && . '${NVM_DIR}/nvm.sh'" >> $BASH_ENV
+              ;;
+            Windows*|CYGWIN*|MINGW*|MSYS*)
+              nvm install 12.8.0
+              nvm use 12.8.0
+              ;;
+          esac
     - run: npm install
     - save_cache:
         paths:
@@ -30,7 +34,9 @@ steps-test: &steps-test
     - run: npm test
 
 
-version: 2
+version: 2.1
+orbs:
+  win: circleci/windows@1.0.0
 jobs:
   test-linux-8:
     docker:
@@ -43,6 +49,11 @@ jobs:
   test-mac:
     macos:
       xcode: "10.2.0"
+    <<: *steps-test
+  test-windows:
+    executor:
+      name: win/vs2019
+      shell: bash.exe
     <<: *steps-test
 
   release:
@@ -61,11 +72,13 @@ workflows:
       - test-linux-8
       - test-linux-10
       - test-mac
+      - test-windows
       - release:
           requires:
             - test-linux-8
             - test-linux-10
             - test-mac
+            - test-windows
           filters:
             branches:
               only:
