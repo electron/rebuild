@@ -14,13 +14,13 @@
     "forge": "./forge.config.js"
   },
   "devDependencies": {
-    "ffi": "2.3.0"
+    "bcrypt": "3.0.6"
   },
   "dependencies": {
-    "ref": "1.3.5",
     "benchr": "3.3.0",
     "@newrelic/native-metrics": "4.0.0",
-    "sodium-native": "2.2.5"
+    "sodium-native": "2.2.5",
+    "srand": "1.1.5"
   },
   "optionalDependencies": {
     "zipfile": "0.5.12"

@@ -49,13 +49,13 @@ describe('rebuilder', () => {
       });
 
       it('should have rebuilt top level prod dependencies', async () => {
-        const forgeMeta = path.resolve(testModulePath, 'node_modules', 'ref', 'build', 'Release', '.forge-meta');
-        expect(await fs.pathExists(forgeMeta), 'ref build meta should exist').to.equal(true);
+        const forgeMeta = path.resolve(testModulePath, 'node_modules', 'srand', 'build', 'Release', '.forge-meta');
+        expect(await fs.pathExists(forgeMeta), 'srand build meta should exist').to.equal(true);
       });
 
       it('should not have rebuild top level prod dependencies that are prebuilt', async () => {
         const forgeMeta = path.resolve(testModulePath, 'node_modules', 'sodium-native', 'build', 'Release', '.forge-meta');
-        expect(await fs.pathExists(forgeMeta), 'ref build meta should exist').to.equal(false);
+        expect(await fs.pathExists(forgeMeta), 'srand build meta should exist').to.equal(false);
       });
 
       it('should have rebuilt children of top level prod dependencies', async () => {
@@ -77,8 +77,8 @@ describe('rebuilder', () => {
       });
 
       it('should not have rebuilt top level devDependencies', async () => {
-        const forgeMeta = path.resolve(testModulePath, 'node_modules', 'ffi', 'build', 'Release', '.forge-meta');
-        expect(await fs.pathExists(forgeMeta), 'ffi build meta should not exist').to.equal(false);
+        const forgeMeta = path.resolve(testModulePath, 'node_modules', 'bcrypt', 'build', 'Release', '.forge-meta');
+        expect(await fs.pathExists(forgeMeta), 'bcrypt build meta should not exist').to.equal(false);
       });
 
       after(async () => {
@@ -137,7 +137,7 @@ describe('rebuilder', () => {
         buildPath: testModulePath,
         electronVersion: '2.0.17',
         arch: process.arch,
-        onlyModules: ['ffi'],
+        onlyModules: ['bcrypt'],
         force: true
       });
       let built = 0;
@@ -151,7 +151,7 @@ describe('rebuilder', () => {
         buildPath: testModulePath,
         electronVersion: '2.0.17',
         arch: process.arch,
-        onlyModules: ['ffi', 'ref'],
+        onlyModules: ['bcrypt', 'srand'],
         force: true
       });
       let built = 0;
@@ -167,20 +167,20 @@ describe('rebuilder', () => {
     before(resetTestModule);
     afterEach(async () => await fs.remove(testModulePath));
 
-    it('should have rebuilt ffi module in Debug mode', async () => {
+    it('should have rebuilt bcrypt module in Debug mode', async () => {
       const rebuilder = rebuild({
         buildPath: testModulePath,
         electronVersion: '2.0.17',
         arch: process.arch,
-        onlyModules: ['ffi'],
+        onlyModules: ['bcrypt'],
         force: true,
         debug: true
       });
       await rebuilder;
-      const forgeMetaDebug = path.resolve(testModulePath, 'node_modules', 'ffi', 'build', 'Debug', '.forge-meta');
-      expect(await fs.pathExists(forgeMetaDebug), 'ffi debug build meta should exist').to.equal(true);
-      const forgeMetaRelease = path.resolve(testModulePath, 'node_modules', 'ffi', 'build', 'Release', '.forge-meta');
-      expect(await fs.pathExists(forgeMetaRelease), 'ffi release build meta should not exist').to.equal(false);
+      const forgeMetaDebug = path.resolve(testModulePath, 'node_modules', 'bcrypt', 'build', 'Debug', '.forge-meta');
+      expect(await fs.pathExists(forgeMetaDebug), 'bcrypt debug build meta should exist').to.equal(true);
+      const forgeMetaRelease = path.resolve(testModulePath, 'node_modules', 'bcrypt', 'build', 'Release', '.forge-meta');
+      expect(await fs.pathExists(forgeMetaRelease), 'bcrypt release build meta should not exist').to.equal(false);
     });
   });
 });
