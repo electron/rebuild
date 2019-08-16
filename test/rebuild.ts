@@ -54,8 +54,8 @@ describe('rebuilder', () => {
       });
 
       it('should not have rebuild top level prod dependencies that are prebuilt', async () => {
-        const forgeMeta = path.resolve(testModulePath, 'node_modules', 'sodium-native', 'build', 'Release', '.forge-meta');
-        expect(await fs.pathExists(forgeMeta), 'sodium-native build meta should exist').to.equal(false);
+        const forgeMeta = path.resolve(testModulePath, 'node_modules', 'farmhash', 'build', 'Release', '.forge-meta');
+        expect(await fs.pathExists(forgeMeta), 'farmhash build meta should exist').to.equal(false);
       });
 
       it('should have rebuilt children of top level prod dependencies', async () => {

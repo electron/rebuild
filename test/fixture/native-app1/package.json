@@ -18,9 +18,9 @@
   },
   "dependencies": {
     "@newrelic/native-metrics": "4.0.0",
+    "farmhash": "3.0.0",
     "electron-markdown": "0.6.0",
-    "snappy": "6.2.3",
-    "sodium-native": "2.2.5"
+    "snappy": "6.2.3"
   },
   "optionalDependencies": {
     "zipfile": "0.5.12"
