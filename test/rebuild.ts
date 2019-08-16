@@ -49,13 +49,13 @@ describe('rebuilder', () => {
       });
 
       it('should have rebuilt top level prod dependencies', async () => {
-        const forgeMeta = path.resolve(testModulePath, 'node_modules', 'srand', 'build', 'Release', '.forge-meta');
-        expect(await fs.pathExists(forgeMeta), 'srand build meta should exist').to.equal(true);
+        const forgeMeta = path.resolve(testModulePath, 'node_modules', 'deasync', 'build', 'Release', '.forge-meta');
+        expect(await fs.pathExists(forgeMeta), 'deasync build meta should exist').to.equal(true);
       });
 
       it('should not have rebuild top level prod dependencies that are prebuilt', async () => {
         const forgeMeta = path.resolve(testModulePath, 'node_modules', 'sodium-native', 'build', 'Release', '.forge-meta');
-        expect(await fs.pathExists(forgeMeta), 'srand build meta should exist').to.equal(false);
+        expect(await fs.pathExists(forgeMeta), 'deasync build meta should exist').to.equal(false);
       });
 
       it('should have rebuilt children of top level prod dependencies', async () => {
@@ -151,7 +151,7 @@ describe('rebuilder', () => {
         buildPath: testModulePath,
         electronVersion: '2.0.17',
         arch: process.arch,
-        onlyModules: ['bcrypt', 'srand'],
+        onlyModules: ['bcrypt', 'deasync'],
         force: true
       });
       let built = 0;

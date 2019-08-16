@@ -19,8 +19,8 @@
   "dependencies": {
     "@newrelic/native-metrics": "4.0.0",
     "asyncawait": "1.0.8",
-    "sodium-native": "2.2.5",
-    "srand": "1.1.5"
+    "deasync": "0.1.15",
+    "sodium-native": "2.2.5"
   },
   "optionalDependencies": {
     "zipfile": "0.5.12"
