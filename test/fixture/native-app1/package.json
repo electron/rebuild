@@ -17,7 +17,7 @@
     "bcrypt": "3.0.6"
   },
   "dependencies": {
-    "benchr": "3.3.0",
+    "deasync-promise": "1.0.1",
     "@newrelic/native-metrics": "4.0.0",
     "sodium-native": "2.2.5",
     "srand": "1.1.5"

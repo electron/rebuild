@@ -59,11 +59,11 @@ describe('rebuilder', () => {
       });
 
       it('should have rebuilt children of top level prod dependencies', async () => {
-        const forgeMetaGoodNPM = path.resolve(testModulePath, 'node_modules', 'microtime', 'build', 'Release', '.forge-meta');
+        const forgeMetaGoodNPM = path.resolve(testModulePath, 'node_modules', 'deasync', 'build', 'Release', '.forge-meta');
         const forgeMetaBadNPM = path.resolve(
-          testModulePath, 'node_modules', 'benchr', 'node_modules', 'microtime', 'build', 'Release', '.forge-meta'
+          testModulePath, 'node_modules', 'benchr', 'node_modules', 'deasync', 'build', 'Release', '.forge-meta'
         );
-        expect(await fs.pathExists(forgeMetaGoodNPM) || await fs.pathExists(forgeMetaBadNPM), 'microtime build meta should exist').to.equal(true);
+        expect(await fs.pathExists(forgeMetaGoodNPM) || await fs.pathExists(forgeMetaBadNPM), 'deasync build meta should exist').to.equal(true);
       });
 
       it('should have rebuilt children of scoped top level prod dependencies', async () => {
