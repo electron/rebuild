@@ -18,8 +18,8 @@
   },
   "dependencies": {
     "@newrelic/native-metrics": "4.0.0",
-    "@serialport/bindings": "2.0.8",
     "asyncawait": "1.0.8",
+    "snappy": "6.2.3",
     "sodium-native": "2.2.5"
   },
   "optionalDependencies": {
