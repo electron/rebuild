@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@newrelic/native-metrics": "4.0.0",
-    "level": "5.0.1",
+    "electron-markdown": "0.6.0",
     "snappy": "6.2.3",
     "sodium-native": "2.2.5"
   },
