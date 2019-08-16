@@ -61,7 +61,7 @@ describe('rebuilder', () => {
       it('should have rebuilt children of top level prod dependencies', async () => {
         const forgeMetaGoodNPM = path.resolve(testModulePath, 'node_modules', 'leveldown', 'build', 'Release', '.forge-meta');
         const forgeMetaBadNPM = path.resolve(
-          testModulePath, 'node_modules', 'pouchdb', 'node_modules', 'leveldown', 'build', 'Release', '.forge-meta'
+          testModulePath, 'node_modules', 'level', 'node_modules', 'leveldown', 'build', 'Release', '.forge-meta'
         );
         expect(await fs.pathExists(forgeMetaGoodNPM) || await fs.pathExists(forgeMetaBadNPM), 'leveldown build meta should exist').to.equal(true);
       });
