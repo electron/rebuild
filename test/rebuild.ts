@@ -105,7 +105,7 @@ describe('rebuilder', () => {
 
     it('should rebuild all modules again when disabled but the electron ABI bumped', async () => {
       await rebuild(testModulePath, '2.0.17', process.arch);
-      const rebuilder = rebuild(testModulePath, '1.6.0', process.arch, [], false);
+      const rebuilder = rebuild(testModulePath, '3.0.0', process.arch, [], false);
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
         skipped++;
