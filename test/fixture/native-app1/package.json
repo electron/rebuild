@@ -19,7 +19,7 @@
   "dependencies": {
     "@newrelic/native-metrics": "4.0.0",
     "asyncawait": "1.0.8",
-    "deasync": "0.1.15",
+    "serialport": "7.1.5",
     "sodium-native": "2.2.5"
   },
   "optionalDependencies": {
