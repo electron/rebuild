@@ -17,8 +17,8 @@
     "bcrypt": "3.0.6"
   },
   "dependencies": {
-    "deasync-promise": "1.0.1",
     "@newrelic/native-metrics": "4.0.0",
+    "asyncawait": "1.0.8",
     "sodium-native": "2.2.5",
     "srand": "1.1.5"
   },
