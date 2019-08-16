@@ -146,7 +146,7 @@ describe('rebuilder', () => {
       expect(built).to.equal(1);
     });
 
-    it.only('should rebuild multiple specified modules via --only option', async () => {
+    it('should rebuild multiple specified modules via --only option', async () => {
       const rebuilder = rebuild({
         buildPath: testModulePath,
         electronVersion: '2.0.17',
