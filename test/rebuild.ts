@@ -27,10 +27,10 @@ describe('rebuilder', () => {
     name: string,
     args: RebuildOptions | string[]
   }[] = [
-    { args: [testModulePath, '2.0.17', process.arch], name: 'sequential args' },
+    { args: [testModulePath, '6.1.0', process.arch], name: 'sequential args' },
     { args: {
       buildPath: testModulePath,
-      electronVersion: '2.0.17',
+      electronVersion: '6.1.0',
       arch: process.arch
     }, name: 'options object' }
   ];
@@ -49,8 +49,8 @@ describe('rebuilder', () => {
       });
 
       it('should have rebuilt top level prod dependencies', async () => {
-        const forgeMeta = path.resolve(testModulePath, 'node_modules', 'snappy', 'build', 'Release', '.forge-meta');
-        expect(await fs.pathExists(forgeMeta), 'snappy build meta should exist').to.equal(true);
+        const forgeMeta = path.resolve(testModulePath, 'node_modules', 'ref-napi', 'build', 'Release', '.forge-meta');
+        expect(await fs.pathExists(forgeMeta), 'ref-napi build meta should exist').to.equal(true);
       });
 
       it('should not have rebuild top level prod dependencies that are prebuilt', async () => {
@@ -77,8 +77,8 @@ describe('rebuilder', () => {
       });
 
       it('should not have rebuilt top level devDependencies', async () => {
-        const forgeMeta = path.resolve(testModulePath, 'node_modules', 'bcrypt', 'build', 'Release', '.forge-meta');
-        expect(await fs.pathExists(forgeMeta), 'bcrypt build meta should not exist').to.equal(false);
+        const forgeMeta = path.resolve(testModulePath, 'node_modules', 'ffi-napi', 'build', 'Release', '.forge-meta');
+        expect(await fs.pathExists(forgeMeta), 'ffi-napi build meta should not exist').to.equal(false);
       });
 
       after(async () => {
@@ -93,8 +93,8 @@ describe('rebuilder', () => {
     before(resetTestModule);
 
     it('should skip the rebuild step when disabled', async () => {
-      await rebuild(testModulePath, '2.0.17', process.arch);
-      const rebuilder = rebuild(testModulePath, '2.0.17', process.arch, [], false);
+      await rebuild(testModulePath, '6.1.0', process.arch);
+      const rebuilder = rebuild(testModulePath, '6.1.0', process.arch, [], false);
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
         skipped++;
@@ -104,7 +104,7 @@ describe('rebuilder', () => {
     });
 
     it('should rebuild all modules again when disabled but the electron ABI bumped', async () => {
-      await rebuild(testModulePath, '2.0.17', process.arch);
+      await rebuild(testModulePath, '6.1.0', process.arch);
       const rebuilder = rebuild(testModulePath, '3.0.0', process.arch, [], false);
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
@@ -115,8 +115,8 @@ describe('rebuilder', () => {
     });
 
     it('should rebuild all modules again when enabled', async () => {
-      await rebuild(testModulePath, '2.0.17', process.arch);
-      const rebuilder = rebuild(testModulePath, '2.0.17', process.arch, [], true);
+      await rebuild(testModulePath, '6.1.0', process.arch);
+      const rebuilder = rebuild(testModulePath, '6.1.0', process.arch, [], true);
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
         skipped++;
@@ -135,9 +135,9 @@ describe('rebuilder', () => {
     it('should rebuild only specified modules', async () => {
       const rebuilder = rebuild({
         buildPath: testModulePath,
-        electronVersion: '2.0.17',
+        electronVersion: '6.1.0',
         arch: process.arch,
-        onlyModules: ['bcrypt'],
+        onlyModules: ['ffi-napi'],
         force: true
       });
       let built = 0;
@@ -149,9 +149,9 @@ describe('rebuilder', () => {
     it('should rebuild multiple specified modules via --only option', async () => {
       const rebuilder = rebuild({
         buildPath: testModulePath,
-        electronVersion: '2.0.17',
+        electronVersion: '6.1.0',
         arch: process.arch,
-        onlyModules: ['bcrypt', 'snappy'], // TODO: check to see if there's a bug with scoped modules
+        onlyModules: ['ffi-napi', 'ref-napi'], // TODO: check to see if there's a bug with scoped modules
         force: true
       });
       let built = 0;
@@ -167,20 +167,20 @@ describe('rebuilder', () => {
     before(resetTestModule);
     afterEach(async () => await fs.remove(testModulePath));
 
-    it('should have rebuilt bcrypt module in Debug mode', async () => {
+    it.only('should have rebuilt ffi-napi module in Debug mode', async () => {
       const rebuilder = rebuild({
         buildPath: testModulePath,
-        electronVersion: '2.0.17',
+        electronVersion: '6.1.0',
         arch: process.arch,
-        onlyModules: ['bcrypt'],
+        onlyModules: ['ffi-napi'],
         force: true,
         debug: true
       });
       await rebuilder;
-      const forgeMetaDebug = path.resolve(testModulePath, 'node_modules', 'bcrypt', 'build', 'Debug', '.forge-meta');
-      expect(await fs.pathExists(forgeMetaDebug), 'bcrypt debug build meta should exist').to.equal(true);
-      const forgeMetaRelease = path.resolve(testModulePath, 'node_modules', 'bcrypt', 'build', 'Release', '.forge-meta');
-      expect(await fs.pathExists(forgeMetaRelease), 'bcrypt release build meta should not exist').to.equal(false);
+      const forgeMetaDebug = path.resolve(testModulePath, 'node_modules', 'ffi-napi', 'build', 'Debug', '.forge-meta');
+      expect(await fs.pathExists(forgeMetaDebug), 'ffi-napi debug build meta should exist').to.equal(true);
+      const forgeMetaRelease = path.resolve(testModulePath, 'node_modules', 'ffi-napi', 'build', 'Release', '.forge-meta');
+      expect(await fs.pathExists(forgeMetaRelease), 'ffi-napi release build meta should not exist').to.equal(false);
     });
   });
 });

@@ -14,13 +14,13 @@
     "forge": "./forge.config.js"
   },
   "devDependencies": {
-    "bcrypt": "3.0.6"
+    "ffi-napi": "2.4.5"
   },
   "dependencies": {
     "@newrelic/native-metrics": "4.0.0",
     "farmhash": "3.0.0",
     "electron-markdown": "0.6.0",
-    "snappy": "6.2.3"
+    "ref-napi": "1.4.2"
   },
   "optionalDependencies": {
     "zipfile": "0.5.12"
