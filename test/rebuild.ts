@@ -167,7 +167,7 @@ describe('rebuilder', () => {
     before(resetTestModule);
     afterEach(async () => await fs.remove(testModulePath));
 
-    it.only('should have rebuilt ffi-napi module in Debug mode', async () => {
+    it('should have rebuilt ffi-napi module in Debug mode', async () => {
       const rebuilder = rebuild({
         buildPath: testModulePath,
         electronVersion: '6.1.0',
