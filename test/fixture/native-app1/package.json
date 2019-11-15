@@ -24,6 +24,6 @@
     "ref-napi": "1.4.2"
   },
   "optionalDependencies": {
-    "bcrypt": "3.0.7"
+    "bcrypt": "3.0.6"
   }
 }
