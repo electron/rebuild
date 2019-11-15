@@ -331,7 +331,11 @@ class Rebuilder {
       rebuildArgs.push('--debug');
     }
 
-    Object.keys(modulePackageJson.binary || {}).forEach((binaryKey) => {
+    for (const binaryKey of Object.keys(modulePackageJson.binary || {})) {
+      if (binaryKey === 'napi_versions') {
+        continue;
+      }
+
       let value = modulePackageJson.binary[binaryKey];
 
       if (binaryKey === 'module_path') {
@@ -350,7 +354,7 @@ class Rebuilder {
       });
 
       rebuildArgs.push(`--${binaryKey}=${value}`);
-    });
+    }
 
     if (process.env.GYP_MSVS_VERSION) {
       rebuildArgs.push(`--msvs_version=${process.env.GYP_MSVS_VERSION}`);
