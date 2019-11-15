@@ -54,7 +54,7 @@ describe('rebuilder', () => {
         expect(await fs.pathExists(forgeMeta), 'ref-napi build meta should exist').to.equal(true);
       });
 
-      it('should not have rebuild top level prod dependencies that are prebuilt', async () => {
+      it('should not have rebuilt top level prod dependencies that are prebuilt', async () => {
         const forgeMeta = path.resolve(testModulePath, 'node_modules', 'farmhash', 'build', 'Release', '.forge-meta');
         expect(await fs.pathExists(forgeMeta), 'farmhash build meta should exist').to.equal(false);
       });
@@ -68,13 +68,13 @@ describe('rebuilder', () => {
       });
 
       it('should have rebuilt children of scoped top level prod dependencies', async () => {
-        const forgeMeta = path.resolve(testModulePath, 'node_modules', '@newrelic/native-metrics', 'build', 'Release', '.forge-meta');
-        expect(await fs.pathExists(forgeMeta), '@newrelic/native-metrics build meta should exist').to.equal(true);
+        const forgeMeta = path.resolve(testModulePath, 'node_modules', '@nlv8/signun', 'build', 'Release', '.forge-meta');
+        expect(await fs.pathExists(forgeMeta), '@nlv8/signun build meta should exist').to.equal(true);
       });
 
       it('should have rebuilt top level optional dependencies', async () => {
-        const forgeMeta = path.resolve(testModulePath, 'node_modules', 'zipfile', 'build', 'Release', '.forge-meta');
-        expect(await fs.pathExists(forgeMeta), 'zipfile build meta should exist').to.equal(true);
+        const forgeMeta = path.resolve(testModulePath, 'node_modules', 'bcrypt', 'build', 'Release', '.forge-meta');
+        expect(await fs.pathExists(forgeMeta), 'bcrypt build meta should exist').to.equal(true);
       });
 
       it('should not have rebuilt top level devDependencies', async () => {
@@ -102,7 +102,7 @@ describe('rebuilder', () => {
         skipped++;
       });
       await rebuilder;
-      expect(skipped).to.equal(4);
+      expect(skipped).to.equal(5);
     });
 
     it('should rebuild all modules again when disabled but the electron ABI bumped', async () => {
