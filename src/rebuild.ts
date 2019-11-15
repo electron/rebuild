@@ -277,11 +277,13 @@ class Rebuilder {
       if (prebuildInstallPath) {
         d(`triggering prebuild download step: ${path.basename(modulePath)}`);
         let success = false;
+        const shimExt = process.env.ELECTRON_REBUILD_TESTS ? 'ts' : 'js';
+        const executable = process.env.ELECTRON_REBUILD_TESTS ? path.resolve(__dirname, '..', 'node_modules', '.bin', 'ts-node') : process.execPath;
         try {
           await spawnPromise(
-            process.execPath,
+            executable,
             [
-              path.resolve(__dirname, 'prebuild-shim.js'),
+              path.resolve(__dirname, `prebuild-shim.${shimExt}`),
               prebuildInstallPath,
               `--arch=${this.arch}`,
               `--platform=${process.platform}`,
