@@ -27,10 +27,10 @@ describe('rebuilder', () => {
     name: string,
     args: RebuildOptions | string[]
   }[] = [
-    { args: [testModulePath, '2.0.17', process.arch], name: 'sequential args' },
+    { args: [testModulePath, '5.0.12', process.arch], name: 'sequential args' },
     { args: {
       buildPath: testModulePath,
-      electronVersion: '2.0.17',
+      electronVersion: '5.0.12',
       arch: process.arch
     }, name: 'options object' }
   ];
@@ -45,43 +45,45 @@ describe('rebuilder', () => {
         if (!Array.isArray(args)) {
           args = [args];
         }
+        process.env.ELECTRON_REBUILD_TESTS = 'true';
         await (<any>rebuild)(...args);
       });
 
       it('should have rebuilt top level prod dependencies', async () => {
-        const forgeMeta = path.resolve(testModulePath, 'node_modules', 'ref', 'build', 'Release', '.forge-meta');
-        expect(await fs.pathExists(forgeMeta), 'ref build meta should exist').to.equal(true);
+        const forgeMeta = path.resolve(testModulePath, 'node_modules', 'ref-napi', 'build', 'Release', '.forge-meta');
+        expect(await fs.pathExists(forgeMeta), 'ref-napi build meta should exist').to.equal(true);
       });
 
-      it('should not have rebuild top level prod dependencies that are prebuilt', async () => {
-        const forgeMeta = path.resolve(testModulePath, 'node_modules', 'sodium-native', 'build', 'Release', '.forge-meta');
-        expect(await fs.pathExists(forgeMeta), 'ref build meta should exist').to.equal(false);
+      it('should not have rebuilt top level prod dependencies that are prebuilt', async () => {
+        const forgeMeta = path.resolve(testModulePath, 'node_modules', 'farmhash', 'build', 'Release', '.forge-meta');
+        expect(await fs.pathExists(forgeMeta), 'farmhash build meta should exist').to.equal(true);
       });
 
       it('should have rebuilt children of top level prod dependencies', async () => {
-        const forgeMetaGoodNPM = path.resolve(testModulePath, 'node_modules', 'microtime', 'build', 'Release', '.forge-meta');
+        const forgeMetaGoodNPM = path.resolve(testModulePath, 'node_modules', 'cmark-gfm', 'build', 'Release', '.forge-meta');
         const forgeMetaBadNPM = path.resolve(
-          testModulePath, 'node_modules', 'benchr', 'node_modules', 'microtime', 'build', 'Release', '.forge-meta'
+          testModulePath, 'node_modules', 'electron-markdown', 'node_modules', 'cmark-gfm', 'build', 'Release', '.forge-meta'
         );
-        expect(await fs.pathExists(forgeMetaGoodNPM) || await fs.pathExists(forgeMetaBadNPM), 'microtime build meta should exist').to.equal(true);
+        expect(await fs.pathExists(forgeMetaGoodNPM) || await fs.pathExists(forgeMetaBadNPM), 'cmark-gfm build meta should exist').to.equal(true);
       });
 
       it('should have rebuilt children of scoped top level prod dependencies', async () => {
-        const forgeMeta = path.resolve(testModulePath, 'node_modules', '@newrelic/native-metrics', 'build', 'Release', '.forge-meta');
-        expect(await fs.pathExists(forgeMeta), '@newrelic/native-metrics build meta should exist').to.equal(true);
+        const forgeMeta = path.resolve(testModulePath, 'node_modules', '@nlv8/signun', 'build', 'Release', '.forge-meta');
+        expect(await fs.pathExists(forgeMeta), '@nlv8/signun build meta should exist').to.equal(true);
       });
 
       it('should have rebuilt top level optional dependencies', async () => {
-        const forgeMeta = path.resolve(testModulePath, 'node_modules', 'zipfile', 'build', 'Release', '.forge-meta');
-        expect(await fs.pathExists(forgeMeta), 'zipfile build meta should exist').to.equal(true);
+        const forgeMeta = path.resolve(testModulePath, 'node_modules', 'bcrypt', 'build', 'Release', '.forge-meta');
+        expect(await fs.pathExists(forgeMeta), 'bcrypt build meta should exist').to.equal(true);
       });
 
       it('should not have rebuilt top level devDependencies', async () => {
-        const forgeMeta = path.resolve(testModulePath, 'node_modules', 'ffi', 'build', 'Release', '.forge-meta');
-        expect(await fs.pathExists(forgeMeta), 'ffi build meta should not exist').to.equal(false);
+        const forgeMeta = path.resolve(testModulePath, 'node_modules', 'ffi-napi', 'build', 'Release', '.forge-meta');
+        expect(await fs.pathExists(forgeMeta), 'ffi-napi build meta should not exist').to.equal(false);
       });
 
       after(async () => {
+        delete process.env.ELECTRON_REBUILD_TESTS;
         await fs.remove(testModulePath);
       });
     });
@@ -93,19 +95,19 @@ describe('rebuilder', () => {
     before(resetTestModule);
 
     it('should skip the rebuild step when disabled', async () => {
-      await rebuild(testModulePath, '2.0.17', process.arch);
-      const rebuilder = rebuild(testModulePath, '2.0.17', process.arch, [], false);
+      await rebuild(testModulePath, '5.0.12', process.arch);
+      const rebuilder = rebuild(testModulePath, '5.0.12', process.arch, [], false);
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
         skipped++;
       });
       await rebuilder;
-      expect(skipped).to.equal(4);
+      expect(skipped).to.equal(5);
     });
 
     it('should rebuild all modules again when disabled but the electron ABI bumped', async () => {
-      await rebuild(testModulePath, '2.0.17', process.arch);
-      const rebuilder = rebuild(testModulePath, '1.6.0', process.arch, [], false);
+      await rebuild(testModulePath, '5.0.12', process.arch);
+      const rebuilder = rebuild(testModulePath, '3.0.0', process.arch, [], false);
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
         skipped++;
@@ -115,8 +117,8 @@ describe('rebuilder', () => {
     });
 
     it('should rebuild all modules again when enabled', async () => {
-      await rebuild(testModulePath, '2.0.17', process.arch);
-      const rebuilder = rebuild(testModulePath, '2.0.17', process.arch, [], true);
+      await rebuild(testModulePath, '5.0.12', process.arch);
+      const rebuilder = rebuild(testModulePath, '5.0.12', process.arch, [], true);
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
         skipped++;
@@ -135,9 +137,9 @@ describe('rebuilder', () => {
     it('should rebuild only specified modules', async () => {
       const rebuilder = rebuild({
         buildPath: testModulePath,
-        electronVersion: '2.0.17',
+        electronVersion: '5.0.12',
         arch: process.arch,
-        onlyModules: ['ffi'],
+        onlyModules: ['ffi-napi'],
         force: true
       });
       let built = 0;
@@ -149,9 +151,9 @@ describe('rebuilder', () => {
     it('should rebuild multiple specified modules via --only option', async () => {
       const rebuilder = rebuild({
         buildPath: testModulePath,
-        electronVersion: '2.0.17',
+        electronVersion: '5.0.12',
         arch: process.arch,
-        onlyModules: ['ffi', 'ref'],
+        onlyModules: ['ffi-napi', 'ref-napi'], // TODO: check to see if there's a bug with scoped modules
         force: true
       });
       let built = 0;
@@ -167,20 +169,20 @@ describe('rebuilder', () => {
     before(resetTestModule);
     afterEach(async () => await fs.remove(testModulePath));
 
-    it('should have rebuilt ffi module in Debug mode', async () => {
+    it('should have rebuilt ffi-napi module in Debug mode', async () => {
       const rebuilder = rebuild({
         buildPath: testModulePath,
-        electronVersion: '2.0.17',
+        electronVersion: '5.0.12',
         arch: process.arch,
-        onlyModules: ['ffi'],
+        onlyModules: ['ffi-napi'],
         force: true,
         debug: true
       });
       await rebuilder;
-      const forgeMetaDebug = path.resolve(testModulePath, 'node_modules', 'ffi', 'build', 'Debug', '.forge-meta');
-      expect(await fs.pathExists(forgeMetaDebug), 'ffi debug build meta should exist').to.equal(true);
-      const forgeMetaRelease = path.resolve(testModulePath, 'node_modules', 'ffi', 'build', 'Release', '.forge-meta');
-      expect(await fs.pathExists(forgeMetaRelease), 'ffi release build meta should not exist').to.equal(false);
+      const forgeMetaDebug = path.resolve(testModulePath, 'node_modules', 'ffi-napi', 'build', 'Debug', '.forge-meta');
+      expect(await fs.pathExists(forgeMetaDebug), 'ffi-napi debug build meta should exist').to.equal(true);
+      const forgeMetaRelease = path.resolve(testModulePath, 'node_modules', 'ffi-napi', 'build', 'Release', '.forge-meta');
+      expect(await fs.pathExists(forgeMetaRelease), 'ffi-napi release build meta should not exist').to.equal(false);
     });
   });
 });
