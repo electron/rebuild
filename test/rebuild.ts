@@ -45,6 +45,7 @@ describe('rebuilder', () => {
         if (!Array.isArray(args)) {
           args = [args];
         }
+        process.env.ELECTRON_REBUILD_TESTS = 'true';
         await (<any>rebuild)(...args);
       });
 
@@ -82,6 +83,7 @@ describe('rebuilder', () => {
       });
 
       after(async () => {
+        delete process.env.ELECTRON_REBUILD_TESTS;
         await fs.remove(testModulePath);
       });
     });
