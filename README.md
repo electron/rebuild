@@ -41,10 +41,10 @@ and then
 npm run rebuild
 ```
 
-### What versions of Node does it work with?
+### What are the requirements?
 
-Node v6.0.0 or higher is required.
-
+Node v6.0.0 or higher is required. Building the extensions use [`node-gyp`](https://github.com/nodejs/node-gyp#installation),
+refer to the link for its installation:runtime requirements.
 
 ### CLI Arguments
 
