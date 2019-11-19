@@ -1,6 +1,6 @@
 {
   "name": "electron-rebuild",
-  "version": "1.8.6",
+  "version": "0.0.0-development",
   "description": "Electron supporting package to rebuild native node modules against the currently installed electron",
   "main": "lib/src/main.js",
   "typings": "lib/src/main.d.ts",
@@ -43,7 +43,7 @@
     "yargs": "^13.2.4"
   },
   "devDependencies": {
-    "@continuous-auth/semantic-release-npm": "^1.0.3",
+    "@continuous-auth/semantic-release-npm": "^2.0.0",
     "@types/chai": "^4.1.7",
     "@types/chai-as-promised": "7.1.0",
     "@types/debug": "^4.1.4",
