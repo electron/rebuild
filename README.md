@@ -43,8 +43,9 @@ npm run rebuild
 
 ### What are the requirements?
 
-Node v6.0.0 or higher is required. Building the extensions use [`node-gyp`](https://github.com/nodejs/node-gyp#installation),
-refer to the link for its installation:runtime requirements.
+Node v6.0.0 or higher is required. Building the native modules from source uses
+[`node-gyp`](https://github.com/nodejs/node-gyp#installation), refer to the link for its
+installation/runtime requirements.
 
 ### CLI Arguments
 
@@ -103,11 +104,14 @@ packager({
 
 ### How can I integrate this with [prebuild](https://github.com/prebuild/prebuild)?
 
-If your module uses [prebuild](https://github.com/prebuild/prebuild) for creating prebuilt binaries it also uses [prebuild-install](https://github.com/prebuild/prebuild-install) to download them. If this is the case then `electron-rebuild` will run `prebuild-install` to download the correct binaries from github instead of rebuilding them.
+If your module uses [prebuild](https://github.com/prebuild/prebuild) for creating prebuilt binaries,
+it also uses [prebuild-install](https://github.com/prebuild/prebuild-install) to download them. If
+this is the case, then `electron-rebuild` will run `prebuild-install` to download the correct
+binaries from the project's GitHub Releases instead of rebuilding them.
 
 ### How can I integrate this into Grunt / Gulp / Whatever?
 
-electron-rebuild is also a library that you can just require into your app or
+electron-rebuild is also a library that you can require into your app or
 build process. It has a very simple API:
 
 ```javascript
@@ -133,8 +137,8 @@ import rebuild from 'electron-rebuild';
 A full build process might look something like:
 
 ```javascript
-let childProcess = require('child_process');
-let pathToElectron = require('electron-prebuilt');
+const childProcess = require('child_process');
+const pathToElectron = require('electron');
 
   rebuild({
     buildPath: __dirname,
