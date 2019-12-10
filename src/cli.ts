@@ -49,14 +49,14 @@ if (argv.h) {
 
 if (process.argv.length === 3 && process.argv[2] === '--version') {
   try {
-    /* tslint:disable */ console.log('Electron Rebuild Version:', require(path.resolve(__dirname, '../../package.json')).version); /* tslint:enable */
+    console.log('Electron Rebuild Version:', require(path.resolve(__dirname, '../../package.json')).version);
   } catch (err) {
-    /* tslint:disable */ console.log('Electron Rebuild Version:', require(path.resolve(__dirname, '../package.json')).version); /* tslint:enable */
+    console.log('Electron Rebuild Version:', require(path.resolve(__dirname, '../package.json')).version);
   }
   process.exit(0);
 }
 
-const handler = (err: Error) => {
+const handler = (err: Error): void => {
   console.error('\nAn unhandled error occurred inside electron-rebuild'.red);
   console.error(`${err.message}\n\n${err.stack}`.red);
   process.exit(-1);
@@ -66,13 +66,14 @@ process.on('uncaughtException', handler);
 process.on('unhandledRejection', handler);
 
 
-(async () => {
+(async (): Promise<void> => {
   const electronModulePath = argv.e ? path.resolve(process.cwd(), (argv.e as string)) : locateElectronModule();
   let electronModuleVersion = argv.v as string;
 
   if (!electronModuleVersion) {
     try {
       if (!electronModulePath) throw new Error('Prebuilt electron module not found');
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const pkgJson = require(path.join(electronModulePath, 'package.json'));
 
       electronModuleVersion = pkgJson.version;
@@ -104,7 +105,7 @@ process.on('unhandledRejection', handler);
   const rebuildSpinner = ora('Searching dependency tree').start();
   let lastModuleName: string;
 
-  const redraw = (moduleName?: string) => {
+  const redraw = (moduleName?: string): void => {
     if (moduleName) lastModuleName = moduleName;
 
     if (argv.p) {

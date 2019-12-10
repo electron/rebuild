@@ -9,7 +9,7 @@
     "watch": "tsc -w",
     "prepare": "npm run compile",
     "mocha": "cross-env TS_NODE_FILES=true mocha --require ts-node/register ./test/*.ts",
-    "lint": "tslint --project tsconfig.json --exclude \"test/**/node_modules/**/*.ts\" \"src/**/*.ts\" \"test/**/*.ts\"",
+    "lint": "eslint --ext .ts .",
     "test": "npm run lint && npm run mocha"
   },
   "bin": {
@@ -51,14 +51,55 @@
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.0.10",
     "@types/yargs": "^13.0.0",
+    "@typescript-eslint/eslint-plugin": "^2.11.0",
+    "@typescript-eslint/parser": "^2.11.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "cross-env": "^5.2.0",
     "electron": "^2.0.18",
+    "eslint": "^6.7.2",
+    "eslint-plugin-mocha": "^6.2.2",
     "mocha": "^6.1.4",
     "semantic-release": "^15.13.12",
     "ts-node": "^8.3.0",
-    "tslint": "^5.18.0",
     "typescript": "^3.5.2"
-  }
+  },
+  "eslintConfig": {
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "ecmaVersion": 8,
+      "sourceType": "module"
+    },
+    "plugins": [
+      "mocha",
+      "@typescript-eslint"
+    ],
+    "env": {
+      "es6": true,
+      "mocha": true,
+      "node": true
+    },
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/eslint-recommended",
+      "plugin:@typescript-eslint/recommended"
+    ],
+    "rules": {
+      "mocha/no-exclusive-tests": "error",
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          "args": "after-used",
+          "argsIgnorePattern": "^_",
+          "ignoreRestSiblings": true,
+          "vars": "all"
+        }
+      ]
+    }
+  },
+  "eslintIgnore": [
+    "*.d.ts",
+    "node_modules"
+  ]
 }

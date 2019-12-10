@@ -5,7 +5,7 @@ import { spawnPromise } from 'spawn-rx';
 
 import { locateElectronModule } from '../src/electron-locator';
 
-function packageCommand(command: string, packageName: string) {
+function packageCommand(command: string, packageName: string): Promise<string> {
   return spawnPromise('npm', [command, '--no-save', packageName], {
     cwd: path.resolve(__dirname, '..'),
     stdio: 'ignore',
@@ -15,10 +15,11 @@ function packageCommand(command: string, packageName: string) {
 const install: ((s: string) => Promise<void>) = packageCommand.bind(null, 'install');
 const uninstall: ((s: string) => Promise<void>) = packageCommand.bind(null, 'uninstall');
 
-const testElectronCanBeFound = () => {
+const testElectronCanBeFound = (): void => {
   it('should return a valid path', () => {
     const electronPath = locateElectronModule();
     expect(electronPath).to.be.a('string');
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     expect(fs.existsSync(electronPath!)).to.be.equal(true);
   });
 };
