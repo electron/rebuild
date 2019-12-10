@@ -38,7 +38,7 @@ const yargs = argParser
   .alias('s', 'sequential')
   .describe('b', 'Build debug version of modules')
   .alias('b','debug')
-  .describe('tp', 'github tag prefix, default is "v", passed to prebuild-install')
+  .describe('tp', 'GitHub tag prefix passed to prebuild-install. Default is "v"')
   .alias('tp', 'prebuild-tag-prefix')
   .epilog('Copyright 2016');
 
