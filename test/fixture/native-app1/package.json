@@ -20,7 +20,7 @@
   "dependencies": {
     "@nlv8/signun": "1.3.4",
     "farmhash": "3.0.0",
-    "electron-markdown": "0.6.0",
+    "level": "6.0.0",
     "ref-napi": "1.4.2"
   },
   "optionalDependencies": {
