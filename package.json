@@ -55,14 +55,14 @@
     "@typescript-eslint/parser": "^2.11.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
-    "cross-env": "^5.2.0",
+    "cross-env": "^5.2.1",
     "electron": "^2.0.18",
     "eslint": "^6.7.2",
     "eslint-plugin-mocha": "^6.2.2",
-    "mocha": "^6.1.4",
-    "semantic-release": "^15.13.12",
-    "ts-node": "^8.3.0",
-    "typescript": "^3.5.2"
+    "mocha": "^6.2.2",
+    "semantic-release": "^15.13.31",
+    "ts-node": "^8.5.4",
+    "typescript": "^3.7.3"
   },
   "eslintConfig": {
     "parser": "@typescript-eslint/parser",
