@@ -11,7 +11,7 @@ interface Snapshot {
   [key: string]: Snap | Snapshot;
 }
 
-const takeSnapshot = async (dir: string, relativeTo = dir) => {
+const takeSnapshot = async (dir: string, relativeTo = dir): Promise<Snapshot> => {
   const snap: Snapshot = {};
   await Promise.all((await fs.readdir(dir)).map(async (child) => {
     if (child === 'node_modules') return;
@@ -30,7 +30,7 @@ const takeSnapshot = async (dir: string, relativeTo = dir) => {
   return snap;
 };
 
-const writeSnapshot = async (diff: Snapshot, dir: string) => {
+const writeSnapshot = async (diff: Snapshot, dir: string): Promise<void> => {
   for (const key in diff) {
     if (diff[key] instanceof Snap) {
       await fs.mkdirp(path.dirname(path.resolve(dir, key)));
@@ -42,7 +42,9 @@ const writeSnapshot = async (diff: Snapshot, dir: string) => {
   }
 };
 
-const serialize = (snap: Snapshot) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const serialize = (snap: Snapshot): any => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const jsonReady: any = {};
   for (const key in snap) {
     if (snap[key] instanceof Snap) {
@@ -59,7 +61,8 @@ const serialize = (snap: Snapshot) => {
   return jsonReady;
 };
 
-const unserialize = (jsonReady: any) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const unserialize = (jsonReady: any): Snapshot => {
   const snap: Snapshot = {};
   for (const key in jsonReady) {
     if (jsonReady[key].__isSnap) {
@@ -74,7 +77,7 @@ const unserialize = (jsonReady: any) => {
   return snap;
 };
 
-export const cacheModuleState = async (dir: string, cachePath: string, key: string) => {
+export const cacheModuleState = async (dir: string, cachePath: string, key: string): Promise<void> => {
   const snap = await takeSnapshot(dir);
 
   const moduleBuffer = Buffer.from(JSON.stringify(serialize(snap)));
@@ -83,9 +86,11 @@ export const cacheModuleState = async (dir: string, cachePath: string, key: stri
   await fs.writeFile(path.resolve(cachePath, key), zipped);
 };
 
-export const lookupModuleState = async (cachePath: string, key: string) => {
+type ApplyDiffFunction = (dir: string) => Promise<void>;
+
+export const lookupModuleState = async (cachePath: string, key: string): Promise<ApplyDiffFunction | boolean> => {
   if (await fs.pathExists(path.resolve(cachePath, key))) {
-    return async function applyDiff(dir: string) {
+    return async function applyDiff(dir: string): Promise<void> {
       const zipped = await fs.readFile(path.resolve(cachePath, key));
       const unzipped: Buffer = await new Promise(resolve => { zlib.gunzip(zipped, (_, result) => resolve(result)); });
       const diff = unserialize(JSON.parse(unzipped.toString()));

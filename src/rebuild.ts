@@ -41,7 +41,7 @@ const defaultTypes: ModuleType[] = ['prod', 'optional'];
 // Update this number if you change the caching logic to ensure no bad cache hits
 const ELECTRON_REBUILD_CACHE_ID = 1;
 
-const locateBinary = async (basePath: string, suffix: string) => {
+const locateBinary = async (basePath: string, suffix: string): Promise<string | null> => {
   let testPath = basePath;
   for (let upDir = 0; upDir <= 20; upDir ++) {
     const checkPath = path.resolve(testPath, suffix);
@@ -53,11 +53,11 @@ const locateBinary = async (basePath: string, suffix: string) => {
   return null;
 };
 
-const locateNodeGyp = async () => {
+const locateNodeGyp = async (): Promise<string | null> => {
   return await locateBinary(__dirname, `node_modules/.bin/node-gyp${process.platform === 'win32' ? '.cmd' : ''}`);
 };
 
-const locatePrebuild = async (modulePath: string) => {
+const locatePrebuild = async (modulePath: string): Promise<string | null> => {
   return await locateBinary(modulePath, 'node_modules/prebuild-install/bin.js');
 };
 
@@ -121,7 +121,7 @@ class Rebuilder {
     this.realNodeModulesPaths = new Set();
   }
 
-  async rebuild() {
+  async rebuild(): Promise<void> {
     if (!path.isAbsolute(this.buildPath)) {
       throw new Error('Expected buildPath to be an absolute path');
     }
@@ -174,7 +174,7 @@ class Rebuilder {
     }
   }
 
-  private hashDirectory = async (dir: string, relativeTo = dir) => {
+  private hashDirectory = async (dir: string, relativeTo = dir): Promise<HashTree> => {
     d('hashing dir', dir);
     const dirTree: HashTree = {};
     await Promise.all((await fs.readdir(dir)).map(async (child) => {
@@ -195,7 +195,7 @@ class Rebuilder {
     return dirTree;
   }
 
-  private dHashTree = (tree: HashTree, hash: crypto.Hash) => {
+  private dHashTree = (tree: HashTree, hash: crypto.Hash): void => {
     for (const key of Object.keys(tree).sort()) {
       hash.update(key);
       if (typeof tree[key] === 'string') {
@@ -206,7 +206,7 @@ class Rebuilder {
     }
   }
 
-  private generateCacheKey = async (opts: { modulePath: string }) => {
+  private generateCacheKey = async (opts: { modulePath: string }): Promise<string> => {
     const tree = await this.hashDirectory(opts.modulePath);
     const hasher = crypto.createHash('SHA256')
       .update(`${ELECTRON_REBUILD_CACHE_ID}`)
@@ -222,7 +222,7 @@ class Rebuilder {
     return hash;
   }
 
-  async rebuildModuleAt(modulePath: string) {
+  async rebuildModuleAt(modulePath: string): Promise<void> {
     if (!(await fs.pathExists(path.resolve(modulePath, 'binding.gyp')))) {
       return;
     }
@@ -262,7 +262,7 @@ class Rebuilder {
       });
 
       const applyDiffFn = await lookupModuleState(this.cachePath, cacheKey);
-      if (applyDiffFn) {
+      if (typeof applyDiffFn === 'function') {
         await applyDiffFn(modulePath);
         this.lifecycle.emit('module-done');
         return;
@@ -363,6 +363,7 @@ class Rebuilder {
     d('rebuilding', path.basename(modulePath), 'with args', rebuildArgs);
     await spawnPromise(nodeGypPath, rebuildArgs, {
       cwd: modulePath,
+      /* eslint-disable @typescript-eslint/camelcase */
       env: Object.assign({}, process.env, {
         USERPROFILE: path.resolve(os.homedir(), '.electron-gyp'),
         npm_config_disturl: 'https://electronjs.org/headers',
@@ -373,6 +374,7 @@ class Rebuilder {
         npm_config_debug: this.debug ? 'true' : '',
         npm_config_devdir: path.resolve(os.homedir(), '.electron-gyp'),
       }),
+      /* eslint-enable @typescript-eslint/camelcase */
     });
 
     d('built:', path.basename(modulePath));
@@ -403,7 +405,7 @@ class Rebuilder {
     this.lifecycle.emit('module-done');
   }
 
-  async rebuildAllModulesIn(nodeModulesPath: string, prefix = '') {
+  async rebuildAllModulesIn(nodeModulesPath: string, prefix = ''): Promise<void> {
     // Some package managers use symbolic links when installing node modules
     // we need to be sure we've never tested the a package before by resolving
     // all symlinks in the path and testing against a set
@@ -441,7 +443,7 @@ class Rebuilder {
     }
   }
 
-  async findModule(moduleName: string, fromDir: string, foundFn: ((p: string) => Promise<void>)) {
+  async findModule(moduleName: string, fromDir: string, foundFn: ((p: string) => Promise<void>)): Promise<void[]> {
     let targetDir = fromDir;
     const foundFns = [];
 
@@ -454,22 +456,22 @@ class Rebuilder {
       targetDir = path.dirname(targetDir);
     }
 
-    await Promise.all(foundFns);
+    return Promise.all(foundFns);
   }
 
-  async markChildrenAsProdDeps(modulePath: string) {
+  async markChildrenAsProdDeps(modulePath: string): Promise<void> {
     if (!await fs.pathExists(modulePath)) {
       return;
     }
 
     d('exploring', modulePath);
-    let childPackageJson: any;
+    let childPackageJson;
     try {
       childPackageJson = await readPackageJson(modulePath, true);
     } catch (err) {
       return;
     }
-    const moduleWait: Promise<void>[] = [];
+    const moduleWait: Promise<void[]>[] = [];
 
     const callback = this.markChildrenAsProdDeps.bind(this);
     Object.keys(childPackageJson.dependencies || {}).concat(Object.keys(childPackageJson.optionalDependencies || {})).forEach((key) => {
@@ -486,24 +488,17 @@ class Rebuilder {
   }
 }
 
-function rebuildWithOptions(options: RebuildOptions) {
+function rebuildWithOptions(options: RebuildOptions): Promise<void> {
+  // eslint-disable-next-line prefer-rest-params
   d('rebuilding with args:', arguments);
   const lifecycle = new EventEmitter();
   const rebuilderOptions: RebuilderOptions = Object.assign({}, options, { lifecycle });
   const rebuilder = new Rebuilder(rebuilderOptions);
 
-  let ret = rebuilder.rebuild() as Promise<void> & { lifecycle: EventEmitter };
+  const ret = rebuilder.rebuild() as Promise<void> & { lifecycle: EventEmitter };
   ret.lifecycle = lifecycle;
 
   return ret;
-}
-
-function doRebuild(options: any, ...args: any[]) {
-  if (typeof options === 'object') {
-    return rebuildWithOptions(options as RebuildOptions);
-  }
-  console.warn('You are using the deprecated electron-rebuild API, please switch to using the options object instead');
-  return rebuildWithOptions((<Function>createOptions)(options, ...args));
 }
 
 export type RebuilderResult = Promise<void> & { lifecycle: EventEmitter };
@@ -521,8 +516,6 @@ export type RebuildFunctionWithArgs = (
   debug?: boolean
 ) => RebuilderResult;
 export type RebuildFunction = RebuildFunctionWithArgs & RebuildFunctionWithOptions;
-
-export const rebuild = (doRebuild as RebuildFunction);
 
 export function createOptions(
     buildPath: string,
@@ -550,6 +543,17 @@ export function createOptions(
   };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function doRebuild(options: any, ...args: any[]): Promise<void> {
+  if (typeof options === 'object') {
+    return rebuildWithOptions(options as RebuildOptions);
+  }
+  console.warn('You are using the deprecated electron-rebuild API, please switch to using the options object instead');
+  return rebuildWithOptions((createOptions as Function)(options, ...args));
+}
+
+export const rebuild = (doRebuild as RebuildFunction);
+
 export function rebuildNativeModules(
     electronVersion: string,
     modulePath: string,
@@ -559,7 +563,7 @@ export function rebuildNativeModules(
     _command: string,
     _ignoreDevDeps= false,
     _ignoreOptDeps= false,
-    _verbose= false) {
+    _verbose= false): Promise<void> {
   if (path.basename(modulePath) === 'node_modules') {
     modulePath = path.dirname(modulePath);
   }

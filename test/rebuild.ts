@@ -10,7 +10,7 @@ describe('rebuilder', () => {
   const testModulePath = path.resolve(os.tmpdir(), 'electron-forge-rebuild-test');
   const timeoutSeconds = process.platform === 'win32' ? 5 : 2;
 
-  const resetTestModule = async () => {
+  const resetTestModule = async (): Promise<void> => {
     await fs.remove(testModulePath);
     await fs.mkdirs(testModulePath);
     await fs.copy(
@@ -24,8 +24,8 @@ describe('rebuilder', () => {
   };
 
   const optionSets: {
-    name: string,
-    args: RebuildOptions | string[]
+    name: string;
+    args: RebuildOptions | string[];
   }[] = [
     { args: [testModulePath, '5.0.12', process.arch], name: 'sequential args' },
     { args: {
@@ -41,12 +41,16 @@ describe('rebuilder', () => {
       before(resetTestModule);
 
       before(async () => {
-        let args: any = options.args;
-        if (!Array.isArray(args)) {
+        let args: RebuildOptions | string | string[] = options.args;
+        if (!Array.isArray(args) && typeof args === 'string') {
           args = [args];
         }
         process.env.ELECTRON_REBUILD_TESTS = 'true';
-        await (<any>rebuild)(...args);
+        if (Array.isArray(args)) {
+          await (rebuild as Function)(...(args as string[]));
+        } else {
+          await rebuild(args);
+        }
       });
 
       it('should have rebuilt top level prod dependencies', async () => {
