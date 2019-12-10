@@ -38,8 +38,8 @@ const yargs = argParser
   .alias('s', 'sequential')
   .describe('b', 'Build debug version of modules')
   .alias('b','debug')
-  .describe('tp', 'GitHub tag prefix passed to prebuild-install. Default is "v"')
-  .alias('tp', 'prebuild-tag-prefix')
+  .describe('ptp', 'GitHub tag prefix passed to prebuild-install. Default is "v"')
+  .alias('ptp', 'prebuild-tag-prefix')
   .epilog('Copyright 2016');
 
 const argv = yargs.argv;
@@ -128,7 +128,7 @@ process.on('unhandledRejection', handler);
     types: argv.t ? (argv.t as string).split(',') as ModuleType[] : ['prod', 'optional'],
     mode: argv.p ? 'parallel' : (argv.s ? 'sequential' : undefined),
     debug: argv.b as boolean,
-    tagPrefix: argv.tp || 'v',
+    prebuildTagPrefix: (argv.tp as string) || 'v',
   });
 
   const lifecycle = rebuilder.lifecycle;
