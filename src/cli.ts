@@ -38,6 +38,7 @@ const yargs = argParser
   .alias('s', 'sequential')
   .describe('b', 'Build debug version of modules')
   .alias('b','debug')
+  .describe('prebuild-tag-prefix', 'GitHub tag prefix passed to prebuild-install. Default is "v"')
   .epilog('Copyright 2016');
 
 const argv = yargs.argv;
@@ -125,7 +126,8 @@ process.on('unhandledRejection', handler);
     headerURL: argv.d as string,
     types: argv.t ? (argv.t as string).split(',') as ModuleType[] : ['prod', 'optional'],
     mode: argv.p ? 'parallel' : (argv.s ? 'sequential' : undefined),
-    debug: argv.b as boolean
+    debug: argv.b as boolean,
+    prebuildTagPrefix: (argv.prebuildTagPrefix as string) || 'v',
   });
 
   const lifecycle = rebuilder.lifecycle;
