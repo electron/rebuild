@@ -7,8 +7,8 @@ import ora from 'ora';
 import * as argParser from 'yargs';
 
 import { rebuild, ModuleType } from './rebuild';
-import { locateElectronPrebuilt } from './electron-locater';
 import { getProjectRootPath } from './search-module';
+import { locateElectronModule } from './electron-locator';
 
 const yargs = argParser
   .usage('Usage: electron-rebuild --version [version] --module-dir [path]')
@@ -27,7 +27,7 @@ const yargs = argParser
   .alias('w', 'which-module')
   .describe('o', 'Only build specified module, or comma separated list of modules. All others are ignored.')
   .alias('o', 'only')
-  .describe('e', 'The path to electron-prebuilt')
+  .describe('e', 'The path to prebuilt electron module')
   .alias('e', 'electron-prebuilt-dir')
   .describe('d', 'Custom header tarball URL')
   .alias('d', 'dist-url')
@@ -39,6 +39,7 @@ const yargs = argParser
   .alias('s', 'sequential')
   .describe('b', 'Build debug version of modules')
   .alias('b','debug')
+  .describe('prebuild-tag-prefix', 'GitHub tag prefix passed to prebuild-install. Default is "v"')
   .epilog('Copyright 2016');
 
 const argv = yargs.argv;
@@ -50,14 +51,14 @@ if (argv.h) {
 
 if (process.argv.length === 3 && process.argv[2] === '--version') {
   try {
-    /* tslint:disable */ console.log('Electron Rebuild Version:', require(path.resolve(__dirname, '../../package.json')).version); /* tslint:enable */
+    console.log('Electron Rebuild Version:', require(path.resolve(__dirname, '../../package.json')).version);
   } catch (err) {
-    /* tslint:disable */ console.log('Electron Rebuild Version:', require(path.resolve(__dirname, '../package.json')).version); /* tslint:enable */
+    console.log('Electron Rebuild Version:', require(path.resolve(__dirname, '../package.json')).version);
   }
   process.exit(0);
 }
 
-const handler = (err: Error) => {
+const handler = (err: Error): void => {
   console.error('\nAn unhandled error occurred inside electron-rebuild'.red);
   console.error(`${err.message}\n\n${err.stack}`.red);
   process.exit(-1);
@@ -67,19 +68,20 @@ process.on('uncaughtException', handler);
 process.on('unhandledRejection', handler);
 
 
-(async () => {
+(async (): Promise<void> => {
   const projectRootPath = getProjectRootPath(process.cwd());
-  const electronPrebuiltPath = argv.e ? path.resolve(process.cwd(), (argv.e as string)) : locateElectronPrebuilt(projectRootPath);
-  let electronPrebuiltVersion = argv.v as string;
+  const electronModulePath = argv.e ? path.resolve(process.cwd(), (argv.e as string)) : locateElectronModule(projectRootPath);
+  let electronModuleVersion = argv.v as string;
 
-  if (!electronPrebuiltVersion) {
+  if (!electronModuleVersion) {
     try {
-      if (!electronPrebuiltPath) throw new Error('electron-prebuilt not found');
-      const pkgJson = require(path.join(electronPrebuiltPath, 'package.json'));
+      if (!electronModulePath) throw new Error('Prebuilt electron module not found');
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const pkgJson = require(path.join(electronModulePath, 'package.json'));
 
-      electronPrebuiltVersion = pkgJson.version;
+      electronModuleVersion = pkgJson.version;
     } catch (e) {
-      throw new Error('Unable to find electron-prebuilt\'s version number, either install it or specify an explicit version');
+      throw new Error(`Unable to find electron's version number, either install it or specify an explicit version`);
     }
   }
 
@@ -106,7 +108,7 @@ process.on('unhandledRejection', handler);
   const rebuildSpinner = ora('Searching dependency tree').start();
   let lastModuleName: string;
 
-  const redraw = (moduleName?: string) => {
+  const redraw = (moduleName?: string): void => {
     if (moduleName) lastModuleName = moduleName;
 
     if (argv.p) {
@@ -118,7 +120,7 @@ process.on('unhandledRejection', handler);
 
   const rebuilder = rebuild({
     buildPath: rootDirectory,
-    electronVersion: electronPrebuiltVersion,
+    electronVersion: electronModuleVersion,
     arch: (argv.a as string) || process.arch,
     extraModules: argv.w ? (argv.w as string).split(',') : [],
     onlyModules: argv.o ? (argv.o as string).split(',') : null,
@@ -127,7 +129,8 @@ process.on('unhandledRejection', handler);
     types: argv.t ? (argv.t as string).split(',') as ModuleType[] : ['prod', 'optional'],
     mode: argv.p ? 'parallel' : (argv.s ? 'sequential' : undefined),
     debug: argv.b as boolean,
-    projectRootPath
+    prebuildTagPrefix: (argv.prebuildTagPrefix as string) || 'v',
+    projectRootPath,
   });
 
   const lifecycle = rebuilder.lifecycle;

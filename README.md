@@ -1,6 +1,6 @@
 ## Electron Rebuild
 
-[![Build Status](https://travis-ci.org/electron/electron-rebuild.svg?branch=master)](https://travis-ci.org/electron/electron-rebuild)
+[![CircleCI](https://circleci.com/gh/electron/electron-rebuild.svg?style=svg)](https://circleci.com/gh/electron/electron-rebuild)
 [![NPM](https://img.shields.io/npm/v/electron-rebuild.svg?style=flat)](https://npm.im/electron-rebuild)
 
 This executable rebuilds native Node.js modules against the version of Node.js
@@ -41,10 +41,11 @@ and then
 npm run rebuild
 ```
 
-### What versions of Node does it work with?
+### What are the requirements?
 
-Node v6.0.0 or higher is required.
-
+Node v6.0.0 or higher is required. Building the native modules from source uses
+[`node-gyp`](https://github.com/nodejs/node-gyp#installation), refer to the link for its
+installation/runtime requirements.
 
 ### CLI Arguments
 
@@ -73,6 +74,8 @@ Options:
   -o, --only                   Only build specified module, or comma separated
                                list of modules. All others are ignored.
   -b, --debug                  Build debug version of modules
+  --prebuild-tag-prefix        GitHub tag prefix passed to prebuild-install.
+                               Default is "v"
 
 Copyright 2016
 ```
@@ -103,11 +106,14 @@ packager({
 
 ### How can I integrate this with [prebuild](https://github.com/prebuild/prebuild)?
 
-If your module uses [prebuild](https://github.com/prebuild/prebuild) for creating prebuilt binaries it also uses [prebuild-install](https://github.com/prebuild/prebuild-install) to download them. If this is the case then `electron-rebuild` will run `prebuild-install` to download the correct binaries from github instead of rebuilding them.
+If your module uses [prebuild](https://github.com/prebuild/prebuild) for creating prebuilt binaries,
+it also uses [prebuild-install](https://github.com/prebuild/prebuild-install) to download them. If
+this is the case, then `electron-rebuild` will run `prebuild-install` to download the correct
+binaries from the project's GitHub Releases instead of rebuilding them.
 
 ### How can I integrate this into Grunt / Gulp / Whatever?
 
-electron-rebuild is also a library that you can just require into your app or
+electron-rebuild is also a library that you can require into your app or
 build process. It has a very simple API:
 
 ```javascript
@@ -133,8 +139,8 @@ import rebuild from 'electron-rebuild';
 A full build process might look something like:
 
 ```javascript
-let childProcess = require('child_process');
-let pathToElectron = require('electron-prebuilt');
+const childProcess = require('child_process');
+const pathToElectron = require('electron');
 
   rebuild({
     buildPath: __dirname,

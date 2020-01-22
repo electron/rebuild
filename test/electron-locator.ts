@@ -1,12 +1,12 @@
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
 import * as path from 'path';
 import { expect } from 'chai';
 import { spawnPromise } from 'spawn-rx';
 
-import { locateElectronPrebuilt } from '../src/electron-locater';
+import { locateElectronModule } from '../src/electron-locator';
 
-function packageCommand(command: string, packageName: string) {
-  return spawnPromise('npm', [command, packageName], {
+function packageCommand(command: string, packageName: string): Promise<string> {
+  return spawnPromise('npm', [command, '--no-save', packageName], {
     cwd: path.resolve(__dirname, '..'),
     stdio: 'ignore',
   });
@@ -15,21 +15,23 @@ function packageCommand(command: string, packageName: string) {
 const install: ((s: string) => Promise<void>) = packageCommand.bind(null, 'install');
 const uninstall: ((s: string) => Promise<void>) = packageCommand.bind(null, 'uninstall');
 
-const testElectronCanBeFound = () => {
+const testElectronCanBeFound = (): void => {
   it('should return a valid path', () => {
-    const electronPath = locateElectronPrebuilt();
+    const electronPath = locateElectronModule();
     expect(electronPath).to.be.a('string');
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     expect(fs.existsSync(electronPath!)).to.be.equal(true);
   });
 };
 
-describe('locateElectronPrebuilt', function() {
+describe('locateElectronModule', function() {
   this.timeout(30 * 1000);
 
   before(() => uninstall('electron'));
 
-  it('should return null when electron is not installed', () => {
-    expect(locateElectronPrebuilt()).to.be.equal(null);
+  it('should return null when electron is not installed', async () => {
+    await fs.remove(path.resolve(__dirname, '..', 'node_modules', 'electron'));
+    expect(locateElectronModule()).to.be.equal(null);
   });
 
   describe('with electron-prebuilt installed', () => {
