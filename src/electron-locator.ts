@@ -5,8 +5,6 @@ import { searchModuleSync } from './search-module';
 const electronModuleNames = ['electron', 'electron-prebuilt', 'electron-prebuilt-compile'];
 const relativeNodeModulesDir = path.resolve(__dirname, '..', '..');
 
-function locateModulesInWorkspace(projectRootPath?: string)
-
 function locateModules(pathMapper: (moduleName: string) => string | null): string[] {
   const possibleModulePaths = electronModuleNames.map(pathMapper);
   return possibleModulePaths.filter((modulePath) => modulePath && fs.existsSync(path.join(modulePath, 'package.json'))) as string[];
@@ -26,11 +24,11 @@ function locateModulesByRequire(): string[] | null {
   });
 }
 
-export function locateElectronModule(): string | null {
+export function locateElectronModule(projectRootPath?: string): string | null {
   let electronPath: string | null = null;
 
   // Attempt to locate modules by path
-  let foundModule = possibleModuleNames.some((moduleName) => {
+  let foundModule = electronModuleNames.some((moduleName) => {
     electronPath = searchModuleSync(
       process.cwd(),
       moduleName,
