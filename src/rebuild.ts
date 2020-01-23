@@ -156,10 +156,10 @@ class Rebuilder {
       depKeys.push(...Object.keys(rootPackageJson.devDependencies || {}));
     }
 
-    depKeys.forEach((key) => {
+    for (const key of depKeys) {
       this.prodDeps[key] = true;
       markWaiters.push(this.markChildrenAsProdDeps(path.resolve(this.buildPath, 'node_modules', key)));
-    });
+    }
 
     await Promise.all(markWaiters);
 
@@ -353,9 +353,9 @@ class Rebuilder {
         .replace('{version}', modulePackageJson.version)
         .replace('{libc}', detectLibc.family || 'unknown');
 
-      Object.keys(modulePackageJson.binary).forEach((binaryReplaceKey) => {
+      for (const binaryReplaceKey of Object.keys(modulePackageJson.binary)) {
         value = value.replace(`{${binaryReplaceKey}}`, modulePackageJson.binary[binaryReplaceKey]);
-      });
+      }
 
       rebuildArgs.push(`--${binaryKey}=${value}`);
     }
@@ -478,15 +478,15 @@ class Rebuilder {
     const moduleWait: Promise<void[]>[] = [];
 
     const callback = this.markChildrenAsProdDeps.bind(this);
-    Object.keys(childPackageJson.dependencies || {}).concat(Object.keys(childPackageJson.optionalDependencies || {})).forEach((key) => {
+    for (const key of Object.keys(childPackageJson.dependencies || {}).concat(Object.keys(childPackageJson.optionalDependencies || {}))) {
       if (this.prodDeps[key]) {
-        return;
+        continue;
       }
 
       this.prodDeps[key] = true;
 
       moduleWait.push(this.findModule(key, modulePath, callback));
-    });
+    }
 
     await Promise.all(moduleWait);
   }
