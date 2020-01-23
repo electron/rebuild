@@ -29,7 +29,7 @@ export const searchModule = async (
     shouldContinueSearch = workspacePath !== path.resolve(rootPath, '..');
   }
   while (shouldContinueSearch) {
-    let modulePath = path.resolve(workspacePath, 'node_modules', moduleName);
+    const modulePath = path.resolve(workspacePath, 'node_modules', moduleName);
     if (await fs.pathExists(modulePath)) {
       modulePaths.push(modulePath);
     }
@@ -64,7 +64,7 @@ export const searchModuleSync = (
   moduleName: string,
   rootPath?: string
 ): string[] => {
-  let modulePaths = [];
+  const modulePaths = [];
   let workspacePath = currentPath;
 
   let shouldContinueSearch: boolean = fs.pathExistsSync(
@@ -74,7 +74,7 @@ export const searchModuleSync = (
     shouldContinueSearch = workspacePath !== path.resolve(rootPath, '..');
   }
   while (shouldContinueSearch) {
-    let modulePath = path.resolve(workspacePath, 'node_modules', moduleName);
+    const modulePath = path.resolve(workspacePath, 'node_modules', moduleName);
     if (fs.pathExistsSync(modulePath)) {
       modulePaths.push(modulePath);
     }
@@ -102,8 +102,8 @@ export const searchNodeModules = async (
   currentPath: string,
   rootPath?: string
 ): Promise<string[]> => {
-  let nodeModules = [];
-  let workspacePath: string = currentPath;
+  const nodeModules = [];
+  let workspacePath = currentPath;
 
   let shouldContinueSearch: boolean = await fs.pathExists(
     path.resolve(workspacePath, 'package.json')
@@ -112,7 +112,7 @@ export const searchNodeModules = async (
     shouldContinueSearch = workspacePath !== path.resolve(rootPath, '..');
   }
   while (shouldContinueSearch) {
-    let modulePath = path.resolve(workspacePath, 'node_modules');
+    const modulePath = path.resolve(workspacePath, 'node_modules');
     if (await fs.pathExists(modulePath)) {
       nodeModules.push(modulePath);
     }
@@ -138,7 +138,7 @@ export const getProjectRootPath = (currentPath: string): string => {
   let workspaceRootPath: string | undefined;
   while (currentPath !== path.resolve('/')) {
     try {
-      let packageJson = fs.readJsonSync(path.join(currentPath, 'package.json'));
+      const packageJson = fs.readJsonSync(path.join(currentPath, 'package.json'));
       if (packageJson.workspaces) {
         workspaceRootPath = currentPath;
         break;

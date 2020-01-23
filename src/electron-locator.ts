@@ -28,7 +28,7 @@ export function locateElectronModule(projectRootPath?: string): string | null {
   let electronPath: string | null = null;
 
   // Attempt to locate modules by path
-  let foundModule = electronModuleNames.some((moduleName) => {
+  const foundModule = electronModuleNames.some((moduleName) => {
     electronPath = searchModuleSync(
       process.cwd(),
       moduleName,

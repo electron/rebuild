@@ -466,10 +466,9 @@ class Rebuilder {
   }
 
   async findModule(moduleName: string, fromDir: string, foundFn: ((p: string) => Promise<void>)): Promise<void[]> {
-    let targetDir = fromDir;
 
-    let testPaths = await searchModule(
-      targetDir,
+    const testPaths = await searchModule(
+      fromDir,
       moduleName,
       this.projectRootPath
     );

@@ -9,14 +9,14 @@ import { getProjectRootPath } from '../src/search-module';
 
 const projectRootPath = getProjectRootPath(process.cwd());
 
-describe('rebuilder in yarn workspace', function() {
+describe('rebuild for yarn workspace', function() {
   this.timeout(2 * 60 * 1000);
   const testModulePath = path.resolve(
     os.tmpdir(),
     'electron-forge-rebuild-test'
   );
 
-  const resetTestModule = async () => {
+  const resetTestModule = async (): Promise<void> => {
     await fs.remove(testModulePath);
     await fs.mkdirs(testModulePath);
     await fs.copy(path.resolve(__dirname, '../test/fixture/workspace-test/package.json'), path.resolve(testModulePath, 'package.json'));
@@ -53,8 +53,7 @@ describe('rebuilder in yarn workspace', function() {
       before(resetTestModule);
 
       before(async () => {
-        let args: any = options.args;
-        await (<any>rebuild)(args);
+        await rebuild(options.args as RebuildOptions);
       });
 
       it('should have rebuilt top level prod dependencies', async () => {
