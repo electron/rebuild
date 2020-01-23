@@ -2,7 +2,7 @@ import { spawnPromise } from 'spawn-rx';
 import * as crypto from 'crypto';
 import * as debug from 'debug';
 import * as detectLibc from 'detect-libc';
-import * as EventEmitter from 'events';
+import { EventEmitter } from 'events';
 import * as fs from 'fs-extra';
 import * as nodeAbi from 'node-abi';
 import * as os from 'os';
@@ -371,9 +371,9 @@ class Rebuilder {
         .replace('{version}', modulePackageJson.version)
         .replace('{libc}', detectLibc.family || 'unknown');
 
-      Object.keys(modulePackageJson.binary).forEach((binaryReplaceKey) => {
+      for (const binaryReplaceKey of Object.keys(modulePackageJson.binary)) {
         value = value.replace(`{${binaryReplaceKey}}`, modulePackageJson.binary[binaryReplaceKey]);
-      });
+      }
 
       rebuildArgs.push(`--${binaryKey}=${value}`);
     }
@@ -493,15 +493,15 @@ class Rebuilder {
     const moduleWait: Promise<void[]>[] = [];
 
     const callback = this.markChildrenAsProdDeps.bind(this);
-    Object.keys(childPackageJson.dependencies || {}).concat(Object.keys(childPackageJson.optionalDependencies || {})).forEach((key) => {
+    for (const key of Object.keys(childPackageJson.dependencies || {}).concat(Object.keys(childPackageJson.optionalDependencies || {}))) {
       if (this.prodDeps[key]) {
-        return;
+        continue;
       }
 
       this.prodDeps[key] = true;
 
       moduleWait.push(this.findModule(key, modulePath, callback));
-    });
+    }
 
     await Promise.all(moduleWait);
   }
