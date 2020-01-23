@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { searchModuleSync } from './search-module';
+import { searchModule } from './search-module';
 
 const electronModuleNames = ['electron', 'electron-prebuilt', 'electron-prebuilt-compile'];
 const relativeNodeModulesDir = path.resolve(__dirname, '..', '..');
@@ -24,12 +24,12 @@ function locateModulesByRequire(): string[] | null {
   });
 }
 
-export function locateElectronModule(projectRootPath?: string): string | null {
+export async function locateElectronModule(projectRootPath?: string): string | null {
   let electronPath: string | null = null;
 
   // Attempt to locate modules by path
   const foundModule = electronModuleNames.some((moduleName) => {
-    electronPath = searchModuleSync(
+    electronPath = await searchModule(
       process.cwd(),
       moduleName,
       projectRootPath

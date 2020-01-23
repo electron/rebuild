@@ -46,51 +46,6 @@ export const searchModule = async (
 };
 
 /**
- * the different between require.resolve:
- *  1. return module's dir but not module's index.js
- *  2. if module is symlink return the path in node_modules but not truely path
- *  3. will not throw error while module have not index.js
- *  4. if there are multiple versions of a given module present, all of the module's paths will be returned
- *  5. can set a rootPath for search end dir
- *    (if not set rootPath, will search untill not have package.json)
- *
- * @param currentPath the path of current exec location
- * @param moduleName the dirname of module
- * @param rootPath the project's root path.
- *  if provide this param, will search up to this path
- */
-export const searchModuleSync = (
-  currentPath: string,
-  moduleName: string,
-  rootPath?: string
-): string[] => {
-  const modulePaths = [];
-  let workspacePath = currentPath;
-
-  let shouldContinueSearch: boolean = fs.pathExistsSync(
-    path.resolve(workspacePath, 'package.json')
-  );
-  if (rootPath) {
-    shouldContinueSearch = workspacePath !== path.resolve(rootPath, '..');
-  }
-  while (shouldContinueSearch) {
-    const modulePath = path.resolve(workspacePath, 'node_modules', moduleName);
-    if (fs.pathExistsSync(modulePath)) {
-      modulePaths.push(modulePath);
-    }
-    workspacePath = path.resolve(workspacePath, '..');
-
-    shouldContinueSearch = fs.pathExistsSync(
-      path.resolve(workspacePath, 'package.json')
-    );
-    if (rootPath) {
-      shouldContinueSearch = workspacePath !== path.resolve(rootPath, '..');
-    }
-  }
-  return modulePaths;
-};
-
-/**
  * return the node_modules's paths in a array,
  *  if currentPath in deep dir return outside's node_modules path too
  *
