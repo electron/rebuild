@@ -2,7 +2,7 @@ import { spawnPromise } from 'spawn-rx';
 import * as crypto from 'crypto';
 import * as debug from 'debug';
 import * as detectLibc from 'detect-libc';
-import * as EventEmitter from 'events';
+import { EventEmitter } from 'events';
 import * as fs from 'fs-extra';
 import * as nodeAbi from 'node-abi';
 import * as os from 'os';
