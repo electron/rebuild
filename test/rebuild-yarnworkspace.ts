@@ -11,11 +11,11 @@ const projectRootPath = getProjectRootPath(process.cwd());
 
 describe('rebuild for yarn workspace', function() {
   this.timeout(2 * 60 * 1000);
-  const testModulePath = path.resolve(os.tmpdir(), 'electron-rebuild-workspace-test');
+  const testModulePath = path.resolve(os.tmpdir(), 'electron-rebuild-test');
 
   const args = {
     buildPath: path.resolve(testModulePath, 'child-workspace'),
-    electronVersion: '2.0.17',
+    electronVersion: '5.0.13',
     arch: process.arch,
     projectRootPath
   }
@@ -34,27 +34,11 @@ describe('rebuild for yarn workspace', function() {
     });
 
     it('should have rebuilt top level prod dependencies', async () => {
-      await expectNativeModuleToBeRebuilt(testModulePath, 'ref');
-    });
-
-    it('should not have rebuild top level prod dependencies that are prebuilt', async () => {
-      await expectNativeModuleToNotBeRebuilt(testModulePath, 'sodium-native');
-    });
-
-    it('should have rebuilt children of top level prod dependencies', async () => {
-      await expectNativeModuleToBeRebuilt(testModulePath, 'microtime');
-    });
-
-    it('should have rebuilt children of scoped top level prod dependencies', async () => {
-      await expectNativeModuleToBeRebuilt(testModulePath, '@newrelic/native-metrics');
-    });
-
-    it('should have rebuilt top level optional dependencies', async () => {
-      await expectNativeModuleToBeRebuilt(testModulePath, 'zipfile');
+      await expectNativeModuleToBeRebuilt(testModulePath, 'ref-napi');
     });
 
     it('should not have rebuilt top level devDependencies', async () => {
-      await expectNativeModuleToNotBeRebuilt(testModulePath, 'ffi');
+      await expectNativeModuleToNotBeRebuilt(testModulePath, 'ffi-napi');
     });
 
     after(async () => {
