@@ -31,7 +31,7 @@ describe('locateElectronModule', function() {
 
   it('should return null when electron is not installed', async () => {
     await fs.remove(path.resolve(__dirname, '..', 'node_modules', 'electron'));
-    expect(locateElectronModule()).to.be.equal(null);
+    expect(await locateElectronModule()).to.be.equal(null);
   });
 
   describe('with electron-prebuilt installed', async () => {
