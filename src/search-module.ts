@@ -98,8 +98,7 @@ export const getProjectRootPath = (currentPath: string): string => {
         workspaceRootPath = currentPath;
         break;
       }
-    } catch (error) {
-      /* tslint:disable:no-empty */
+    } catch (error) { // eslint-disable-line no-empty
     }
     currentPath = path.resolve(currentPath, '..');
   }
