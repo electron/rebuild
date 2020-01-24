@@ -13,13 +13,6 @@ describe('rebuild for yarn workspace', function() {
   this.timeout(2 * 60 * 1000);
   const testModulePath = path.resolve(os.tmpdir(), 'electron-rebuild-test');
 
-  const args = {
-    buildPath: path.resolve(testModulePath, 'child-workspace'),
-    electronVersion: '5.0.13',
-    arch: process.arch,
-    projectRootPath
-  }
-
   describe('core behavior', () => {
     before(async () => {
       await fs.remove(testModulePath);
@@ -30,7 +23,12 @@ describe('rebuild for yarn workspace', function() {
         stdio: 'ignore'
       });
 
-      await rebuild(args);
+      await rebuild({
+        buildPath: path.resolve(testModulePath, 'child-workspace'),
+        electronVersion: '5.0.13',
+        arch: process.arch,
+        projectRootPath
+      });
     });
 
     it('should have rebuilt top level prod dependencies', async () => {
