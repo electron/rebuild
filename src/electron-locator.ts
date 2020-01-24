@@ -1,4 +1,4 @@
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
 import * as path from 'path';
 import { searchModule } from './search-module';
 
@@ -25,24 +25,13 @@ function locateModulesByRequire(): string[] | null {
 }
 
 export async function locateElectronModule(projectRootPath?: string): Promise<string | null> {
-  let electronPath: string | null = null;
+  for (const moduleName of electronModuleNames) {
+    const electronPath = await searchModule(process.cwd(), moduleName, projectRootPath)[0];
 
-  // Attempt to locate modules by path
-  const foundModule = electronModuleNames.some(async (moduleName) => {
-    electronPath = await searchModule(
-      process.cwd(),
-      moduleName,
-      projectRootPath
-    )[0];
-
-    if (electronPath) {
-      return fs.existsSync(path.join(electronPath, 'package.json'));
-    } else {
-      return false;
+    if (electronPath && await fs.pathExists(path.join(electronPath, 'package.json'))) {
+      return electronPath;
     }
-  });
-
-  if (foundModule) return electronPath;
+  }
 
   const siblingModules: string[] | null = locateSiblingModules();
   if (siblingModules.length > 0) {
