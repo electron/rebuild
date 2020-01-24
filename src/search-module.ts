@@ -1,6 +1,14 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 
+async function shouldContinueSearch(workspacePath: string, rootPath?: string): Promise<boolean> {
+  if (rootPath) {
+    return Promise.resolve(workspacePath !== path.resolve(rootPath, '..'));
+  } else {
+    return fs.pathExists(path.resolve(workspacePath, 'package.json'));
+  }
+}
+
 /**
  * This is different from `require.resolve` in that:
  *  1. it returns the module's directory but not the module's `index.js`
@@ -57,14 +65,6 @@ export async function searchNodeModules(
   return nodeModules;
 }
 
-async function shouldContinueSearch(workspacePath: string, rootPath?: string): Promise<boolean> {
-  if (rootPath) {
-    return Promise.resolve(workspacePath !== path.resolve(rootPath, '..'));
-  } else {
-    return fs.pathExists(path.resolve(workspacePath, 'package.json'));
-  }
-}
-
 /**
  * get project's rootPath
  *  if currentPath is in a yarn workspace project,
@@ -86,4 +86,4 @@ export function getProjectRootPath(currentPath: string): string {
     currentPath = path.resolve(currentPath, '..');
   }
   return workspaceRootPath || currentPath;
-};
+}
