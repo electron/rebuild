@@ -24,11 +24,11 @@ function locateModulesByRequire(): string[] | null {
   });
 }
 
-export async function locateElectronModule(projectRootPath?: string): string | null {
+export async function locateElectronModule(projectRootPath?: string): Promise<string | null> {
   let electronPath: string | null = null;
 
   // Attempt to locate modules by path
-  const foundModule = electronModuleNames.some((moduleName) => {
+  const foundModule = electronModuleNames.some(async (moduleName) => {
     electronPath = await searchModule(
       process.cwd(),
       moduleName,

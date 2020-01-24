@@ -16,11 +16,11 @@ const install: ((s: string) => Promise<void>) = packageCommand.bind(null, 'insta
 const uninstall: ((s: string) => Promise<void>) = packageCommand.bind(null, 'uninstall');
 
 const testElectronCanBeFound = (): void => {
-  it('should return a valid path', () => {
-    const electronPath = locateElectronModule();
+  it('should return a valid path', async () => {
+    const electronPath = await locateElectronModule();
     expect(electronPath).to.be.a('string');
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    expect(fs.existsSync(electronPath!)).to.be.equal(true);
+    expect(await fs.pathExists(electronPath!)).to.be.equal(true);
   });
 };
 
@@ -34,18 +34,18 @@ describe('locateElectronModule', function() {
     expect(locateElectronModule()).to.be.equal(null);
   });
 
-  describe('with electron-prebuilt installed', () => {
+  describe('with electron-prebuilt installed', async () => {
     before(() => install('electron-prebuilt'));
 
-    testElectronCanBeFound();
+    await testElectronCanBeFound();
 
     after(() => uninstall('electron-prebuilt'));
   });
 
-  describe('with electron installed', () => {
+  describe('with electron installed', async () => {
     before(() => install('electron'));
 
-    testElectronCanBeFound();
+    await testElectronCanBeFound();
 
     after(() => uninstall('electron'));
   });
