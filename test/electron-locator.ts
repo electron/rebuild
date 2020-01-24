@@ -37,18 +37,18 @@ describe('locateElectronModule', function() {
   describe('with electron-prebuilt installed', async () => {
     before(() => install('electron-prebuilt'));
 
-    await testElectronCanBeFound();
+    testElectronCanBeFound();
 
     after(() => uninstall('electron-prebuilt'));
   });
 
   describe('with electron installed', async () => {
-    before(() => install('electron'));
+    before(() => install('electron@^5.0.13'));
 
-    await testElectronCanBeFound();
+    testElectronCanBeFound();
 
     after(() => uninstall('electron'));
   });
 
-  after(() => install('electron'));
+  after(() => install('electron@^5.0.13'));
 });
