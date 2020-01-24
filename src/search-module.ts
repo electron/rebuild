@@ -1,89 +1,79 @@
+import * as findUp from 'find-up';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 
 async function shouldContinueSearch(workspacePath: string, rootPath?: string): Promise<boolean> {
   if (rootPath) {
-    return Promise.resolve(workspacePath !== path.resolve(rootPath, '..'));
+    return Promise.resolve(workspacePath !== path.dirname(rootPath));
   } else {
-    return fs.pathExists(path.resolve(workspacePath, 'package.json'));
+    return fs.pathExists(path.join(workspacePath, 'package.json'));
   }
 }
 
+type PathGeneratorFunction = (workspacePath: string) => string;
+
+async function traverseAncestorDirectories(cwd: string, pathGenerator: PathGeneratorFunction, rootPath?: string): Promise<string[]> {
+  const paths: string[] = [];
+  let workspacePath = path.resolve(cwd);
+
+  while (await shouldContinueSearch(workspacePath, rootPath)) {
+    const generatedPath = pathGenerator(workspacePath);
+    if (await fs.pathExists(generatedPath)) {
+      paths.push(generatedPath);
+    }
+    workspacePath = path.dirname(workspacePath);
+  }
+
+  return paths;
+}
+
 /**
- * This is different from `require.resolve` in that:
- *  1. it returns the module's directory but not the module's `index.js`
- *  2. if the module is a symlink, return the path in `node_modules` but not the symlinked path
- *  3. it will not throw an error if the module does not have an `index.js` file
- *  4. will return mutiValue while have mutiVersion
- *  5. a `rootPath` can be specified to limit the parent traversal
- *    (if `rootPath` is not set, it will traverse parent directories until a directory without a `package.json` is found)
+ * Find all instances of a given module in node_modules subdirectories while traversing up
+ * ancestor directories.
  *
- * @param currentPath the path of current exec location
- * @param moduleName the dirname of the module
- * @param rootPath the project's root path. if provide this param,
- *  will search up to this path
+ * @param cwd the initial directory to traverse
+ * @param moduleName the Node module name (should work for scoped modules as well)
+ * @param rootPath the project's root path. If provided, the traversal will stop at this path.
  */
 export async function searchModule(
-  currentPath: string,
+  cwd: string,
   moduleName: string,
   rootPath?: string
 ): Promise<string[]> {
-  const modulePaths = [];
-  let workspacePath: string = currentPath;
-  while (shouldContinueSearch(workspacePath, rootPath)) {
-    const modulePath = path.resolve(workspacePath, 'node_modules', moduleName);
-    if (await fs.pathExists(modulePath)) {
-      modulePaths.push(modulePath);
-    }
-    workspacePath = path.resolve(workspacePath, '..');
-  }
-  return modulePaths;
+  return traverseAncestorDirectories(
+    cwd,
+    (workspacePath) => path.join(workspacePath, 'node_modules', moduleName),
+    rootPath,
+  );
 }
 
 /**
- * return the node_modules's paths in a array,
- *  if currentPath in deep dir return outside's node_modules path too
+ * Find all instances of node_modules subdirectories while traversing up ancestor directories.
  *
- * @param currentPath the path of current exec location
- * @param rootPath the project's root path. if provide this param, will search up to this path
- *  (if not provide this param, will search untill not have package.json)
+ * @param cwd the initial directory to traverse
+ * @param rootPath the project's root path. If provided, the traversal will stop at this path.
  */
-export async function searchNodeModules(
-  currentPath: string,
-  rootPath?: string
-): Promise<string[]> {
-  const nodeModules = [];
-  let workspacePath = currentPath;
-
-  while (shouldContinueSearch(workspacePath, rootPath)) {
-    const modulePath = path.resolve(workspacePath, 'node_modules');
-    if (await fs.pathExists(modulePath)) {
-      nodeModules.push(modulePath);
-    }
-    workspacePath = path.resolve(workspacePath, '..');
-  }
-  return nodeModules;
+export async function searchNodeModules(cwd: string, rootPath?: string): Promise<string[]> {
+  return traverseAncestorDirectories(
+    cwd,
+    (workspacePath) => path.join(workspacePath, 'node_modules'),
+    rootPath,
+  );
 }
 
 /**
- * get project's rootPath
- *  if currentPath is in a yarn workspace project,
- *  will retrun the yarn workspace's rootpath
- * @param currentPath
+ * Determine the root directory of a given project, by looking for a directory with an
+ * NPM or yarn lockfile.
+ *
+ * @param cwd the initial directory to traverse
  */
-export function getProjectRootPath(currentPath: string): string {
-  let workspaceRootPath: string | undefined;
-
-  while (currentPath !== path.resolve('/')) {
-    try {
-      const packageJson = fs.readJsonSync(path.join(currentPath, 'package.json'));
-      if (packageJson.workspaces) {
-        workspaceRootPath = currentPath;
-        break;
-      }
-    } catch (error) { // eslint-disable-line no-empty
+export async function getProjectRootPath(cwd: string): Promise<string> {
+  for (const lockFilename of ['yarn.lock', 'package-lock.json']) {
+    const lockPath = await findUp(lockFilename, { cwd, type: 'file' });
+    if (lockPath) {
+      return path.dirname(lockPath);
     }
-    currentPath = path.resolve(currentPath, '..');
   }
-  return workspaceRootPath || currentPath;
+
+  return cwd;
 }

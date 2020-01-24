@@ -69,7 +69,7 @@ process.on('unhandledRejection', handler);
 
 
 (async (): Promise<void> => {
-  const projectRootPath = getProjectRootPath(process.cwd());
+  const projectRootPath = await getProjectRootPath(process.cwd());
   const electronModulePath = argv.e ? path.resolve(process.cwd(), (argv.e as string)) : await locateElectronModule(projectRootPath);
   let electronModuleVersion = argv.v as string;
 

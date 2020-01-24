@@ -7,8 +7,6 @@ import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from 
 import { rebuild } from '../src/rebuild';
 import { getProjectRootPath } from '../src/search-module';
 
-const projectRootPath = getProjectRootPath(process.cwd());
-
 describe('rebuild for yarn workspace', function() {
   this.timeout(2 * 60 * 1000);
   const testModulePath = path.resolve(os.tmpdir(), 'electron-rebuild-test');
@@ -22,6 +20,8 @@ describe('rebuild for yarn workspace', function() {
         cwd: testModulePath,
         stdio: 'ignore'
       });
+
+      const projectRootPath = await getProjectRootPath(path.join(testModulePath, 'workspace-test', 'child-workspace'));
 
       await rebuild({
         buildPath: path.resolve(testModulePath, 'child-workspace'),
