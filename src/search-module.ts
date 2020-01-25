@@ -40,11 +40,8 @@ export async function searchModule(
   moduleName: string,
   rootPath?: string
 ): Promise<string[]> {
-  return traverseAncestorDirectories(
-    cwd,
-    (workspacePath) => path.join(workspacePath, 'node_modules', moduleName),
-    rootPath,
-  );
+  const pathGenerator: PathGeneratorFunction = (workspacePath) => path.join(workspacePath, 'node_modules', moduleName);
+  return traverseAncestorDirectories(cwd, pathGenerator, rootPath);
 }
 
 /**
@@ -54,11 +51,8 @@ export async function searchModule(
  * @param rootPath the project's root path. If provided, the traversal will stop at this path.
  */
 export async function searchNodeModules(cwd: string, rootPath?: string): Promise<string[]> {
-  return traverseAncestorDirectories(
-    cwd,
-    (workspacePath) => path.join(workspacePath, 'node_modules'),
-    rootPath,
-  );
+  const pathGenerator: PathGeneratorFunction = (workspacePath) => path.join(workspacePath, 'node_modules');
+  return traverseAncestorDirectories(cwd, pathGenerator, rootPath);
 }
 
 /**
