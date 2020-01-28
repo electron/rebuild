@@ -9,7 +9,7 @@ import * as os from 'os';
 import * as path from 'path';
 import { readPackageJson } from './read-package-json';
 import { lookupModuleState, cacheModuleState } from './cache';
-import { searchModule, searchNodeModules } from './search-module';
+import { searchForModule, searchForNodeModules } from './search-module';
 
 export type ModuleType = 'prod' | 'dev' | 'optional';
 export type RebuildMode = 'sequential' | 'parallel';
@@ -162,7 +162,7 @@ class Rebuilder {
 
     for (const key of depKeys) {
       this.prodDeps[key] = true;
-      const modulePaths: string[] = await searchModule(
+      const modulePaths: string[] = await searchForModule(
         this.buildPath,
         key,
         this.projectRootPath
@@ -176,7 +176,7 @@ class Rebuilder {
 
     d('identified prod deps:', this.prodDeps);
 
-    const nodeModulesPaths = await searchNodeModules(
+    const nodeModulesPaths = await searchForNodeModules(
       this.buildPath,
       this.projectRootPath
     );
@@ -467,7 +467,7 @@ class Rebuilder {
 
   async findModule(moduleName: string, fromDir: string, foundFn: ((p: string) => Promise<void>)): Promise<void[]> {
 
-    const testPaths = await searchModule(
+    const testPaths = await searchForModule(
       fromDir,
       moduleName,
       this.projectRootPath

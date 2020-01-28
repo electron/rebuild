@@ -1,6 +1,6 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import { searchModule } from './search-module';
+import { searchForModule } from './search-module';
 
 const electronModuleNames = ['electron', 'electron-prebuilt', 'electron-prebuilt-compile'];
 const relativeNodeModulesDir = path.resolve(__dirname, '..', '..');
@@ -26,7 +26,7 @@ function locateModulesByRequire(): string[] | null {
 
 export async function locateElectronModule(projectRootPath?: string): Promise<string | null> {
   for (const moduleName of electronModuleNames) {
-    const electronPath = await searchModule(process.cwd(), moduleName, projectRootPath)[0];
+    const electronPath = await searchForModule(process.cwd(), moduleName, projectRootPath)[0];
 
     if (electronPath && await fs.pathExists(path.join(electronPath, 'package.json'))) {
       return electronPath;

@@ -1,27 +1,39 @@
-import * as findUp from 'find-up';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 
-async function shouldContinueSearch(workspacePath: string, rootPath?: string): Promise<boolean> {
+async function shouldContinueSearch(traversedPath: string, rootPath?: string, stopAtPackageJSON?: boolean): Promise<boolean> {
   if (rootPath) {
-    return Promise.resolve(workspacePath !== path.dirname(rootPath));
+    return Promise.resolve(traversedPath !== path.dirname(rootPath));
+  } else if (stopAtPackageJSON) {
+    return fs.pathExists(path.join(traversedPath, 'package.json'));
   } else {
-    return fs.pathExists(path.join(workspacePath, 'package.json'));
+    return true;
   }
 }
 
-type PathGeneratorFunction = (workspacePath: string) => string;
+type PathGeneratorFunction = (traversedPath: string) => string;
 
-async function traverseAncestorDirectories(cwd: string, pathGenerator: PathGeneratorFunction, rootPath?: string): Promise<string[]> {
+async function traverseAncestorDirectories(
+  cwd: string,
+  pathGenerator: PathGeneratorFunction,
+  rootPath?: string,
+  maxItems?: number,
+  stopAtPackageJSON?: boolean
+): Promise<string[]> {
   const paths: string[] = [];
-  let workspacePath = path.resolve(cwd);
+  let traversedPath = path.resolve(cwd);
 
-  while (await shouldContinueSearch(workspacePath, rootPath)) {
-    const generatedPath = pathGenerator(workspacePath);
+  while (await shouldContinueSearch(traversedPath, rootPath, stopAtPackageJSON)) {
+    const generatedPath = pathGenerator(traversedPath);
     if (await fs.pathExists(generatedPath)) {
       paths.push(generatedPath);
     }
-    workspacePath = path.dirname(workspacePath);
+
+    const parentPath = path.dirname(traversedPath);
+    if (parentPath === traversedPath || (maxItems && paths.length >= maxItems)) {
+      break;
+    }
+    traversedPath = parentPath;
   }
 
   return paths;
@@ -35,13 +47,13 @@ async function traverseAncestorDirectories(cwd: string, pathGenerator: PathGener
  * @param moduleName the Node module name (should work for scoped modules as well)
  * @param rootPath the project's root path. If provided, the traversal will stop at this path.
  */
-export async function searchModule(
+export async function searchForModule(
   cwd: string,
   moduleName: string,
   rootPath?: string
 ): Promise<string[]> {
-  const pathGenerator: PathGeneratorFunction = (workspacePath) => path.join(workspacePath, 'node_modules', moduleName);
-  return traverseAncestorDirectories(cwd, pathGenerator, rootPath);
+  const pathGenerator: PathGeneratorFunction = (traversedPath) => path.join(traversedPath, 'node_modules', moduleName);
+  return traverseAncestorDirectories(cwd, pathGenerator, rootPath, undefined, true);
 }
 
 /**
@@ -50,9 +62,9 @@ export async function searchModule(
  * @param cwd the initial directory to traverse
  * @param rootPath the project's root path. If provided, the traversal will stop at this path.
  */
-export async function searchNodeModules(cwd: string, rootPath?: string): Promise<string[]> {
-  const pathGenerator: PathGeneratorFunction = (workspacePath) => path.join(workspacePath, 'node_modules');
-  return traverseAncestorDirectories(cwd, pathGenerator, rootPath);
+export async function searchForNodeModules(cwd: string, rootPath?: string): Promise<string[]> {
+  const pathGenerator: PathGeneratorFunction = (traversedPath) => path.join(traversedPath, 'node_modules');
+  return traverseAncestorDirectories(cwd, pathGenerator, rootPath, undefined, true);
 }
 
 /**
@@ -63,9 +75,10 @@ export async function searchNodeModules(cwd: string, rootPath?: string): Promise
  */
 export async function getProjectRootPath(cwd: string): Promise<string> {
   for (const lockFilename of ['yarn.lock', 'package-lock.json']) {
-    const lockPath = await findUp(lockFilename, { cwd, type: 'file' });
-    if (lockPath) {
-      return path.dirname(lockPath);
+    const pathGenerator: PathGeneratorFunction = (traversedPath) => path.join(traversedPath, lockFilename);
+    const lockPaths = await traverseAncestorDirectories(cwd, pathGenerator, undefined, 1)
+    if (lockPaths.length > 0) {
+      return path.dirname(lockPaths[0]);
     }
   }
 
