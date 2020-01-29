@@ -1,0 +1,16 @@
+{
+  "name": "workspace-app",
+  "productName": "Workspace App",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "ffi-napi": "2.4.5"
+  },
+  "dependencies": {
+    "ref-napi": "1.4.2"
+  }
+}

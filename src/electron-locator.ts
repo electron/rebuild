@@ -1,38 +1,31 @@
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
 import * as path from 'path';
+import { searchForModule } from './search-module';
 
 const electronModuleNames = ['electron', 'electron-prebuilt', 'electron-prebuilt-compile'];
-const relativeNodeModulesDir = path.resolve(__dirname, '..', '..');
 
-function locateModules(pathMapper: (moduleName: string) => string | null): string[] {
-  const possibleModulePaths = electronModuleNames.map(pathMapper);
-  return possibleModulePaths.filter((modulePath) => modulePath && fs.existsSync(path.join(modulePath, 'package.json'))) as string[];
-}
-
-function locateSiblingModules(): string[] {
-  return locateModules((moduleName) => path.join(relativeNodeModulesDir, moduleName));
-}
-
-function locateModulesByRequire(): string[] | null {
-  return locateModules((moduleName) => {
+async function locateModuleByRequire(): Promise<string | null> {
+  for (const moduleName of electronModuleNames) {
     try {
-      return path.resolve(require.resolve(path.join(moduleName, 'package.json')), '..');
-    } catch (error) {
-      return null;
+      const modulePath = path.resolve(require.resolve(path.join(moduleName, 'package.json')), '..');
+      if (await fs.pathExists(path.join(modulePath, 'package.json'))) {
+        return modulePath;
+      }
+    } catch (_error) { // eslint-disable-line no-empty
     }
-  });
+  }
+
+  return null
 }
 
-export function locateElectronModule(): string | null {
-  const siblingModules: string[] | null = locateSiblingModules();
-  if (siblingModules.length > 0) {
-    return siblingModules[0];
+export async function locateElectronModule(projectRootPath?: string): Promise<string | null> {
+  for (const moduleName of electronModuleNames) {
+    const electronPath = await searchForModule(process.cwd(), moduleName, projectRootPath)[0];
+
+    if (electronPath && await fs.pathExists(path.join(electronPath, 'package.json'))) {
+      return electronPath;
+    }
   }
 
-  const requiredModules = locateModulesByRequire();
-  if (requiredModules && requiredModules.length > 0) {
-    return requiredModules[0];
-  }
-
-  return null;
+  return locateModuleByRequire();
 }

@@ -16,11 +16,11 @@ const install: ((s: string) => Promise<void>) = packageCommand.bind(null, 'insta
 const uninstall: ((s: string) => Promise<void>) = packageCommand.bind(null, 'uninstall');
 
 const testElectronCanBeFound = (): void => {
-  it('should return a valid path', () => {
-    const electronPath = locateElectronModule();
+  it('should return a valid path', async () => {
+    const electronPath = await locateElectronModule();
     expect(electronPath).to.be.a('string');
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    expect(fs.existsSync(electronPath!)).to.be.equal(true);
+    expect(await fs.pathExists(electronPath!)).to.be.equal(true);
   });
 };
 
@@ -31,10 +31,10 @@ describe('locateElectronModule', function() {
 
   it('should return null when electron is not installed', async () => {
     await fs.remove(path.resolve(__dirname, '..', 'node_modules', 'electron'));
-    expect(locateElectronModule()).to.be.equal(null);
+    expect(await locateElectronModule()).to.be.equal(null);
   });
 
-  describe('with electron-prebuilt installed', () => {
+  describe('with electron-prebuilt installed', async () => {
     before(() => install('electron-prebuilt'));
 
     testElectronCanBeFound();
@@ -42,13 +42,13 @@ describe('locateElectronModule', function() {
     after(() => uninstall('electron-prebuilt'));
   });
 
-  describe('with electron installed', () => {
-    before(() => install('electron'));
+  describe('with electron installed', async () => {
+    before(() => install('electron@^5.0.13'));
 
     testElectronCanBeFound();
 
     after(() => uninstall('electron'));
   });
 
-  after(() => install('electron'));
+  after(() => install('electron@^5.0.13'));
 });

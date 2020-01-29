@@ -7,6 +7,7 @@ import ora from 'ora';
 import * as argParser from 'yargs';
 
 import { rebuild, ModuleType } from './rebuild';
+import { getProjectRootPath } from './search-module';
 import { locateElectronModule } from './electron-locator';
 
 const yargs = argParser
@@ -68,7 +69,8 @@ process.on('unhandledRejection', handler);
 
 
 (async (): Promise<void> => {
-  const electronModulePath = argv.e ? path.resolve(process.cwd(), (argv.e as string)) : locateElectronModule();
+  const projectRootPath = await getProjectRootPath(process.cwd());
+  const electronModulePath = argv.e ? path.resolve(process.cwd(), (argv.e as string)) : await locateElectronModule(projectRootPath);
   let electronModuleVersion = argv.v as string;
 
   if (!electronModuleVersion) {
@@ -128,6 +130,7 @@ process.on('unhandledRejection', handler);
     mode: argv.p ? 'parallel' : (argv.s ? 'sequential' : undefined),
     debug: argv.b as boolean,
     prebuildTagPrefix: (argv.prebuildTagPrefix as string) || 'v',
+    projectRootPath,
   });
 
   const lifecycle = rebuilder.lifecycle;
