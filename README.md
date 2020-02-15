@@ -129,7 +129,7 @@ import rebuild from 'electron-rebuild';
 //     onlyModules (optional) - Default: null - An array of modules to rebuild, ONLY these module names will be rebuilt.
 //                                              The "types" property will be ignored if this option is set.
 //     force (optional) - Default: false - Force a rebuild of modules regardless of their current build state
-//     headerURL (optional) - Default: atom.io/download/electron - The URL to download Electron header files from
+//     headerURL (optional) - Default: https://electronjs.org/headers - The URL to download Electron header files from
 //     types (optional) - Default: ['prod', 'optional'] - The types of modules to rebuild
 //     mode (optional) - The rebuild mode, either 'sequential' or 'parallel' - Default varies per platform (probably shouldn't mess with this one)
 
