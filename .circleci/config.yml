@@ -13,13 +13,11 @@ steps-test: &steps-test
         command: |
           case "$(uname -s)" in
             Darwin)
-              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
               export NVM_DIR="$HOME/.nvm"
               [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
               nvm install 10.19.0
               nvm alias default 10.19.0
-              echo 'export NVM_DIR=${HOME}/.nvm' >> $BASH_ENV
-              echo "[ -s '${NVM_DIR}/nvm.sh' ] && . '${NVM_DIR}/nvm.sh'" >> $BASH_ENV
               ;;
             Windows*|CYGWIN*|MINGW*|MSYS*)
               nvm install 10.19.0
