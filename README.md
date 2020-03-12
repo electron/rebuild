@@ -8,12 +8,18 @@ that your Electron project is using. This allows you to use native Node.js
 modules in Electron apps without your system version of Node.js matching exactly
 (which is often not the case, and sometimes not even possible).
 
+### What are the requirements?
+
+Node v10.14.0 or higher is required. Building the native modules from source uses
+[`node-gyp`](https://github.com/nodejs/node-gyp#installation), refer to the link for its
+installation/runtime requirements.
+
 ### How does it work?
 
 Install the package with `--save-dev`:
 
 ```sh
-npm install --save-dev electron-rebuild
+npm install --engine-strict --save-dev electron-rebuild
 ```
 
 Then, whenever you install a new npm package, rerun electron-rebuild:
@@ -40,12 +46,6 @@ and then
 ```sh
 npm run rebuild
 ```
-
-### What are the requirements?
-
-Node v6.0.0 or higher is required. Building the native modules from source uses
-[`node-gyp`](https://github.com/nodejs/node-gyp#installation), refer to the link for its
-installation/runtime requirements.
 
 ### CLI Arguments
 
