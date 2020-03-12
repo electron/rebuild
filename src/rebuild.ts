@@ -1,4 +1,3 @@
-import { spawnPromise } from 'spawn-rx';
 import * as crypto from 'crypto';
 import * as debug from 'debug';
 import * as detectLibc from 'detect-libc';
@@ -7,6 +6,8 @@ import * as fs from 'fs-extra';
 import * as nodeAbi from 'node-abi';
 import * as os from 'os';
 import * as path from 'path';
+import { spawn } from '@malept/cross-spawn-promise';
+
 import { readPackageJson } from './read-package-json';
 import { lookupModuleState, cacheModuleState } from './cache';
 import { searchForModule, searchForNodeModules } from './search-module';
@@ -301,7 +302,7 @@ class Rebuilder {
         const shimExt = process.env.ELECTRON_REBUILD_TESTS ? 'ts' : 'js';
         const executable = process.env.ELECTRON_REBUILD_TESTS ? path.resolve(__dirname, '..', 'node_modules', '.bin', 'ts-node') : process.execPath;
         try {
-          await spawnPromise(
+          await spawn(
             executable,
             [
               path.resolve(__dirname, `prebuild-shim.${shimExt}`),
@@ -383,7 +384,7 @@ class Rebuilder {
     }
 
     d('rebuilding', path.basename(modulePath), 'with args', rebuildArgs);
-    await spawnPromise(nodeGypPath, rebuildArgs, {
+    await spawn(nodeGypPath, rebuildArgs, {
       cwd: modulePath,
       /* eslint-disable @typescript-eslint/camelcase */
       env: Object.assign({}, process.env, {
