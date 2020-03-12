@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as os from 'os';
-import { spawnPromise } from 'spawn-rx';
+import { spawn } from '@malept/cross-spawn-promise';
 
 import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild';
 import { rebuild } from '../src/rebuild';
@@ -16,7 +16,7 @@ describe('rebuild for yarn workspace', function() {
       await fs.remove(testModulePath);
       await fs.copy(path.resolve(__dirname, 'fixture/workspace-test'), testModulePath);
 
-      await spawnPromise('yarn', [], {
+      await spawn('yarn', [], {
         cwd: testModulePath,
         stdio: 'ignore'
       });

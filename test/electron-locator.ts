@@ -1,12 +1,12 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { expect } from 'chai';
-import { spawnPromise } from 'spawn-rx';
+import { spawn } from '@malept/cross-spawn-promise';
 
 import { locateElectronModule } from '../src/electron-locator';
 
 function packageCommand(command: string, packageName: string): Promise<string> {
-  return spawnPromise('npm', [command, '--no-save', packageName], {
+  return spawn('npm', [command, '--no-save', packageName], {
     cwd: path.resolve(__dirname, '..'),
     stdio: 'ignore',
   });
