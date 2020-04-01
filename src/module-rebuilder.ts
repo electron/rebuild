@@ -1,9 +1,11 @@
 import * as debug from 'debug';
 import * as detectLibc from 'detect-libc';
 import * as fs from 'fs-extra';
+import * as NodeGyp from 'node-gyp';
 import * as os from 'os';
 import * as path from 'path';
 import { cacheModuleState } from './cache';
+import { promisify } from 'util';
 import { readPackageJson } from './read-package-json';
 import { Rebuilder } from './rebuild';
 import { spawn } from '@malept/cross-spawn-promise';
@@ -21,16 +23,6 @@ const locateBinary = async (basePath: string, suffix: string): Promise<string | 
   }
   return null;
 };
-
-let nodeGypPath: string | null | undefined;
-
-async function locateNodeGyp(): Promise<string | null> {
-  if (nodeGypPath === undefined) {
-    nodeGypPath = await locateBinary(__dirname, `node_modules/.bin/node-gyp${process.platform === 'win32' ? '.cmd' : ''}`);
-  }
-
-  return nodeGypPath;
-}
 
 async function locatePrebuild(modulePath: string): Promise<string | null> {
   return await locateBinary(modulePath, 'node_modules/prebuild-install/bin.js');
@@ -94,6 +86,8 @@ export class ModuleRebuilder {
 
   async buildNodeGypArgs(): Promise<string[]> {
     const args = [
+      'node',
+      'node-gyp',
       'rebuild',
       `--target=${this.rebuilder.electronVersion}`,
       `--arch=${this.rebuilder.arch}`,
@@ -171,11 +165,6 @@ export class ModuleRebuilder {
   }
 
   async rebuildNodeGypModule(cacheKey: string): Promise<void> {
-    const nodeGypPath = await locateNodeGyp();
-    if (!nodeGypPath) {
-      throw new Error('Could not locate node-gyp');
-    }
-
     if (this.modulePath.includes(' ')) {
       console.error('Attempting to build a module with a space in the path');
       console.error('See https://github.com/nodejs/node-gyp/issues/65#issuecomment-368820565 for reasons why this may not work');
@@ -185,11 +174,11 @@ export class ModuleRebuilder {
 
     const nodeGypArgs = await this.buildNodeGypArgs();
 
-    d('rebuilding', this.moduleName, 'with args', nodeGypArgs);
-    await spawn(nodeGypPath, nodeGypArgs, {
-      cwd: this.modulePath,
-      env: this.nodeGypEnv,
-    });
+    const nodeGyp = NodeGyp();
+    nodeGyp.parseArgv(nodeGypArgs);
+    const rebuildArgs = nodeGyp.todo[0].args;
+    d('rebuilding', this.moduleName, 'with args', rebuildArgs);
+    await promisify(nodeGyp.commands.rebuild)(rebuildArgs);
 
     d('built:', this.moduleName);
     await this.writeMetadata();
