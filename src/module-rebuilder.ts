@@ -131,7 +131,7 @@ export class ModuleRebuilder {
         .replace('{node_abi}', `electron-v${this.rebuilder.electronVersion.split('.').slice(0, 2).join('.')}`)
         .replace('{platform}', process.platform)
         .replace('{arch}', this.rebuilder.arch)
-        .replace('{version}', await this.packageJSONField('version'))
+        .replace('{version}', await this.packageJSONField('version') as string)
         .replace('{libc}', detectLibc.family || 'unknown');
 
       for (const [replaceKey, replaceValue] of Object.entries(binary)) {
