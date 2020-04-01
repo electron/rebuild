@@ -1,15 +1,13 @@
 import * as crypto from 'crypto';
 import * as debug from 'debug';
-import * as detectLibc from 'detect-libc';
 import { EventEmitter } from 'events';
 import * as fs from 'fs-extra';
 import * as nodeAbi from 'node-abi';
 import * as os from 'os';
 import * as path from 'path';
-import { spawn } from '@malept/cross-spawn-promise';
 
 import { readPackageJson } from './read-package-json';
-import { lookupModuleState, cacheModuleState } from './cache';
+import { lookupModuleState } from './cache';
 import { searchForModule, searchForNodeModules } from './search-module';
 
 export type ModuleType = 'prod' | 'dev' | 'optional';
@@ -45,27 +43,7 @@ const defaultTypes: ModuleType[] = ['prod', 'optional'];
 // Update this number if you change the caching logic to ensure no bad cache hits
 const ELECTRON_REBUILD_CACHE_ID = 1;
 
-const locateBinary = async (basePath: string, suffix: string): Promise<string | null> => {
-  let testPath = basePath;
-  for (let upDir = 0; upDir <= 20; upDir ++) {
-    const checkPath = path.resolve(testPath, suffix);
-    if (await fs.pathExists(checkPath)) {
-      return checkPath;
-    }
-    testPath = path.resolve(testPath, '..');
-  }
-  return null;
-};
-
-const locateNodeGyp = async (): Promise<string | null> => {
-  return await locateBinary(__dirname, `node_modules/.bin/node-gyp${process.platform === 'win32' ? '.cmd' : ''}`);
-};
-
-const locatePrebuild = async (modulePath: string): Promise<string | null> => {
-  return await locateBinary(modulePath, 'node_modules/prebuild-install/bin.js');
-};
-
-class Rebuilder {
+export class Rebuilder {
   ABI: string;
   nodeGypPath: string;
   prodDeps: Set<string>;
@@ -249,30 +227,20 @@ class Rebuilder {
       return;
     }
 
-    const nodeGypPath = await locateNodeGyp();
-    if (!nodeGypPath) {
-      throw new Error('Could not locate node-gyp');
-    }
-
-    const buildType = this.debug ? 'Debug' : 'Release';
-
-    const metaPath = path.resolve(modulePath, 'build', buildType, '.forge-meta');
-    const metaData = `${this.arch}--${this.ABI}`;
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { ModuleRebuilder } = require('./module-rebuilder');
+    const moduleRebuilder = new ModuleRebuilder(this, modulePath);
 
     this.lifecycle.emit('module-found', path.basename(modulePath));
 
-    if (!this.force && await fs.pathExists(metaPath)) {
-      const meta = await fs.readFile(metaPath, 'utf8');
-      if (meta === metaData) {
-        d(`skipping: ${path.basename(modulePath)} as it is already built`);
-        this.lifecycle.emit('module-done');
-        this.lifecycle.emit('module-skip');
-        return;
-      }
+    if (!this.force && await moduleRebuilder.alreadyBuiltByRebuild()) {
+      d(`skipping: ${path.basename(modulePath)} as it is already built`);
+      this.lifecycle.emit('module-done');
+      this.lifecycle.emit('module-skip');
+      return;
     }
 
-    // prebuild already exists
-    if (await fs.pathExists(path.resolve(modulePath, 'prebuilds', `${process.platform}-${this.arch}`, `electron-${this.ABI}.node`))) {
+    if (await moduleRebuilder.prebuildNativeModuleExists(modulePath)) {
       d(`skipping: ${path.basename(modulePath)} as it was prebuilt`);
       return;
     }
@@ -291,140 +259,11 @@ class Rebuilder {
       }
     }
 
-    const modulePackageJson = await readPackageJson(modulePath);
-
-    if ((modulePackageJson.dependencies || {})['prebuild-install']) {
-      d(`assuming is prebuild powered: ${path.basename(modulePath)}`);
-      const prebuildInstallPath = await locatePrebuild(modulePath);
-      if (prebuildInstallPath) {
-        d(`triggering prebuild download step: ${path.basename(modulePath)}`);
-        let success = false;
-        const shimExt = process.env.ELECTRON_REBUILD_TESTS ? 'ts' : 'js';
-        const executable = process.env.ELECTRON_REBUILD_TESTS ? path.resolve(__dirname, '..', 'node_modules', '.bin', 'ts-node') : process.execPath;
-        try {
-          await spawn(
-            executable,
-            [
-              path.resolve(__dirname, `prebuild-shim.${shimExt}`),
-              prebuildInstallPath,
-              `--arch=${this.arch}`,
-              `--platform=${process.platform}`,
-              '--runtime=electron',
-              `--target=${this.electronVersion}`,
-              `--tag-prefix=${this.prebuildTagPrefix}`
-            ],
-            {
-              cwd: modulePath,
-            }
-          );
-          success = true;
-        } catch (err) {
-          d('failed to use prebuild-install:', err);
-        }
-        if (success) {
-          d('built:', path.basename(modulePath));
-          await fs.mkdirs(path.dirname(metaPath));
-          await fs.writeFile(metaPath, metaData);
-          if (this.useCache) {
-            await cacheModuleState(modulePath, this.cachePath, cacheKey);
-          }
-          this.lifecycle.emit('module-done');
-          return;
-        }
-      } else {
-        d(`could not find prebuild-install relative to: ${modulePath}`);
-      }
+    if (await moduleRebuilder.rebuildPrebuildModule(cacheKey)) {
+      this.lifecycle.emit('module-done');
+      return;
     }
-    if (modulePath.indexOf(' ') !== -1) {
-      console.error('Attempting to build a module with a space in the path');
-      console.error('See https://github.com/nodejs/node-gyp/issues/65#issuecomment-368820565 for reasons why this may not work');
-      // FIXME: Re-enable the throw when more research has been done
-      // throw new Error(`node-gyp does not support building modules with spaces in their path, tried to build: ${modulePath}`);
-    }
-    d('rebuilding:', path.basename(modulePath));
-    const rebuildArgs = [
-      'rebuild',
-      `--target=${this.electronVersion}`,
-      `--arch=${this.arch}`,
-      `--dist-url=${this.headerURL}`,
-      '--build-from-source',
-    ];
-
-    if (this.debug) {
-      rebuildArgs.push('--debug');
-    }
-
-    for (const binaryKey of Object.keys(modulePackageJson.binary || {})) {
-      if (binaryKey === 'napi_versions') {
-        continue;
-      }
-
-      let value = modulePackageJson.binary[binaryKey];
-
-      if (binaryKey === 'module_path') {
-        value = path.resolve(modulePath, value);
-      }
-
-      value = value.replace('{configuration}', buildType)
-        .replace('{node_abi}', `electron-v${this.electronVersion.split('.').slice(0, 2).join('.')}`)
-        .replace('{platform}', process.platform)
-        .replace('{arch}', this.arch)
-        .replace('{version}', modulePackageJson.version)
-        .replace('{libc}', detectLibc.family || 'unknown');
-
-      for (const binaryReplaceKey of Object.keys(modulePackageJson.binary)) {
-        value = value.replace(`{${binaryReplaceKey}}`, modulePackageJson.binary[binaryReplaceKey]);
-      }
-
-      rebuildArgs.push(`--${binaryKey}=${value}`);
-    }
-
-    if (process.env.GYP_MSVS_VERSION) {
-      rebuildArgs.push(`--msvs_version=${process.env.GYP_MSVS_VERSION}`);
-    }
-
-    d('rebuilding', path.basename(modulePath), 'with args', rebuildArgs);
-    await spawn(nodeGypPath, rebuildArgs, {
-      cwd: modulePath,
-      /* eslint-disable @typescript-eslint/camelcase */
-      env: Object.assign({}, process.env, {
-        USERPROFILE: path.resolve(os.homedir(), '.electron-gyp'),
-        npm_config_disturl: 'https://electronjs.org/headers',
-        npm_config_runtime: 'electron',
-        npm_config_arch: this.arch,
-        npm_config_target_arch: this.arch,
-        npm_config_build_from_source: 'true',
-        npm_config_debug: this.debug ? 'true' : '',
-        npm_config_devdir: path.resolve(os.homedir(), '.electron-gyp'),
-      }),
-      /* eslint-enable @typescript-eslint/camelcase */
-    });
-
-    d('built:', path.basename(modulePath));
-    await fs.mkdirs(path.dirname(metaPath));
-    await fs.writeFile(metaPath, metaData);
-
-    const moduleName = path.basename(modulePath);
-    const buildLocation = 'build/' + buildType;
-
-    d('searching for .node file', path.resolve(modulePath, buildLocation));
-    d('testing files', (await fs.readdir(path.resolve(modulePath, buildLocation))));
-
-    const nodeFile = (await fs.readdir(path.resolve(modulePath, buildLocation)))
-      .find((file) => file !== '.node' && file.endsWith('.node'));
-    const nodePath = nodeFile ? path.resolve(modulePath, buildLocation, nodeFile) : undefined;
-
-    const abiPath = path.resolve(modulePath, `bin/${process.platform}-${this.arch}-${this.ABI}`);
-    if (nodePath && await fs.pathExists(nodePath)) {
-      d('found .node file', nodePath);
-      d('copying to prebuilt place:', abiPath);
-      await fs.mkdirs(abiPath);
-      await fs.copy(nodePath, path.resolve(abiPath, `${moduleName}.node`));
-    }
-
-    if (this.useCache) {
-      await cacheModuleState(modulePath, this.cachePath, cacheKey);
-    }
+    await moduleRebuilder.rebuildNodeGypModule(cacheKey);
     this.lifecycle.emit('module-done');
   }
 
