@@ -8,7 +8,7 @@ import { readPackageJson } from './read-package-json';
 import { Rebuilder } from './rebuild';
 import { spawn } from '@malept/cross-spawn-promise';
 
-const d = debug('electron-windows-installer:module-rebuilder');
+const d = debug('electron-rebuild');
 
 const locateBinary = async (basePath: string, suffix: string): Promise<string | null> => {
   let testPath = basePath;
