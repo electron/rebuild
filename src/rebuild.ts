@@ -7,7 +7,7 @@ import * as os from 'os';
 import * as path from 'path';
 
 import { readPackageJson } from './read-package-json';
-import { lookupModuleState, cacheModuleState } from './cache';
+import { lookupModuleState } from './cache';
 import { searchForModule, searchForNodeModules } from './search-module';
 
 export type ModuleType = 'prod' | 'dev' | 'optional';
@@ -227,6 +227,7 @@ export class Rebuilder {
       return;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { ModuleRebuilder } = require('./module-rebuilder');
     const moduleRebuilder = new ModuleRebuilder(this, modulePath);
 

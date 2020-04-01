@@ -30,11 +30,11 @@ async function locateNodeGyp(): Promise<string | null> {
   }
 
   return nodeGypPath;
-};
+}
 
-const locatePrebuild = async (modulePath: string): Promise<string | null> => {
+async function locatePrebuild(modulePath: string): Promise<string | null> {
   return await locateBinary(modulePath, 'node_modules/prebuild-install/bin.js');
-};
+}
 
 export enum BuildType {
   Debug = 'Debug',
@@ -67,7 +67,7 @@ export class ModuleRebuilder {
     return path.basename(this.modulePath);
   }
 
-  get nodeGypEnv() {
+  get nodeGypEnv(): Record<string, string> {
     /* eslint-disable @typescript-eslint/camelcase */
     return {
       ...process.env,
@@ -92,7 +92,7 @@ export class ModuleRebuilder {
     return false;
   }
 
-  async buildNodeGypArgs() {
+  async buildNodeGypArgs(): Promise<string[]> {
     const args = [
       'rebuild',
       `--target=${this.rebuilder.electronVersion}`,
@@ -144,7 +144,7 @@ export class ModuleRebuilder {
     return flags.filter(value => value) as string[];
   }
 
-  async cacheModuleState(cacheKey: string) {
+  async cacheModuleState(cacheKey: string): Promise<void> {
     if (this.rebuilder.useCache) {
       await cacheModuleState(this.modulePath, this.rebuilder.cachePath, cacheKey);
     }
@@ -155,7 +155,7 @@ export class ModuleRebuilder {
     return !!dependencies['prebuild-install']
   }
 
-  async packageJSONField(key: string, defaultValue?: any): Promise<any> {
+  async packageJSONField(key: string, defaultValue?: string | object): Promise<string | object> {
     if (!this.packageJSON) {
       this.packageJSON = await readPackageJson(this.modulePath);
     }
@@ -198,7 +198,7 @@ export class ModuleRebuilder {
   }
 
   async rebuildPrebuildModule(cacheKey: string): Promise<boolean> {
-    if (!(await this.rebuildPrebuildModule())) {
+    if (!(await this.isPrebuildNativeModule())) {
       return false;
     }
 
@@ -242,7 +242,7 @@ export class ModuleRebuilder {
     return false;
   }
 
-  async replaceExistingNativeModule() {
+  async replaceExistingNativeModule(): Promise<void> {
     const buildLocation = path.resolve(this.modulePath, 'build', this.buildType);
 
     d('searching for .node file', buildLocation);
@@ -261,7 +261,7 @@ export class ModuleRebuilder {
     }
   }
 
-  async writeMetadata() {
+  async writeMetadata(): Promise<void> {
     await fs.ensureDir(path.dirname(this.metaPath));
     await fs.writeFile(this.metaPath, this.metaData);
   }
