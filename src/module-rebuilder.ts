@@ -182,24 +182,8 @@ export class ModuleRebuilder {
     if (prebuildInstallPath) {
       d(`triggering prebuild download step: ${this.moduleName}`);
       let success = false;
-      const shimExt = process.env.ELECTRON_REBUILD_TESTS ? 'ts' : 'js';
-      const executable = process.env.ELECTRON_REBUILD_TESTS ? path.resolve(__dirname, '..', 'node_modules', '.bin', 'ts-node') : process.execPath;
       try {
-        await spawn(
-          executable,
-          [
-            path.resolve(__dirname, `prebuild-shim.${shimExt}`),
-            prebuildInstallPath,
-            `--arch=${this.rebuilder.arch}`,
-            `--platform=${process.platform}`,
-            '--runtime=electron',
-            `--target=${this.rebuilder.electronVersion}`,
-            `--tag-prefix=${this.rebuilder.prebuildTagPrefix}`
-          ],
-          {
-            cwd: this.modulePath,
-          }
-        );
+        await this.runPrebuildInstall(prebuildInstallPath);
         success = true;
       } catch (err) {
         d('failed to use prebuild-install:', err);
@@ -234,6 +218,27 @@ export class ModuleRebuilder {
       await fs.ensureDir(abiPath);
       await fs.copy(nodePath, path.resolve(abiPath, `${this.moduleName}.node`));
     }
+  }
+
+  async runPrebuildInstall(prebuildInstallPath: string): Promise<void> {
+    const shimExt = process.env.ELECTRON_REBUILD_TESTS ? 'ts' : 'js';
+    const executable = process.env.ELECTRON_REBUILD_TESTS ? path.resolve(__dirname, '..', 'node_modules', '.bin', 'ts-node') : process.execPath;
+
+    await spawn(
+      executable,
+      [
+        path.resolve(__dirname, `prebuild-shim.${shimExt}`),
+        prebuildInstallPath,
+        `--arch=${this.rebuilder.arch}`,
+        `--platform=${process.platform}`,
+        '--runtime=electron',
+        `--target=${this.rebuilder.electronVersion}`,
+        `--tag-prefix=${this.rebuilder.prebuildTagPrefix}`
+      ],
+      {
+        cwd: this.modulePath,
+      }
+    );
   }
 
   async writeMetadata(): Promise<void> {
