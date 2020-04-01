@@ -59,22 +59,6 @@ export class ModuleRebuilder {
     return path.basename(this.modulePath);
   }
 
-  get nodeGypEnv(): Record<string, string> {
-    /* eslint-disable @typescript-eslint/camelcase */
-    return {
-      ...process.env,
-      USERPROFILE: path.resolve(os.homedir(), '.electron-gyp'),
-      npm_config_disturl: 'https://www.electronjs.org/headers',
-      npm_config_runtime: 'electron',
-      npm_config_arch: this.rebuilder.arch,
-      npm_config_target_arch: this.rebuilder.arch,
-      npm_config_build_from_source: 'true',
-      npm_config_debug: this.rebuilder.debug ? 'true' : '',
-      npm_config_devdir: path.resolve(os.homedir(), '.electron-gyp'),
-    }
-    /* eslint-enable @typescript-eslint/camelcase */
-  }
-
   async alreadyBuiltByRebuild(): Promise<boolean> {
     if (await fs.pathExists(this.metaPath)) {
       const meta = await fs.readFile(this.metaPath, 'utf8');
@@ -89,10 +73,12 @@ export class ModuleRebuilder {
       'node',
       'node-gyp',
       'rebuild',
+      `--runtime=electron`,
       `--target=${this.rebuilder.electronVersion}`,
       `--arch=${this.rebuilder.arch}`,
       `--dist-url=${this.rebuilder.headerURL}`,
       '--build-from-source',
+      `--devdir="${path.resolve(os.homedir(), '.electron-gyp')}"`
     ];
 
     if (this.rebuilder.debug) {
