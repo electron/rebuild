@@ -29,6 +29,7 @@ export interface RebuildOptions {
   cachePath?: string;
   prebuildTagPrefix?: string;
   projectRootPath?: string;
+  forceABI?: number;
 }
 
 export type HashTree = { [path: string]: string | HashTree };
@@ -121,7 +122,7 @@ class Rebuilder {
       throw new Error(`Expected a string version for electron version, got a "${typeof this.electronVersion}"`);
     }
 
-    this.ABI = nodeAbi.getAbi(this.electronVersion, 'electron');
+    this.ABI = options.forceABI || nodeAbi.getAbi(this.electronVersion, 'electron');
     this.prodDeps = this.extraModules.reduce((acc: Set<string>, x: string) => acc.add(x), new Set<string>());
     this.rebuilds = [];
     this.realModulePaths = new Set();

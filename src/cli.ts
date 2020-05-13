@@ -40,6 +40,7 @@ const yargs = argParser
   .describe('b', 'Build debug version of modules')
   .alias('b','debug')
   .describe('prebuild-tag-prefix', 'GitHub tag prefix passed to prebuild-install. Default is "v"')
+  .describe('force-abi', 'Override the ABI version for the version of Electron you are targeting.  Only use when targeting Nightly releases.')
   .epilog('Copyright 2016');
 
 const argv = yargs.argv;
@@ -103,6 +104,10 @@ process.on('unhandledRejection', handler);
     rootDirectory = path.resolve(process.cwd(), rootDirectory);
   }
 
+  if (argv.forceAbi && typeof argv.forceAbi !== 'number') {
+    throw new Error('force-abi must be a number');
+  }
+
   let modulesDone = 0;
   let moduleTotal = 0;
   const rebuildSpinner = ora('Searching dependency tree').start();
@@ -130,6 +135,7 @@ process.on('unhandledRejection', handler);
     mode: argv.p ? 'parallel' : (argv.s ? 'sequential' : undefined),
     debug: argv.b as boolean,
     prebuildTagPrefix: (argv.prebuildTagPrefix as string) || 'v',
+    forceABI: argv.forceAbi as number,
     projectRootPath,
   });
 
