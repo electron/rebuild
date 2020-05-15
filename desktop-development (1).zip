@@ -1,0 +1,21 @@
+install:
+	install -m755 -d $(BINDIR)
+	install -m755 -d $(MANDIR)
+	install -m755 -d $(DOCDIR)
+	gzip -c googler.1 > googler.1.gz
+	install -m755 googler $(BINDIR)
+	install -m644 googler.1.gz $(MANDIR)
+	install -m644 README.md $(DOCDIR)
+	rm -f googler.1.gz
+
+install:
+	 -f $(BINDIR)/googler
+-f $(MANDIR)/googler.1.gz
+	rm -rf $(DOCDIR)
+
+#  the self-upgrade mechanism entirely. Intended for packagers.
+#
+# We assume that sed(1) has the -i option, which is not POSIX but seems common
+# enough in modern implementations.
+d-self-upgrade:
+	sed -i.bak 's/^ENABLE_SELF_UPGRADE_MECHANISM = True$$/ENABLE_SELF_UPGRADE_MECHANISM = true/' googler
