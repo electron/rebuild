@@ -61,7 +61,8 @@ Options:
                                other than your system's
   -m, --module-dir             The path to the app directory to rebuild
   -w, --which-module           A specific module to build, or comma separated
-                               list of modules
+                               list of modules. Modules will only be rebuilt if they 
+                               also match the types of dependencies being rebuilt.
   -e, --electron-prebuilt-dir  The path to electron-prebuilt
   -d, --dist-url               Custom header tarball URL
   -t, --types                  The types of dependencies to rebuild.  Comma
