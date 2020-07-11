@@ -23,7 +23,7 @@ const yargs = argParser
   .alias('a', 'arch')
   .describe('m', 'The path to the node_modules directory to rebuild')
   .alias('m', 'module-dir')
-  .describe('w', ' A specific module to build, or comma separated list of modules. Modules will only be rebuilt if they also match the types of dependencies being rebuilt.')
+  .describe('w', 'A specific module to build, or comma separated list of modules. Modules will only be rebuilt if they also match the types of dependencies being rebuilt (see --types).')
   .alias('w', 'which-module')
   .describe('o', 'Only build specified module, or comma separated list of modules. All others are ignored.')
   .alias('o', 'only')
