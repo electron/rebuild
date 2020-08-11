@@ -48,7 +48,7 @@
     "@types/chai-as-promised": "^7.1.2",
     "@types/debug": "^4.1.5",
     "@types/fs-extra": "^9.0.1",
-    "@types/mocha": "^7.0.2",
+    "@types/mocha": "^8.0.1",
     "@types/node": "^13.9.8",
     "@types/yargs": "^15.0.4",
     "@typescript-eslint/eslint-plugin": "^2.26.0",
