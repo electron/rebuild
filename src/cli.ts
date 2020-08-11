@@ -51,8 +51,10 @@ if (argv.h) {
 
 if (process.argv.length === 3 && process.argv[2] === '--version') {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     console.log('Electron Rebuild Version:', require(path.resolve(__dirname, '../../package.json')).version);
   } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     console.log('Electron Rebuild Version:', require(path.resolve(__dirname, '../package.json')).version);
   }
   process.exit(0);

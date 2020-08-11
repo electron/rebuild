@@ -24,6 +24,8 @@ const locateBinary = async (basePath: string, suffix: string): Promise<string | 
   return null;
 };
 
+type PackageJSONValue = string | Record<string, unknown>;
+
 async function locatePrebuild(modulePath: string): Promise<string | null> {
   return await locateBinary(modulePath, 'node_modules/prebuild-install/bin.js');
 }
@@ -35,7 +37,7 @@ export enum BuildType {
 
 export class ModuleRebuilder {
   private modulePath: string;
-  private packageJSON: object;
+  private packageJSON: Record<string, unknown>;
   private rebuilder: Rebuilder;
 
   constructor(rebuilder: Rebuilder, modulePath: string) {
@@ -135,12 +137,12 @@ export class ModuleRebuilder {
     return !!dependencies['prebuild-install']
   }
 
-  async packageJSONField(key: string, defaultValue?: string | object): Promise<string | object> {
+  async packageJSONField(key: string, defaultValue?: PackageJSONValue): Promise<PackageJSONValue> {
     if (!this.packageJSON) {
       this.packageJSON = await readPackageJson(this.modulePath);
     }
 
-    return this.packageJSON[key] || defaultValue;
+    return (this.packageJSON[key] || defaultValue) as PackageJSONValue;
   }
 
   /**
