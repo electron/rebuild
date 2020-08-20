@@ -40,7 +40,7 @@ export interface RebuilderOptions extends RebuildOptions {
 
 const d = debug('electron-rebuild');
 
-const defaultMode: RebuildMode = process.platform === 'win32' ? 'sequential' : 'parallel';
+const defaultMode: RebuildMode = 'sequential';
 const defaultTypes: ModuleType[] = ['prod', 'optional'];
 // Update this number if you change the caching logic to ensure no bad cache hits
 const ELECTRON_REBUILD_CACHE_ID = 1;
@@ -384,18 +384,20 @@ class Rebuilder {
     }
 
     d('rebuilding', path.basename(modulePath), 'with args', rebuildArgs);
+    const devDir = path.resolve(os.homedir(), '.electron-gyp');
+    await fs.mkdirp(devDir)
     await spawnPromise(nodeGypPath, rebuildArgs, {
       cwd: modulePath,
       /* eslint-disable @typescript-eslint/camelcase */
       env: Object.assign({}, process.env, {
-        USERPROFILE: path.resolve(os.homedir(), '.electron-gyp'),
+        USERPROFILE: devDir,
         npm_config_disturl: 'https://www.electronjs.org/headers',
         npm_config_runtime: 'electron',
         npm_config_arch: this.arch,
         npm_config_target_arch: this.arch,
         npm_config_build_from_source: 'true',
         npm_config_debug: this.debug ? 'true' : '',
-        npm_config_devdir: path.resolve(os.homedir(), '.electron-gyp'),
+        npm_config_devdir: devDir,
       }),
       /* eslint-enable @typescript-eslint/camelcase */
     });
