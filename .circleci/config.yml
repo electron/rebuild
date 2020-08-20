@@ -2,7 +2,6 @@ step-restore-cache: &step-restore-cache
   restore_cache:
     keys:
       - v1-dependencies-{{ arch }}-{{ checksum "package-lock.json" }}
-      - v1-dependencies-{{ arch }}
 
 steps-test: &steps-test
   steps:
