@@ -40,7 +40,7 @@ export interface RebuilderOptions extends RebuildOptions {
 
 const d = debug('electron-rebuild');
 
-const defaultMode: RebuildMode = process.platform === 'win32' ? 'sequential' : 'parallel';
+const defaultMode: RebuildMode = 'sequential';
 const defaultTypes: ModuleType[] = ['prod', 'optional'];
 // Update this number if you change the caching logic to ensure no bad cache hits
 const ELECTRON_REBUILD_CACHE_ID = 1;
