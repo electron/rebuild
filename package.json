@@ -37,7 +37,7 @@
     "detect-libc": "^1.0.3",
     "fs-extra": "^8.1.0",
     "node-abi": "^2.11.0",
-    "node-gyp": "^6.0.1",
+    "node-gyp": "^7.1.0",
     "ora": "^3.4.0",
     "spawn-rx": "^3.0.0",
     "yargs": "^14.2.0"
