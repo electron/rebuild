@@ -15,17 +15,17 @@ steps-test: &steps-test
               curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
               export NVM_DIR="$HOME/.nvm"
               [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-              nvm install 8
-              nvm alias default 8
+              nvm install 10
+              nvm alias default 10
               echo 'export NVM_DIR=${HOME}/.nvm' >> $BASH_ENV
               echo "[ -s '${NVM_DIR}/nvm.sh' ] && . '${NVM_DIR}/nvm.sh'" >> $BASH_ENV
               ;;
             Windows*|CYGWIN*|MINGW*|MSYS*)
-              nvm install 12.8.0
-              nvm use 12.8.0
+              nvm install 10.22.0
+              nvm use 10.22.0
               ;;
           esac
-    - run: npm install
+    - run: npm install --engine-strict
     - save_cache:
         paths:
           - node_modules
@@ -37,13 +37,17 @@ version: 2.1
 orbs:
   win: circleci/windows@1.0.0
 jobs:
-  test-linux-8:
-    docker:
-      - image: circleci/node:8
-    <<: *steps-test
   test-linux-10:
     docker:
       - image: circleci/node:10
+    <<: *steps-test
+  test-linux-12:
+    docker:
+      - image: circleci/node:12
+    <<: *steps-test
+  test-linux-14:
+    docker:
+      - image: circleci/node:14
     <<: *steps-test
   test-mac:
     macos:
@@ -68,14 +72,16 @@ workflows:
   test_and_release:
     # Run the test jobs first, then the release only when all the test jobs are successful
     jobs:
-      - test-linux-8
       - test-linux-10
+      - test-linux-12
+      - test-linux-14
       - test-mac
       - test-windows
       - release:
           requires:
-            - test-linux-8
             - test-linux-10
+            - test-linux-12
+            - test-linux-14
             - test-mac
             - test-windows
           filters:
