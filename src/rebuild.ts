@@ -388,7 +388,6 @@ class Rebuilder {
     await fs.mkdirp(devDir)
     await spawnPromise(nodeGypPath, rebuildArgs, {
       cwd: modulePath,
-      /* eslint-disable @typescript-eslint/camelcase */
       env: Object.assign({}, process.env, {
         USERPROFILE: devDir,
         npm_config_disturl: 'https://www.electronjs.org/headers',
@@ -399,7 +398,6 @@ class Rebuilder {
         npm_config_debug: this.debug ? 'true' : '',
         npm_config_devdir: devDir,
       }),
-      /* eslint-enable @typescript-eslint/camelcase */
     });
 
     d('built:', path.basename(modulePath));
@@ -570,6 +568,7 @@ function doRebuild(options: any, ...args: any[]): Promise<void> {
     return rebuildWithOptions(options as RebuildOptions);
   }
   console.warn('You are using the deprecated electron-rebuild API, please switch to using the options object instead');
+  // eslint-disable-next-line @typescript-eslint/ban-types
   return rebuildWithOptions((createOptions as Function)(options, ...args));
 }
 
