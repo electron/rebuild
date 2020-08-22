@@ -3,7 +3,7 @@
 import 'colors';
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import ora from 'ora';
+import ora = require('ora');
 import * as argParser from 'yargs';
 
 import { rebuild, ModuleType } from './rebuild';
