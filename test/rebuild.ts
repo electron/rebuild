@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as os from 'os';
-import { spawnPromise } from 'spawn-rx';
+import { spawn } from '@malept/cross-spawn-promise';
 
 import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild';
 import { rebuild, RebuildOptions } from '../src/rebuild';
@@ -18,7 +18,7 @@ describe('rebuilder', () => {
       path.resolve(__dirname, '../test/fixture/native-app1/package.json'),
       path.resolve(testModulePath, 'package.json')
     );
-    await spawnPromise('npm', ['install'], {
+    await spawn('npm', ['install'], {
       cwd: testModulePath,
       stdio: 'ignore',
     });
