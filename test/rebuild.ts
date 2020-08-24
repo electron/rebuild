@@ -48,6 +48,7 @@ describe('rebuilder', () => {
         }
         process.env.ELECTRON_REBUILD_TESTS = 'true';
         if (Array.isArray(args)) {
+          // eslint-disable-next-line @typescript-eslint/ban-types
           await (rebuild as Function)(...(args as string[]));
         } else {
           await rebuild(args);

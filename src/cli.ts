@@ -3,7 +3,7 @@
 import 'colors';
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import ora from 'ora';
+import ora = require('ora');
 import * as argParser from 'yargs';
 
 import { rebuild, ModuleType } from './rebuild';
@@ -51,11 +51,13 @@ if (argv.h) {
 }
 
 if (process.argv.length === 3 && process.argv[2] === '--version') {
+  /* eslint-disable @typescript-eslint/no-var-requires */
   try {
     console.log('Electron Rebuild Version:', require(path.resolve(__dirname, '../../package.json')).version);
   } catch (err) {
     console.log('Electron Rebuild Version:', require(path.resolve(__dirname, '../package.json')).version);
   }
+  /* eslint-enable @typescript-eslint/no-var-requires */
   process.exit(0);
 }
 
