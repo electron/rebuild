@@ -74,15 +74,14 @@ workflows:
     jobs:
       - test-linux-10
       - test-linux-12
-      # FIXME: figure out why this fails
-      # - test-linux-14
+      - test-linux-14
       - test-mac
       - test-windows
       - release:
           requires:
             - test-linux-10
             - test-linux-12
-            # - test-linux-14
+            - test-linux-14
             - test-mac
             - test-windows
           filters:
