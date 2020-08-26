@@ -68,7 +68,7 @@ describe('rebuilder', () => {
       });
 
       it('should have rebuilt children of scoped top level prod dependencies', async () => {
-        await expectNativeModuleToBeRebuilt(testModulePath, '@nlv8/signun');
+        await expectNativeModuleToBeRebuilt(testModulePath, '@newrelic/native-metrics');
       });
 
       it('should have rebuilt top level optional dependencies', async () => {
