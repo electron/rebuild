@@ -389,7 +389,8 @@ class Rebuilder {
     await fs.mkdirp(devDir)
     await spawn(nodeGypPath, rebuildArgs, {
       cwd: modulePath,
-      env: Object.assign({}, process.env, {
+      env: {
+        ...process.env,
         USERPROFILE: devDir,
         npm_config_disturl: 'https://www.electronjs.org/headers',
         npm_config_runtime: 'electron',
@@ -398,7 +399,7 @@ class Rebuilder {
         npm_config_build_from_source: 'true',
         npm_config_debug: this.debug ? 'true' : '',
         npm_config_devdir: devDir,
-      }),
+      },
     });
 
     d('built:', path.basename(modulePath));
@@ -512,7 +513,7 @@ function rebuildWithOptions(options: RebuildOptions): Promise<void> {
   // eslint-disable-next-line prefer-rest-params
   d('rebuilding with args:', arguments);
   const lifecycle = new EventEmitter();
-  const rebuilderOptions: RebuilderOptions = Object.assign({}, options, { lifecycle });
+  const rebuilderOptions: RebuilderOptions = { ...options, lifecycle };
   const rebuilder = new Rebuilder(rebuilderOptions);
 
   const ret = rebuilder.rebuild() as Promise<void> & { lifecycle: EventEmitter };
