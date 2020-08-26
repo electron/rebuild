@@ -4,11 +4,11 @@ import * as os from 'os';
 import { spawn } from '@malept/cross-spawn-promise';
 
 import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild';
-import { rebuild } from '../src/rebuild';
+import { getExactElectronVersionSync } from './helpers/electron-version';
 import { getProjectRootPath } from '../src/search-module';
+import { rebuild } from '../src/rebuild';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const testElectronVersion = fs.readFileSync(path.join(path.dirname(require('electron')), 'version')).toString().trim();
+const testElectronVersion = getExactElectronVersionSync();
 
 describe('rebuild for yarn workspace', function() {
   this.timeout(2 * 60 * 1000);

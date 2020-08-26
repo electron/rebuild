@@ -5,10 +5,10 @@ import * as os from 'os';
 import { spawn } from '@malept/cross-spawn-promise';
 
 import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild';
+import { getExactElectronVersionSync } from './helpers/electron-version';
 import { rebuild, RebuildOptions } from '../src/rebuild';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const testElectronVersion = fs.readFileSync(path.join(path.dirname(require('electron')), 'version')).toString().trim();
+const testElectronVersion = getExactElectronVersionSync();
 
 describe('rebuilder', () => {
   const testModulePath = path.resolve(os.tmpdir(), 'electron-rebuild-test');
