@@ -7,6 +7,9 @@ import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from 
 import { rebuild } from '../src/rebuild';
 import { getProjectRootPath } from '../src/search-module';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const testElectronVersion = fs.readFileSync(path.join(path.dirname(require('electron')), 'version')).toString().trim();
+
 describe('rebuild for yarn workspace', function() {
   this.timeout(2 * 60 * 1000);
   const testModulePath = path.resolve(os.tmpdir(), 'electron-rebuild-test');
@@ -25,7 +28,7 @@ describe('rebuild for yarn workspace', function() {
 
       await rebuild({
         buildPath: path.resolve(testModulePath, 'child-workspace'),
-        electronVersion: '5.0.13',
+        electronVersion: testElectronVersion,
         arch: process.arch,
         projectRootPath
       });

@@ -7,6 +7,9 @@ import { spawn } from '@malept/cross-spawn-promise';
 import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild';
 import { rebuild, RebuildOptions } from '../src/rebuild';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const testElectronVersion = fs.readFileSync(path.join(path.dirname(require('electron')), 'version')).toString().trim();
+
 describe('rebuilder', () => {
   const testModulePath = path.resolve(os.tmpdir(), 'electron-rebuild-test');
   const timeoutSeconds = process.platform === 'win32' ? 5 : 2;
@@ -28,10 +31,10 @@ describe('rebuilder', () => {
     name: string;
     args: RebuildOptions | string[];
   }[] = [
-    { args: [testModulePath, '5.0.13', process.arch], name: 'sequential args' },
+    { args: [testModulePath, testElectronVersion, process.arch], name: 'sequential args' },
     { args: {
       buildPath: testModulePath,
-      electronVersion: '5.0.13',
+      electronVersion: testElectronVersion,
       arch: process.arch
     }, name: 'options object' }
   ];
@@ -92,8 +95,8 @@ describe('rebuilder', () => {
     before(resetTestModule);
 
     it('should skip the rebuild step when disabled', async () => {
-      await rebuild(testModulePath, '5.0.13', process.arch);
-      const rebuilder = rebuild(testModulePath, '5.0.13', process.arch, [], false);
+      await rebuild(testModulePath, testElectronVersion, process.arch);
+      const rebuilder = rebuild(testModulePath, testElectronVersion, process.arch, [], false);
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
         skipped++;
@@ -103,7 +106,7 @@ describe('rebuilder', () => {
     });
 
     it('should rebuild all modules again when disabled but the electron ABI bumped', async () => {
-      await rebuild(testModulePath, '5.0.13', process.arch);
+      await rebuild(testModulePath, testElectronVersion, process.arch);
       const rebuilder = rebuild(testModulePath, '3.0.0', process.arch, [], false);
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
@@ -114,8 +117,8 @@ describe('rebuilder', () => {
     });
 
     it('should rebuild all modules again when enabled', async () => {
-      await rebuild(testModulePath, '5.0.13', process.arch);
-      const rebuilder = rebuild(testModulePath, '5.0.13', process.arch, [], true);
+      await rebuild(testModulePath, testElectronVersion, process.arch);
+      const rebuilder = rebuild(testModulePath, testElectronVersion, process.arch, [], true);
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
         skipped++;
@@ -134,7 +137,7 @@ describe('rebuilder', () => {
     it('should rebuild only specified modules', async () => {
       const rebuilder = rebuild({
         buildPath: testModulePath,
-        electronVersion: '5.0.13',
+        electronVersion: testElectronVersion,
         arch: process.arch,
         onlyModules: ['ffi-napi'],
         force: true
@@ -148,7 +151,7 @@ describe('rebuilder', () => {
     it('should rebuild multiple specified modules via --only option', async () => {
       const rebuilder = rebuild({
         buildPath: testModulePath,
-        electronVersion: '5.0.13',
+        electronVersion: testElectronVersion,
         arch: process.arch,
         onlyModules: ['ffi-napi', 'ref-napi'], // TODO: check to see if there's a bug with scoped modules
         force: true
@@ -169,7 +172,7 @@ describe('rebuilder', () => {
     it('should have rebuilt ffi-napi module in Debug mode', async () => {
       await rebuild({
         buildPath: testModulePath,
-        electronVersion: '5.0.13',
+        electronVersion: testElectronVersion,
         arch: process.arch,
         onlyModules: ['ffi-napi'],
         force: true,
