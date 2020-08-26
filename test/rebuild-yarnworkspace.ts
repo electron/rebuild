@@ -36,7 +36,7 @@ describe('rebuild for yarn workspace', function() {
     });
 
     it('should not have rebuilt top level devDependencies', async () => {
-      await expectNativeModuleToNotBeRebuilt(testModulePath, 'ffi-napi');
+      await expectNativeModuleToNotBeRebuilt(testModulePath, 'sleep');
     });
 
     after(async () => {

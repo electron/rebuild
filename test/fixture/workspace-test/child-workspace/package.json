@@ -8,7 +8,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "ffi-napi": "2.4.5"
+    "sleep": "6.3.0"
   },
   "dependencies": {
     "snappy": "6.3.4"
