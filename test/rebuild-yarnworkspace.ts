@@ -7,7 +7,7 @@ import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from 
 import { rebuild } from '../src/rebuild';
 import { getProjectRootPath } from '../src/search-module';
 
-describe.skip('rebuild for yarn workspace', function() {
+describe('rebuild for yarn workspace', function() {
   this.timeout(2 * 60 * 1000);
   const testModulePath = path.resolve(os.tmpdir(), 'electron-rebuild-test');
 
