@@ -11,6 +11,6 @@
     "ffi-napi": "2.4.5"
   },
   "dependencies": {
-    "ref-napi": "1.4.2"
+    "snappy": "6.3.4"
   }
 }

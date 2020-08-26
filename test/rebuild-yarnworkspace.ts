@@ -32,7 +32,7 @@ describe('rebuild for yarn workspace', function() {
     });
 
     it('should have rebuilt top level prod dependencies', async () => {
-      await expectNativeModuleToBeRebuilt(testModulePath, 'ref-napi');
+      await expectNativeModuleToBeRebuilt(testModulePath, 'snappy');
     });
 
     it('should not have rebuilt top level devDependencies', async () => {
