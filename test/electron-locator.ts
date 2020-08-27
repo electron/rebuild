@@ -5,6 +5,9 @@ import { spawn } from '@malept/cross-spawn-promise';
 
 import { locateElectronModule } from '../src/electron-locator';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const testElectronRange = require(path.resolve(__dirname, '..', 'package.json')).devDependencies.electron;
+
 function packageCommand(command: string, packageName: string): Promise<string> {
   return spawn('npm', [command, '--no-save', packageName], {
     cwd: path.resolve(__dirname, '..'),
@@ -43,12 +46,12 @@ describe('locateElectronModule', function() {
   });
 
   describe('with electron installed', async () => {
-    before(() => install('electron@^5.0.13'));
+    before(() => install(`electron@${testElectronRange}`));
 
     testElectronCanBeFound();
 
     after(() => uninstall('electron'));
   });
 
-  after(() => install('electron@^5.0.13'));
+  after(() => install(`electron@${testElectronRange}`));
 });

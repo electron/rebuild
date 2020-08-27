@@ -5,7 +5,10 @@ import * as os from 'os';
 import { spawn } from '@malept/cross-spawn-promise';
 
 import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild';
+import { getExactElectronVersionSync } from './helpers/electron-version';
 import { rebuild, RebuildOptions } from '../src/rebuild';
+
+const testElectronVersion = getExactElectronVersionSync();
 
 describe('rebuilder', () => {
   const testModulePath = path.resolve(os.tmpdir(), 'electron-rebuild-test');
@@ -18,20 +21,17 @@ describe('rebuilder', () => {
       path.resolve(__dirname, '../test/fixture/native-app1/package.json'),
       path.resolve(testModulePath, 'package.json')
     );
-    await spawn('npm', ['install'], {
-      cwd: testModulePath,
-      stdio: 'ignore',
-    });
+    await spawn('npm', ['install'], { cwd: testModulePath });
   };
 
   const optionSets: {
     name: string;
     args: RebuildOptions | string[];
   }[] = [
-    { args: [testModulePath, '5.0.13', process.arch], name: 'sequential args' },
+    { args: [testModulePath, testElectronVersion, process.arch], name: 'sequential args' },
     { args: {
       buildPath: testModulePath,
-      electronVersion: '5.0.13',
+      electronVersion: testElectronVersion,
       arch: process.arch
     }, name: 'options object' }
   ];
@@ -68,7 +68,7 @@ describe('rebuilder', () => {
       });
 
       it('should have rebuilt children of scoped top level prod dependencies', async () => {
-        await expectNativeModuleToBeRebuilt(testModulePath, '@nlv8/signun');
+        await expectNativeModuleToBeRebuilt(testModulePath, '@newrelic/native-metrics');
       });
 
       it('should have rebuilt top level optional dependencies', async () => {
@@ -92,8 +92,8 @@ describe('rebuilder', () => {
     before(resetTestModule);
 
     it('should skip the rebuild step when disabled', async () => {
-      await rebuild(testModulePath, '5.0.13', process.arch);
-      const rebuilder = rebuild(testModulePath, '5.0.13', process.arch, [], false);
+      await rebuild(testModulePath, testElectronVersion, process.arch);
+      const rebuilder = rebuild(testModulePath, testElectronVersion, process.arch, [], false);
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
         skipped++;
@@ -103,7 +103,7 @@ describe('rebuilder', () => {
     });
 
     it('should rebuild all modules again when disabled but the electron ABI bumped', async () => {
-      await rebuild(testModulePath, '5.0.13', process.arch);
+      await rebuild(testModulePath, testElectronVersion, process.arch);
       const rebuilder = rebuild(testModulePath, '3.0.0', process.arch, [], false);
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
@@ -114,8 +114,8 @@ describe('rebuilder', () => {
     });
 
     it('should rebuild all modules again when enabled', async () => {
-      await rebuild(testModulePath, '5.0.13', process.arch);
-      const rebuilder = rebuild(testModulePath, '5.0.13', process.arch, [], true);
+      await rebuild(testModulePath, testElectronVersion, process.arch);
+      const rebuilder = rebuild(testModulePath, testElectronVersion, process.arch, [], true);
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
         skipped++;
@@ -134,7 +134,7 @@ describe('rebuilder', () => {
     it('should rebuild only specified modules', async () => {
       const rebuilder = rebuild({
         buildPath: testModulePath,
-        electronVersion: '5.0.13',
+        electronVersion: testElectronVersion,
         arch: process.arch,
         onlyModules: ['ffi-napi'],
         force: true
@@ -148,7 +148,7 @@ describe('rebuilder', () => {
     it('should rebuild multiple specified modules via --only option', async () => {
       const rebuilder = rebuild({
         buildPath: testModulePath,
-        electronVersion: '5.0.13',
+        electronVersion: testElectronVersion,
         arch: process.arch,
         onlyModules: ['ffi-napi', 'ref-napi'], // TODO: check to see if there's a bug with scoped modules
         force: true
@@ -169,7 +169,7 @@ describe('rebuilder', () => {
     it('should have rebuilt ffi-napi module in Debug mode', async () => {
       await rebuild({
         buildPath: testModulePath,
-        electronVersion: '5.0.13',
+        electronVersion: testElectronVersion,
         arch: process.arch,
         onlyModules: ['ffi-napi'],
         force: true,

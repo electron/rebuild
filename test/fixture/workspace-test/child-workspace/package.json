@@ -8,9 +8,9 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "ffi-napi": "2.4.5"
+    "sleep": "6.3.0"
   },
   "dependencies": {
-    "ref-napi": "1.4.2"
+    "snappy": "6.3.4"
   }
 }

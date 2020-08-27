@@ -4,10 +4,13 @@ import * as os from 'os';
 import { spawn } from '@malept/cross-spawn-promise';
 
 import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild';
-import { rebuild } from '../src/rebuild';
+import { getExactElectronVersionSync } from './helpers/electron-version';
 import { getProjectRootPath } from '../src/search-module';
+import { rebuild } from '../src/rebuild';
 
-describe.skip('rebuild for yarn workspace', function() {
+const testElectronVersion = getExactElectronVersionSync();
+
+describe('rebuild for yarn workspace', function() {
   this.timeout(2 * 60 * 1000);
   const testModulePath = path.resolve(os.tmpdir(), 'electron-rebuild-test');
 
@@ -16,27 +19,24 @@ describe.skip('rebuild for yarn workspace', function() {
       await fs.remove(testModulePath);
       await fs.copy(path.resolve(__dirname, 'fixture/workspace-test'), testModulePath);
 
-      await spawn('yarn', [], {
-        cwd: testModulePath,
-        stdio: 'ignore'
-      });
+      await spawn('yarn', [], { cwd: testModulePath });
 
       const projectRootPath = await getProjectRootPath(path.join(testModulePath, 'workspace-test', 'child-workspace'));
 
       await rebuild({
         buildPath: path.resolve(testModulePath, 'child-workspace'),
-        electronVersion: '5.0.13',
+        electronVersion: testElectronVersion,
         arch: process.arch,
         projectRootPath
       });
     });
 
     it('should have rebuilt top level prod dependencies', async () => {
-      await expectNativeModuleToBeRebuilt(testModulePath, 'ref-napi');
+      await expectNativeModuleToBeRebuilt(testModulePath, 'snappy');
     });
 
     it('should not have rebuilt top level devDependencies', async () => {
-      await expectNativeModuleToNotBeRebuilt(testModulePath, 'ffi-napi');
+      await expectNativeModuleToNotBeRebuilt(testModulePath, 'sleep');
     });
 
     after(async () => {
