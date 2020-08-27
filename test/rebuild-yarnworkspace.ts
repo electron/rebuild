@@ -19,10 +19,7 @@ describe('rebuild for yarn workspace', function() {
       await fs.remove(testModulePath);
       await fs.copy(path.resolve(__dirname, 'fixture/workspace-test'), testModulePath);
 
-      await spawn('yarn', [], {
-        cwd: testModulePath,
-        stdio: 'ignore'
-      });
+      await spawn('yarn', [], { cwd: testModulePath });
 
       const projectRootPath = await getProjectRootPath(path.join(testModulePath, 'workspace-test', 'child-workspace'));
 

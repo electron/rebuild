@@ -21,10 +21,7 @@ describe('rebuilder', () => {
       path.resolve(__dirname, '../test/fixture/native-app1/package.json'),
       path.resolve(testModulePath, 'package.json')
     );
-    await spawn('npm', ['install'], {
-      cwd: testModulePath,
-      stdio: 'ignore',
-    });
+    await spawn('npm', ['install'], { cwd: testModulePath });
   };
 
   const optionSets: {
