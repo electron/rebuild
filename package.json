@@ -5,7 +5,9 @@
   "main": "lib/src/main.js",
   "typings": "lib/src/main.d.ts",
   "scripts": {
+    "codecov": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "compile": "tsc",
+    "coverage": "nyc npm run mocha",
     "watch": "tsc -w",
     "prepare": "npm run compile",
     "mocha": "cross-env TS_NODE_FILES=true mocha --require ts-node/register ./test/*.ts",
@@ -44,6 +46,7 @@
   },
   "devDependencies": {
     "@continuous-auth/semantic-release-npm": "^2.0.0",
+    "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/chai": "^4.2.12",
     "@types/chai-as-promised": "^7.1.3",
     "@types/debug": "^4.1.5",
@@ -55,11 +58,13 @@
     "@typescript-eslint/parser": "^3.10.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
+    "codecov": "^3.7.2",
     "cross-env": "^7.0.2",
     "electron": "^10.0.0",
     "eslint": "^7.7.0",
     "eslint-plugin-mocha": "^8.0.0",
     "mocha": "^8.1.1",
+    "nyc": "^15.1.0",
     "semantic-release": "^17.1.1",
     "ts-node": "^9.0.0",
     "typescript": "^4.0.2"
@@ -100,5 +105,8 @@
   "eslintIgnore": [
     "*.d.ts",
     "node_modules"
-  ]
+  ],
+  "nyc": {
+    "extends": "@istanbuljs/nyc-config-typescript"
+  }
 }
