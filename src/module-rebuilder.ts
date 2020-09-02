@@ -13,14 +13,18 @@ import { spawn } from '@malept/cross-spawn-promise';
 const d = debug('electron-rebuild');
 
 const locateBinary = async (basePath: string, suffix: string): Promise<string | null> => {
-  let testPath = basePath;
-  for (let upDir = 0; upDir <= 20; upDir ++) {
+  let parentPath = basePath;
+  let testPath: string | undefined;
+
+  while (testPath !== parentPath) {
+    testPath = parentPath;
     const checkPath = path.resolve(testPath, suffix);
     if (await fs.pathExists(checkPath)) {
       return checkPath;
     }
-    testPath = path.resolve(testPath, '..');
+    parentPath = path.resolve(testPath, '..');
   }
+
   return null;
 };
 
