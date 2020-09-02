@@ -2,6 +2,7 @@
 
 [![CircleCI](https://circleci.com/gh/electron/electron-rebuild.svg?style=svg)](https://circleci.com/gh/electron/electron-rebuild)
 [![NPM](https://img.shields.io/npm/v/electron-rebuild.svg?style=flat)](https://npm.im/electron-rebuild)
+[![Coverage Status](https://codecov.io/gh/electron/electron-rebuild/branch/master/graph/badge.svg)](https://codecov.io/gh/electron/electron-rebuild)
 
 This executable rebuilds native Node.js modules against the version of Node.js
 that your Electron project is using. This allows you to use native Node.js

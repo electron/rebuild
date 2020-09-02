@@ -30,7 +30,9 @@ steps-test: &steps-test
         paths:
           - node_modules
         key: v1-dependencies-{{ arch }}-{{ checksum "package-lock.json" }}
-    - run: npm test
+    - run: npm run lint
+    - run: npm run coverage
+    - run: npm run codecov
 
 
 version: 2.1
