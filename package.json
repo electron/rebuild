@@ -41,7 +41,7 @@
     "fs-extra": "^9.0.1",
     "node-abi": "^2.19.1",
     "node-gyp": "^7.1.0",
-    "ora": "^5.0.0",
+    "ora": "^5.1.0",
     "yargs": "^15.4.1"
   },
   "devDependencies": {
