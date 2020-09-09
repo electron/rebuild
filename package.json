@@ -42,7 +42,7 @@
     "node-abi": "^2.19.1",
     "node-gyp": "^7.1.0",
     "ora": "^5.1.0",
-    "yargs": "^15.4.1"
+    "yargs": "^16.0.0"
   },
   "devDependencies": {
     "@continuous-auth/semantic-release-npm": "^2.0.0",
