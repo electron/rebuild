@@ -67,6 +67,7 @@ export class Rebuilder {
   public cachePath: string;
   public prebuildTagPrefix: string;
   public projectRootPath?: string;
+  public msvsVersion?: string;
 
   constructor(options: RebuilderOptions) {
     this.lifecycle = options.lifecycle;
@@ -83,6 +84,7 @@ export class Rebuilder {
     this.useCache = options.useCache || false;
     this.cachePath = options.cachePath || path.resolve(os.homedir(), '.electron-rebuild-cache');
     this.prebuildTagPrefix = options.prebuildTagPrefix || 'v';
+    this.msvsVersion = process.env.GYP_MSVS_VERSION;
 
     if (this.useCache && this.force) {
       console.warn('[WARNING]: Electron Rebuild has force enabled and cache enabled, force take precedence and the cache will not be used.');

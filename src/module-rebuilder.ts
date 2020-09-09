@@ -93,8 +93,8 @@ export class ModuleRebuilder {
 
     args.push(...(await this.buildNodeGypArgsFromBinaryField()));
 
-    if (process.env.GYP_MSVS_VERSION) {
-      args.push(`--msvs_version=${process.env.GYP_MSVS_VERSION}`);
+    if (this.rebuilder.msvsVersion) {
+      args.push(`--msvs_version=${this.rebuilder.msvsVersion}`);
     }
 
     return args;
