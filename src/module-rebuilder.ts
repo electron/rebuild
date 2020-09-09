@@ -168,11 +168,11 @@ export class ModuleRebuilder {
     }
 
     const nodeGypArgs = await this.buildNodeGypArgs();
+    d('rebuilding', this.moduleName, 'with args', nodeGypArgs);
 
     const nodeGyp = NodeGyp();
     nodeGyp.parseArgv(nodeGypArgs);
     let command = nodeGyp.todo.shift();
-    d('rebuilding', this.moduleName, 'with args', command.args);
     const originalWorkingDir = process.cwd();
     try {
       process.chdir(this.modulePath);
