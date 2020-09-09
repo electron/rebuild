@@ -173,9 +173,19 @@ export class ModuleRebuilder {
     nodeGyp.parseArgv(nodeGypArgs);
     let command = nodeGyp.todo.shift();
     d('rebuilding', this.moduleName, 'with args', command.args);
-    while (command) {
-      await promisify(nodeGyp.commands[command.name])(command.args);
-      command = nodeGyp.todo.shift();
+    const originalWorkingDir = process.cwd();
+    try {
+      process.chdir(this.modulePath);
+      while (command) {
+        await promisify(nodeGyp.commands[command.name])(command.args);
+        command = nodeGyp.todo.shift();
+      }
+    } catch (err) {
+      let errorMessage = `node-gyp failed to rebuild '${this.modulePath}'.\n`;
+      errorMessage += `Error: ${err.message || err}\n\n`;
+      throw new Error(errorMessage);
+    } finally {
+      process.chdir(originalWorkingDir);
     }
 
     d('built:', this.moduleName);
