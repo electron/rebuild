@@ -4,6 +4,7 @@ import * as path from 'path';
 import * as os from 'os';
 import { spawn } from '@malept/cross-spawn-promise';
 
+import { determineChecksum } from './helpers/checksum';
 import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild';
 import { getExactElectronVersionSync } from './helpers/electron-version';
 import { rebuild, RebuildOptions } from '../src/rebuild';
@@ -132,17 +133,21 @@ describe('rebuilder', () => {
     afterEach(async () => await fs.remove(testModulePath));
 
     it('should rebuild only specified modules', async () => {
+      const nativeModuleBinary = path.join(testModulePath, 'node_modules', 'farmhash', 'build', 'Release', 'farmhash.node');
+      const nodeModuleChecksum = await determineChecksum(nativeModuleBinary);
       const rebuilder = rebuild({
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch: process.arch,
-        onlyModules: ['ffi-napi'],
+        onlyModules: ['farmhash'],
         force: true
       });
       let built = 0;
       rebuilder.lifecycle.on('module-done', () => built++);
       await rebuilder;
       expect(built).to.equal(1);
+      const electronModuleChecksum = await determineChecksum(nativeModuleBinary);
+      expect(electronModuleChecksum).to.not.equal(nodeModuleChecksum);
     });
 
     it('should rebuild multiple specified modules via --only option', async () => {
