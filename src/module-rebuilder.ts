@@ -171,9 +171,12 @@ export class ModuleRebuilder {
 
     const nodeGyp = NodeGyp();
     nodeGyp.parseArgv(nodeGypArgs);
-    const rebuildArgs = nodeGyp.todo[0].args;
-    d('rebuilding', this.moduleName, 'with args', rebuildArgs);
-    await promisify(nodeGyp.commands.rebuild)(rebuildArgs);
+    let command = nodeGyp.todo.shift();
+    d('rebuilding', this.moduleName, 'with args', command.args);
+    while (command) {
+      await promisify(nodeGyp.commands[command.name])(command.args);
+      command = nodeGyp.todo.shift();
+    }
 
     d('built:', this.moduleName);
     await this.writeMetadata();
