@@ -59,6 +59,8 @@ jobs:
     executor:
       name: win/vs2019
       shell: bash.exe
+    environment:
+      GYP_MSVS_VERSION: '2019'
     <<: *steps-test
 
   release:
