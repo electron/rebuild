@@ -14,7 +14,13 @@ const testElectronVersion = getExactElectronVersionSync();
 describe('rebuilder', () => {
   const testModulePath = path.resolve(os.tmpdir(), 'electron-rebuild-test');
   const timeoutSeconds = process.platform === 'win32' ? 5 : 2;
+  const msvs_version: string | undefined = process.env.GYP_MSVS_VERSION;
 
+  const resetMSVSVersion = () => {
+    if (msvs_version) {
+      process.env.GYP_MSVS_VERSION = msvs_version;
+    }
+  };
   const resetTestModule = async (): Promise<void> => {
     await fs.remove(testModulePath);
     await fs.mkdirs(testModulePath);
@@ -23,7 +29,13 @@ describe('rebuilder', () => {
       path.resolve(testModulePath, 'package.json')
     );
     await spawn('npm', ['install'], { cwd: testModulePath });
+    resetMSVSVersion();
   };
+
+  const cleanupTestModule = async (): Promise<void> => {
+    await fs.remove(testModulePath);
+    resetMSVSVersion();
+  }
 
   const optionSets: {
     name: string;
@@ -82,7 +94,7 @@ describe('rebuilder', () => {
 
       after(async () => {
         delete process.env.ELECTRON_REBUILD_TESTS;
-        await fs.remove(testModulePath);
+        await cleanupTestModule();
       });
     });
   }
@@ -91,9 +103,12 @@ describe('rebuilder', () => {
     this.timeout(timeoutSeconds * 60 * 1000);
 
     before(resetTestModule);
+    after(cleanupTestModule);
+    afterEach(resetMSVSVersion);
 
     it('should skip the rebuild step when disabled', async () => {
       await rebuild(testModulePath, testElectronVersion, process.arch);
+      resetMSVSVersion();
       const rebuilder = rebuild(testModulePath, testElectronVersion, process.arch, [], false);
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
@@ -105,6 +120,7 @@ describe('rebuilder', () => {
 
     it('should rebuild all modules again when disabled but the electron ABI bumped', async () => {
       await rebuild(testModulePath, testElectronVersion, process.arch);
+      resetMSVSVersion();
       const rebuilder = rebuild(testModulePath, '3.0.0', process.arch, [], false);
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
@@ -116,6 +132,7 @@ describe('rebuilder', () => {
 
     it('should rebuild all modules again when enabled', async () => {
       await rebuild(testModulePath, testElectronVersion, process.arch);
+      resetMSVSVersion();
       const rebuilder = rebuild(testModulePath, testElectronVersion, process.arch, [], true);
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
@@ -130,7 +147,7 @@ describe('rebuilder', () => {
     this.timeout(2 * 60 * 1000);
 
     beforeEach(resetTestModule);
-    afterEach(async () => await fs.remove(testModulePath));
+    afterEach(cleanupTestModule);
 
     it('should rebuild only specified modules', async () => {
       const nativeModuleBinary = path.join(testModulePath, 'node_modules', 'farmhash', 'build', 'Release', 'farmhash.node');
@@ -169,7 +186,7 @@ describe('rebuilder', () => {
     this.timeout(10 * 60 * 1000);
 
     before(resetTestModule);
-    afterEach(async () => await fs.remove(testModulePath));
+    after(cleanupTestModule);
 
     it('should have rebuilt ffi-napi module in Debug mode', async () => {
       await rebuild({

@@ -13,6 +13,7 @@ const testElectronVersion = getExactElectronVersionSync();
 describe('rebuild for yarn workspace', function() {
   this.timeout(2 * 60 * 1000);
   const testModulePath = path.resolve(os.tmpdir(), 'electron-rebuild-test');
+  const msvs_version: string | undefined = process.env.GYP_MSVS_VERSION;
 
   describe('core behavior', () => {
     before(async () => {
@@ -20,6 +21,9 @@ describe('rebuild for yarn workspace', function() {
       await fs.copy(path.resolve(__dirname, 'fixture/workspace-test'), testModulePath);
 
       await spawn('yarn', [], { cwd: testModulePath });
+      if (msvs_version) {
+        process.env.GYP_MSVS_VERSION = msvs_version;
+      }
 
       const projectRootPath = await getProjectRootPath(path.join(testModulePath, 'workspace-test', 'child-workspace'));
 
@@ -41,6 +45,9 @@ describe('rebuild for yarn workspace', function() {
 
     after(async () => {
       await fs.remove(testModulePath);
+      if (msvs_version) {
+        process.env.GYP_MSVS_VERSION = msvs_version;
+      }
     });
   });
 });
