@@ -93,8 +93,8 @@ export class ModuleRebuilder {
 
     args.push(...(await this.buildNodeGypArgsFromBinaryField()));
 
-    if (process.env.GYP_MSVS_VERSION) {
-      args.push(`--msvs_version=${process.env.GYP_MSVS_VERSION}`);
+    if (this.rebuilder.msvsVersion) {
+      args.push(`--msvs_version=${this.rebuilder.msvsVersion}`);
     }
 
     return args;
@@ -168,12 +168,25 @@ export class ModuleRebuilder {
     }
 
     const nodeGypArgs = await this.buildNodeGypArgs();
+    d('rebuilding', this.moduleName, 'with args', nodeGypArgs);
 
     const nodeGyp = NodeGyp();
     nodeGyp.parseArgv(nodeGypArgs);
-    const rebuildArgs = nodeGyp.todo[0].args;
-    d('rebuilding', this.moduleName, 'with args', rebuildArgs);
-    await promisify(nodeGyp.commands.rebuild)(rebuildArgs);
+    let command = nodeGyp.todo.shift();
+    const originalWorkingDir = process.cwd();
+    try {
+      process.chdir(this.modulePath);
+      while (command) {
+        await promisify(nodeGyp.commands[command.name])(command.args);
+        command = nodeGyp.todo.shift();
+      }
+    } catch (err) {
+      let errorMessage = `node-gyp failed to rebuild '${this.modulePath}'.\n`;
+      errorMessage += `Error: ${err.message || err}\n\n`;
+      throw new Error(errorMessage);
+    } finally {
+      process.chdir(originalWorkingDir);
+    }
 
     d('built:', this.moduleName);
     await this.writeMetadata();
