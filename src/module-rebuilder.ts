@@ -2,13 +2,14 @@ import * as debug from 'debug';
 import * as detectLibc from 'detect-libc';
 import * as fs from 'fs-extra';
 import * as NodeGyp from 'node-gyp';
-import * as os from 'os';
 import * as path from 'path';
 import { cacheModuleState } from './cache';
 import { promisify } from 'util';
 import { readPackageJson } from './read-package-json';
 import { Rebuilder } from './rebuild';
 import { spawn } from '@malept/cross-spawn-promise';
+import { ELECTRON_GYP_DIR } from './constants';
+import { downloadClangVersion, getClangEnvironmentVars } from './clang-fetcher';
 
 const d = debug('electron-rebuild');
 
@@ -84,7 +85,7 @@ export class ModuleRebuilder {
       `--arch=${this.rebuilder.arch}`,
       `--dist-url=${this.rebuilder.headerURL}`,
       '--build-from-source',
-      `--devdir="${path.resolve(os.homedir(), '.electron-gyp')}"`
+      `--devdir="${ELECTRON_GYP_DIR}"`
     ];
 
     if (this.rebuilder.debug) {
@@ -167,6 +168,16 @@ export class ModuleRebuilder {
       // throw new Error(`node-gyp does not support building modules with spaces in their path, tried to build: ${modulePath}`);
     }
 
+    const env = { ...process.env };
+
+    if (this.rebuilder.useElectronClang) {
+      await downloadClangVersion(this.rebuilder.electronVersion);
+      process.env = {
+        ...env,
+        ...getClangEnvironmentVars(this.rebuilder.electronVersion),
+      };
+    }
+
     const nodeGypArgs = await this.buildNodeGypArgs();
     d('rebuilding', this.moduleName, 'with args', nodeGypArgs);
 
@@ -191,7 +202,9 @@ export class ModuleRebuilder {
     d('built:', this.moduleName);
     await this.writeMetadata();
     await this.replaceExistingNativeModule();
-    await this.cacheModuleState(cacheKey)
+    await this.cacheModuleState(cacheKey);
+
+    process.env = env;
   }
 
   async rebuildPrebuildModule(cacheKey: string): Promise<boolean> {

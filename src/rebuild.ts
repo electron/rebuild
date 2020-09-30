@@ -25,6 +25,7 @@ export interface RebuildOptions {
   mode?: RebuildMode;
   debug?: boolean;
   useCache?: boolean;
+  useElectronClang?: boolean;
   cachePath?: string;
   prebuildTagPrefix?: string;
   projectRootPath?: string;
@@ -68,6 +69,7 @@ export class Rebuilder {
   public prebuildTagPrefix: string;
   public projectRootPath?: string;
   public msvsVersion?: string;
+  public useElectronClang: boolean;
 
   constructor(options: RebuilderOptions) {
     this.lifecycle = options.lifecycle;
@@ -82,6 +84,7 @@ export class Rebuilder {
     this.mode = options.mode || defaultMode;
     this.debug = options.debug || false;
     this.useCache = options.useCache || false;
+    this.useElectronClang = options.useElectronClang || false;
     this.cachePath = options.cachePath || path.resolve(os.homedir(), '.electron-rebuild-cache');
     this.prebuildTagPrefix = options.prebuildTagPrefix || 'v';
     this.msvsVersion = process.env.GYP_MSVS_VERSION;
