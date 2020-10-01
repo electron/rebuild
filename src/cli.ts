@@ -41,6 +41,7 @@ const yargs = argParser
   .alias('b','debug')
   .describe('prebuild-tag-prefix', 'GitHub tag prefix passed to prebuild-install. Default is "v"')
   .describe('force-abi', 'Override the ABI version for the version of Electron you are targeting.  Only use when targeting Nightly releases.')
+  .describe('use-electron-clang', 'Use the clang executable that Electron used when building its binary. This will guarantee compiler compatibility')
   .epilog('Copyright 2016');
 
 const argv = yargs.argv;
@@ -138,6 +139,7 @@ process.on('unhandledRejection', handler);
     debug: argv.b as boolean,
     prebuildTagPrefix: (argv.prebuildTagPrefix as string) || 'v',
     forceABI: argv.forceAbi as number,
+    useElectronClang: !!argv.useElectronClang,
     projectRootPath,
   });
 
