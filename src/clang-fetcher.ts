@@ -1,3 +1,4 @@
+import * as cp from 'child_process';
 import * as debug from 'debug';
 import * as fs from 'fs-extra';
 import got from 'got';
@@ -49,11 +50,22 @@ function getClangDownloadURL(packageFile: string, packageVersion: string, hostOS
   return getPlatformUrlPrefix(hostOS) + cdsFile;
 }
 
+function getSDKRoot(): string {
+  if (process.env.SDKROOT) return process.env.SDKROOT;
+  const output = cp.execFileSync('xcrun', ['--sdk', 'macosx', '--show-sdk-path']);
+  return output.toString().trim();
+}
+
 export function getClangEnvironmentVars(electronVersion: string) {
   const clangDir = path.resolve(ELECTRON_GYP_DIR, `${electronVersion}-clang`, 'bin');
+  const clangArgs: string[] = [];
+  if (process.platform === 'darwin') {
+    clangArgs.push('-isysroot', getSDKRoot());
+  }
+
   return {
-    CC: `"${path.resolve(clangDir, 'clang')}"`,
-    CXX: `"${path.resolve(clangDir, 'clang++')}"`,
+    CC: `"${path.resolve(clangDir, 'clang')}" ${clangArgs.join(' ')}`,
+    CXX: `"${path.resolve(clangDir, 'clang++')}" ${clangArgs.join(' ')}`,
   }
 }
 

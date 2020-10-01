@@ -88,6 +88,10 @@ export class ModuleRebuilder {
       `--devdir="${ELECTRON_GYP_DIR}"`
     ];
 
+    if (process.env.DEBUG) {
+      args.push('--verbose');
+    }
+
     if (this.rebuilder.debug) {
       args.push('--debug');
     }
@@ -168,9 +172,10 @@ export class ModuleRebuilder {
       // throw new Error(`node-gyp does not support building modules with spaces in their path, tried to build: ${modulePath}`);
     }
 
-    const env = { ...process.env };
+    let env: any;
 
     if (this.rebuilder.useElectronClang) {
+      env = { ...process.env };
       await downloadClangVersion(this.rebuilder.electronVersion);
       process.env = {
         ...env,
@@ -204,7 +209,9 @@ export class ModuleRebuilder {
     await this.replaceExistingNativeModule();
     await this.cacheModuleState(cacheKey);
 
-    process.env = env;
+    if (this.rebuilder.useElectronClang) {
+      process.env = env;
+    }
   }
 
   async rebuildPrebuildModule(cacheKey: string): Promise<boolean> {
