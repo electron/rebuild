@@ -164,6 +164,24 @@ export class ModuleRebuilder {
     return fs.pathExists(path.resolve(this.modulePath, 'prebuilds', `${process.platform}-${this.rebuilder.arch}`, `electron-${this.rebuilder.ABI}.node`))
   }
 
+  private restoreEnv(env: any) {
+    const gotKeys = new Set<string>(Object.keys(process.env));
+    const expectedKeys = new Set<string>(Object.keys(env));
+
+    for (const key of Object.keys(process.env)) {
+      if (!expectedKeys.has(key)) {
+        delete process.env[key];
+      } else if (env[key] !== process.env[key]) {
+        process.env[key] = env[key];
+      }
+    }
+    for (const key of Object.keys(env)) {
+      if (!gotKeys.has(key)) {
+        process.env[key] = env[key];
+      }
+    }
+  }
+
   async rebuildNodeGypModule(cacheKey: string): Promise<void> {
     if (this.modulePath.includes(' ')) {
       console.error('Attempting to build a module with a space in the path');
@@ -177,10 +195,7 @@ export class ModuleRebuilder {
     if (this.rebuilder.useElectronClang) {
       env = { ...process.env };
       await downloadClangVersion(this.rebuilder.electronVersion);
-      process.env = {
-        ...env,
-        ...getClangEnvironmentVars(this.rebuilder.electronVersion),
-      };
+      Object.assign(process.env, getClangEnvironmentVars(this.rebuilder.electronVersion));
     }
 
     const nodeGypArgs = await this.buildNodeGypArgs();
@@ -210,7 +225,7 @@ export class ModuleRebuilder {
     await this.cacheModuleState(cacheKey);
 
     if (this.rebuilder.useElectronClang) {
-      process.env = env;
+      this.restoreEnv(env);
     }
   }
 
