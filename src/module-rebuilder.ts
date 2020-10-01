@@ -2,13 +2,14 @@ import * as debug from 'debug';
 import * as detectLibc from 'detect-libc';
 import * as fs from 'fs-extra';
 import * as NodeGyp from 'node-gyp';
-import * as os from 'os';
 import * as path from 'path';
 import { cacheModuleState } from './cache';
 import { promisify } from 'util';
 import { readPackageJson } from './read-package-json';
 import { Rebuilder } from './rebuild';
 import { spawn } from '@malept/cross-spawn-promise';
+import { ELECTRON_GYP_DIR } from './constants';
+import { downloadClangVersion, getClangEnvironmentVars } from './clang-fetcher';
 
 const d = debug('electron-rebuild');
 
@@ -74,18 +75,23 @@ export class ModuleRebuilder {
     return false;
   }
 
-  async buildNodeGypArgs(): Promise<string[]> {
+  async buildNodeGypArgs(prefixedArgs: string[]): Promise<string[]> {
     const args = [
       'node',
       'node-gyp',
       'rebuild',
+      ...prefixedArgs,
       `--runtime=electron`,
       `--target=${this.rebuilder.electronVersion}`,
       `--arch=${this.rebuilder.arch}`,
       `--dist-url=${this.rebuilder.headerURL}`,
       '--build-from-source',
-      `--devdir="${path.resolve(os.homedir(), '.electron-gyp')}"`
+      `--devdir="${ELECTRON_GYP_DIR}"`
     ];
+
+    if (process.env.DEBUG) {
+      args.push('--verbose');
+    }
 
     if (this.rebuilder.debug) {
       args.push('--debug');
@@ -159,6 +165,24 @@ export class ModuleRebuilder {
     return fs.pathExists(path.resolve(this.modulePath, 'prebuilds', `${process.platform}-${this.rebuilder.arch}`, `electron-${this.rebuilder.ABI}.node`))
   }
 
+  private restoreEnv(env: any) {
+    const gotKeys = new Set<string>(Object.keys(process.env));
+    const expectedKeys = new Set<string>(Object.keys(env));
+
+    for (const key of Object.keys(process.env)) {
+      if (!expectedKeys.has(key)) {
+        delete process.env[key];
+      } else if (env[key] !== process.env[key]) {
+        process.env[key] = env[key];
+      }
+    }
+    for (const key of Object.keys(env)) {
+      if (!gotKeys.has(key)) {
+        process.env[key] = env[key];
+      }
+    }
+  }
+
   async rebuildNodeGypModule(cacheKey: string): Promise<void> {
     if (this.modulePath.includes(' ')) {
       console.error('Attempting to build a module with a space in the path');
@@ -167,7 +191,18 @@ export class ModuleRebuilder {
       // throw new Error(`node-gyp does not support building modules with spaces in their path, tried to build: ${modulePath}`);
     }
 
-    const nodeGypArgs = await this.buildNodeGypArgs();
+    let env: any;
+    const extraNodeGypArgs: string[] = [];
+
+    if (this.rebuilder.useElectronClang) {
+      env = { ...process.env };
+      await downloadClangVersion(this.rebuilder.electronVersion);
+      const { env: clangEnv, args: clangArgs } = getClangEnvironmentVars(this.rebuilder.electronVersion);
+      Object.assign(process.env, clangEnv);
+      extraNodeGypArgs.push(...clangArgs);
+    }
+
+    const nodeGypArgs = await this.buildNodeGypArgs(extraNodeGypArgs);
     d('rebuilding', this.moduleName, 'with args', nodeGypArgs);
 
     const nodeGyp = NodeGyp();
@@ -177,6 +212,17 @@ export class ModuleRebuilder {
     try {
       process.chdir(this.modulePath);
       while (command) {
+        if (command.name === 'configure') {
+          command.args = command.args.filter((arg: string) => !extraNodeGypArgs.includes(arg));
+        } else if (command.name === 'build' && process.platform === 'win32') {
+          // This is disgusting but it prevents node-gyp from destroying our MSBuild arguments
+          command.args.map = (fn: (arg: string) => string) => {
+            return Array.prototype.map.call(command.args, (arg: string) => {
+              if (arg.startsWith('/p:')) return arg;
+              return fn(arg);
+            });
+          }
+        }
         await promisify(nodeGyp.commands[command.name])(command.args);
         command = nodeGyp.todo.shift();
       }
@@ -191,7 +237,11 @@ export class ModuleRebuilder {
     d('built:', this.moduleName);
     await this.writeMetadata();
     await this.replaceExistingNativeModule();
-    await this.cacheModuleState(cacheKey)
+    await this.cacheModuleState(cacheKey);
+
+    if (this.rebuilder.useElectronClang) {
+      this.restoreEnv(env);
+    }
   }
 
   async rebuildPrebuildModule(cacheKey: string): Promise<boolean> {

@@ -201,4 +201,23 @@ describe('rebuilder', () => {
       await expectNativeModuleToNotBeRebuilt(testModulePath, 'ffi-napi');
     });
   });
+
+  describe('useElectronClang rebuild', function() {
+    this.timeout(10 * 60 * 1000);
+
+    before(resetTestModule);
+    after(cleanupTestModule);
+
+    it('should have rebuilt ffi-napi module using clang mode', async () => {
+      await rebuild({
+        buildPath: testModulePath,
+        electronVersion: testElectronVersion,
+        arch: process.arch,
+        onlyModules: ['ffi-napi'],
+        force: true,
+        useElectronClang: true
+      });
+      await expectNativeModuleToBeRebuilt(testModulePath, 'ffi-napi');
+    });
+  });
 });
