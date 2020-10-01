@@ -131,5 +131,3 @@ export async function downloadClangVersion(electronVersion: string) {
   await fs.remove(tarPath);
   d('cleaning up clang tar file');
 }
-
-if (process.mainModule === module) downloadClangVersion('11.0.0-beta.1')

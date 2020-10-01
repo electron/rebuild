@@ -135,7 +135,7 @@ import rebuild from 'electron-rebuild';
 //     headerURL (optional) - Default: https://www.electronjs.org/headers - The URL to download Electron header files from
 //     types (optional) - Default: ['prod', 'optional'] - The types of modules to rebuild
 //     mode (optional) - The rebuild mode, either 'sequential' or 'parallel' - Default varies per platform (probably shouldn't mess with this one)
-//     useElectronClang (optional) - Whether to use the clang executable that Electron used when building.  This will guaruntee compiler compatibility
+//     useElectronClang (optional) - Whether to use the clang executable that Electron used when building its binary. This will guarantee compiler compatibility
 
 // Returns a Promise indicating whether the operation succeeded or not
 ```
