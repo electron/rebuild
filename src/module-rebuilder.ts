@@ -75,11 +75,12 @@ export class ModuleRebuilder {
     return false;
   }
 
-  async buildNodeGypArgs(): Promise<string[]> {
+  async buildNodeGypArgs(prefixedArgs: string[]): Promise<string[]> {
     const args = [
       'node',
       'node-gyp',
       'rebuild',
+      ...prefixedArgs,
       `--runtime=electron`,
       `--target=${this.rebuilder.electronVersion}`,
       `--arch=${this.rebuilder.arch}`,
@@ -191,14 +192,17 @@ export class ModuleRebuilder {
     }
 
     let env: any;
+    const extraNodeGypArgs: string[] = [];
 
     if (this.rebuilder.useElectronClang) {
       env = { ...process.env };
       await downloadClangVersion(this.rebuilder.electronVersion);
-      Object.assign(process.env, getClangEnvironmentVars(this.rebuilder.electronVersion));
+      const { env: clangEnv, args: clangArgs } = getClangEnvironmentVars(this.rebuilder.electronVersion);
+      Object.assign(process.env, clangEnv);
+      extraNodeGypArgs.push(...clangArgs);
     }
 
-    const nodeGypArgs = await this.buildNodeGypArgs();
+    const nodeGypArgs = await this.buildNodeGypArgs(extraNodeGypArgs);
     d('rebuilding', this.moduleName, 'with args', nodeGypArgs);
 
     const nodeGyp = NodeGyp();
@@ -208,6 +212,17 @@ export class ModuleRebuilder {
     try {
       process.chdir(this.modulePath);
       while (command) {
+        if (command.name === 'configure') {
+          command.args = command.args.filter((arg: string) => !extraNodeGypArgs.includes(arg));
+        } else if (command.name === 'build' && process.platform === 'win32') {
+          // This is disgusting but it prevents node-gyp from destroying our MSBuild arguments
+          command.args.map = (fn: (arg: string) => string) => {
+            return Array.prototype.map.call(command.args, (arg: string) => {
+              if (arg.startsWith('/p:')) return arg;
+              return fn(arg);
+            });
+          }
+        }
         await promisify(nodeGyp.commands[command.name])(command.args);
         command = nodeGyp.todo.shift();
       }

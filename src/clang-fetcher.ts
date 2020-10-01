@@ -63,9 +63,18 @@ export function getClangEnvironmentVars(electronVersion: string) {
     clangArgs.push('-isysroot', getSDKRoot());
   }
 
+  const gypArgs = [];
+  if (process.platform === 'win32') {
+    console.log(fs.readdirSync(clangDir));
+    gypArgs.push(`/p:CLToolExe=clang-cl.exe`, `/p:CLToolPath=${clangDir}`);
+  }
+
   return {
-    CC: `"${path.resolve(clangDir, 'clang')}" ${clangArgs.join(' ')}`,
-    CXX: `"${path.resolve(clangDir, 'clang++')}" ${clangArgs.join(' ')}`,
+    env: {
+      CC: `"${path.resolve(clangDir, 'clang')}" ${clangArgs.join(' ')}`,
+      CXX: `"${path.resolve(clangDir, 'clang++')}" ${clangArgs.join(' ')}`,
+    },
+    args: gypArgs,
   }
 }
 
