@@ -9,7 +9,7 @@ import { readPackageJson } from './read-package-json';
 import { Rebuilder } from './rebuild';
 import { spawn } from '@malept/cross-spawn-promise';
 import { ELECTRON_GYP_DIR } from './constants';
-import { downloadClangVersion, getClangEnvironmentVars } from './clang-fetcher';
+import { getClangEnvironmentVars } from './clang-fetcher';
 
 const d = debug('electron-rebuild');
 
@@ -165,7 +165,7 @@ export class ModuleRebuilder {
     return fs.pathExists(path.resolve(this.modulePath, 'prebuilds', `${process.platform}-${this.rebuilder.arch}`, `electron-${this.rebuilder.ABI}.node`))
   }
 
-  private restoreEnv(env: any) {
+  private restoreEnv(env: Record<string, string | undefined>): void {
     const gotKeys = new Set<string>(Object.keys(process.env));
     const expectedKeys = new Set<string>(Object.keys(env));
 
@@ -191,13 +191,12 @@ export class ModuleRebuilder {
       // throw new Error(`node-gyp does not support building modules with spaces in their path, tried to build: ${modulePath}`);
     }
 
-    let env: any;
+    let env: Record<string, string | undefined>;
     const extraNodeGypArgs: string[] = [];
 
     if (this.rebuilder.useElectronClang) {
       env = { ...process.env };
-      await downloadClangVersion(this.rebuilder.electronVersion);
-      const { env: clangEnv, args: clangArgs } = getClangEnvironmentVars(this.rebuilder.electronVersion);
+      const { env: clangEnv, args: clangArgs } = await getClangEnvironmentVars(this.rebuilder.electronVersion, this.rebuilder.arch);
       Object.assign(process.env, clangEnv);
       extraNodeGypArgs.push(...clangArgs);
     }
@@ -240,7 +239,7 @@ export class ModuleRebuilder {
     await this.cacheModuleState(cacheKey);
 
     if (this.rebuilder.useElectronClang) {
-      this.restoreEnv(env);
+      this.restoreEnv(env!);
     }
   }
 
