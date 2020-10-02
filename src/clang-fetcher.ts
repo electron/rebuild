@@ -1,38 +1,14 @@
 import * as cp from 'child_process';
 import * as debug from 'debug';
 import * as fs from 'fs-extra';
-import got from 'got';
 import * as path from 'path';
 import * as tar from 'tar';
 import * as zlib from 'zlib';
 import { ELECTRON_GYP_DIR } from './constants';
+import { fetch } from './fetcher';
+import { downloadLinuxSysroot } from './sysroot-fetcher';
 
 const d = debug('electron-rebuild');
-
-function sleep(n: number) {
-  return new Promise(r => setTimeout(r, n));
-}
-
-async function fetch(url: string, responseType: 'buffer' | 'text', retries = 3): Promise<string | Buffer> {
-  if (retries === 0) throw new Error('Failed to fetch a clang resource, run with DEBUG=electron-rebuild for more information');
-  d('downloading:', url);
-  try {
-    const response = await got.get(url, {
-      responseType,
-    });
-    if (response.statusCode !== 200) {
-      d('got bad status code:', response.statusCode);
-      await sleep(2000);
-      return fetch(url, responseType, retries - 1);
-    }
-    d('response came back OK');
-    return response.body as any;
-  } catch (err) {
-    d('request failed for some reason', err);
-    await sleep(2000);
-    return fetch(url, responseType, retries - 1);
-  }
-}
 
 const CDS_URL = 'https://commondatastorage.googleapis.com/chromium-browser-clang';
 
@@ -56,8 +32,10 @@ function getSDKRoot(): string {
   return output.toString().trim();
 }
 
-export function getClangEnvironmentVars(electronVersion: string) {
-  const clangDir = path.resolve(ELECTRON_GYP_DIR, `${electronVersion}-clang`, 'bin');
+export async function getClangEnvironmentVars(electronVersion: string, targetArch: string) {
+  const clangDownloadDir = await downloadClangVersion(electronVersion);
+
+  const clangDir = path.resolve(clangDownloadDir, 'bin');
   const clangArgs: string[] = [];
   if (process.platform === 'darwin') {
     clangArgs.push('-isysroot', getSDKRoot());
@@ -67,6 +45,11 @@ export function getClangEnvironmentVars(electronVersion: string) {
   if (process.platform === 'win32') {
     console.log(fs.readdirSync(clangDir));
     gypArgs.push(`/p:CLToolExe=clang-cl.exe`, `/p:CLToolPath=${clangDir}`);
+  }
+
+  if (process.platform === 'linux') {
+    const sysrootPath = await downloadLinuxSysroot(electronVersion, targetArch);
+    clangArgs.push('--sysroot', sysrootPath);
   }
 
   return {
@@ -94,21 +77,21 @@ function clangVersionFromSVN(update: string): string | null {
   return `${clangSvn}-${clangVersion.substr(0, 8)}-${clangSubRevision}`;
 }
 
-export async function downloadClangVersion(electronVersion: string) {
+async function downloadClangVersion(electronVersion: string) {
   d('fetching clang for Electron:', electronVersion);
   const clangDirPath = path.resolve(ELECTRON_GYP_DIR, `${electronVersion}-clang`);
-  if (await fs.pathExists(path.resolve(clangDirPath, 'bin', 'clang'))) return;
+  if (await fs.pathExists(path.resolve(clangDirPath, 'bin', 'clang'))) return clangDirPath;
   if (!await fs.pathExists(ELECTRON_GYP_DIR)) await fs.mkdirp(ELECTRON_GYP_DIR);
 
   const electronDeps = await fetch(`https://raw.githubusercontent.com/electron/electron/v${electronVersion}/DEPS`, 'text');
   const chromiumRevisionExtractor = /'chromium_version':\n\s+'([^']+)/g;
-  const chromiumRevisionMatch = chromiumRevisionExtractor.exec(electronDeps as string);
+  const chromiumRevisionMatch = chromiumRevisionExtractor.exec(electronDeps);
   if (!chromiumRevisionMatch) throw new Error('Failed to determine Chromium revision for given Electron version');
   const chromiumRevision = chromiumRevisionMatch[1];
   d('fetching clang for Chromium:', chromiumRevision)
 
   const base64ClangUpdate = await fetch(`https://chromium.googlesource.com/chromium/src.git/+/${chromiumRevision}/tools/clang/scripts/update.py?format=TEXT`, 'text');
-  const clangUpdate = Buffer.from(base64ClangUpdate as string, 'base64').toString('utf8');
+  const clangUpdate = Buffer.from(base64ClangUpdate, 'base64').toString('utf8');
 
   const clangVersionString = clangVersionFromRevision(clangUpdate) || clangVersionFromSVN(clangUpdate);
   if (!clangVersionString) throw new Error('Failed to determine Clang revision from Electron version');
@@ -130,4 +113,5 @@ export async function downloadClangVersion(electronVersion: string) {
   });
   await fs.remove(tarPath);
   d('cleaning up clang tar file');
+  return clangDirPath;
 }

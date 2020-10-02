@@ -9,7 +9,7 @@ import { readPackageJson } from './read-package-json';
 import { Rebuilder } from './rebuild';
 import { spawn } from '@malept/cross-spawn-promise';
 import { ELECTRON_GYP_DIR } from './constants';
-import { downloadClangVersion, getClangEnvironmentVars } from './clang-fetcher';
+import { getClangEnvironmentVars } from './clang-fetcher';
 
 const d = debug('electron-rebuild');
 
@@ -196,8 +196,7 @@ export class ModuleRebuilder {
 
     if (this.rebuilder.useElectronClang) {
       env = { ...process.env };
-      await downloadClangVersion(this.rebuilder.electronVersion);
-      const { env: clangEnv, args: clangArgs } = getClangEnvironmentVars(this.rebuilder.electronVersion);
+      const { env: clangEnv, args: clangArgs } = await getClangEnvironmentVars(this.rebuilder.electronVersion, this.rebuilder.arch);
       Object.assign(process.env, clangEnv);
       extraNodeGypArgs.push(...clangArgs);
     }
