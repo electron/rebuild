@@ -32,7 +32,7 @@ function getSDKRoot(): string {
   return output.toString().trim();
 }
 
-export async function getClangEnvironmentVars(electronVersion: string, targetArch: string) {
+export async function getClangEnvironmentVars(electronVersion: string, targetArch: string): Promise<{ env: Record<string, string>; args: string[] }> {
   const clangDownloadDir = await downloadClangVersion(electronVersion);
 
   const clangDir = path.resolve(clangDownloadDir, 'bin');

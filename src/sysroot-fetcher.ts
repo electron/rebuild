@@ -16,7 +16,7 @@ const sysrootArchAliases = {
 
 const SYSROOT_BASE_URL = 'https://s3.amazonaws.com/electronjs-sysroots/toolchain'
 
-export async function downloadLinuxSysroot(electronVersion: string, targetArch: string) {
+export async function downloadLinuxSysroot(electronVersion: string, targetArch: string): Promise<string> {
   d('fetching sysroot for Electron:', electronVersion);
   const sysrootDir = path.resolve(ELECTRON_GYP_DIR, `${electronVersion}-sysroot`);
   if (await fs.pathExists(path.resolve(sysrootDir, 'lib'))) return sysrootDir;

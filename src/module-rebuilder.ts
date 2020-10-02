@@ -165,7 +165,7 @@ export class ModuleRebuilder {
     return fs.pathExists(path.resolve(this.modulePath, 'prebuilds', `${process.platform}-${this.rebuilder.arch}`, `electron-${this.rebuilder.ABI}.node`))
   }
 
-  private restoreEnv(env: any) {
+  private restoreEnv(env: Record<string, string | undefined>): void {
     const gotKeys = new Set<string>(Object.keys(process.env));
     const expectedKeys = new Set<string>(Object.keys(env));
 
@@ -191,7 +191,7 @@ export class ModuleRebuilder {
       // throw new Error(`node-gyp does not support building modules with spaces in their path, tried to build: ${modulePath}`);
     }
 
-    let env: any;
+    let env: Record<string, string | undefined>;
     const extraNodeGypArgs: string[] = [];
 
     if (this.rebuilder.useElectronClang) {
@@ -239,7 +239,7 @@ export class ModuleRebuilder {
     await this.cacheModuleState(cacheKey);
 
     if (this.rebuilder.useElectronClang) {
-      this.restoreEnv(env);
+      this.restoreEnv(env!);
     }
   }
 
