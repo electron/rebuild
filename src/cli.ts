@@ -141,6 +141,7 @@ process.on('unhandledRejection', handler);
     prebuildTagPrefix: (argv.prebuildTagPrefix as string) || 'v',
     forceABI: argv.forceAbi as number,
     useElectronClang: !!argv.useElectronClang,
+    disablePreGypCopy: !!argv.disablePreGypCopy,
     projectRootPath,
   });
 
