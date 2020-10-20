@@ -3,7 +3,6 @@ import * as debug from 'debug';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as tar from 'tar';
-import * as lzma from 'lzma-native';
 
 import { ELECTRON_GYP_DIR } from './constants';
 import { fetch } from './fetcher';
@@ -36,7 +35,7 @@ export async function downloadLinuxSysroot(electronVersion: string, targetArch: 
   if (sha !== actualSha) throw new Error(`Attempted to download the linux sysroot for ${electronVersion} but the SHA checksum did not match`);
 
   d('decompressing sysroot');
-  sysrootBuffer = await new Promise<Buffer>(resolve => lzma.decompress(sysrootBuffer, undefined, result => resolve(result)));
+  sysrootBuffer = await new Promise<Buffer>(resolve => require('lzma-native').decompress(sysrootBuffer, undefined, result => resolve(result)));
 
   const tmpTarFile = path.resolve(ELECTRON_GYP_DIR, `${electronVersion}-${fileName}`);
   if (await fs.pathExists(tmpTarFile)) await fs.remove(tmpTarFile);
