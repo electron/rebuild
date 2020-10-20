@@ -284,10 +284,12 @@ export class ModuleRebuilder {
 
     if (nodePath && await fs.pathExists(nodePath)) {
       d('found .node file', nodePath);
-      const abiPath = path.resolve(this.modulePath, `bin/${process.platform}-${this.rebuilder.arch}-${this.rebuilder.ABI}`);
-      d('copying to prebuilt place:', abiPath);
-      await fs.ensureDir(abiPath);
-      await fs.copy(nodePath, path.resolve(abiPath, `${this.moduleName}.node`));
+      if (!this.rebuilder.disablePreGypCopy) {
+        const abiPath = path.resolve(this.modulePath, `bin/${process.platform}-${this.rebuilder.arch}-${this.rebuilder.ABI}`);
+        d('copying to prebuilt place:', abiPath);
+        await fs.ensureDir(abiPath);
+        await fs.copy(nodePath, path.resolve(abiPath, `${this.moduleName}.node`));
+      }
     }
   }
 

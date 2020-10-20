@@ -30,6 +30,7 @@ export interface RebuildOptions {
   prebuildTagPrefix?: string;
   projectRootPath?: string;
   forceABI?: number;
+  disablePreGypCopy?: boolean;
 }
 
 export type HashTree = { [path: string]: string | HashTree };
@@ -70,6 +71,7 @@ export class Rebuilder {
   public projectRootPath?: string;
   public msvsVersion?: string;
   public useElectronClang: boolean;
+  public disablePreGypCopy: boolean;
 
   constructor(options: RebuilderOptions) {
     this.lifecycle = options.lifecycle;
@@ -88,6 +90,7 @@ export class Rebuilder {
     this.cachePath = options.cachePath || path.resolve(os.homedir(), '.electron-rebuild-cache');
     this.prebuildTagPrefix = options.prebuildTagPrefix || 'v';
     this.msvsVersion = process.env.GYP_MSVS_VERSION;
+    this.disablePreGypCopy = options.disablePreGypCopy || false;
 
     if (this.useCache && this.force) {
       console.warn('[WARNING]: Electron Rebuild has force enabled and cache enabled, force take precedence and the cache will not be used.');
