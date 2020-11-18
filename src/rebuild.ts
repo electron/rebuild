@@ -47,7 +47,7 @@ const defaultTypes: ModuleType[] = ['prod', 'optional'];
 const ELECTRON_REBUILD_CACHE_ID = 1;
 
 export class Rebuilder {
-  ABI: string;
+  ABIVersion: string | undefined;
   nodeGypPath: string;
   prodDeps: Set<string>;
   rebuilds: (() => Promise<void>)[];
@@ -109,11 +109,19 @@ export class Rebuilder {
       throw new Error(`Expected a string version for electron version, got a "${typeof this.electronVersion}"`);
     }
 
-    this.ABI = options.forceABI || nodeAbi.getAbi(this.electronVersion, 'electron');
+    this.ABIVersion = options.forceABI?.toString();
     this.prodDeps = this.extraModules.reduce((acc: Set<string>, x: string) => acc.add(x), new Set<string>());
     this.rebuilds = [];
     this.realModulePaths = new Set();
     this.realNodeModulesPaths = new Set();
+  }
+
+  get ABI(): string {
+    if (this.ABIVersion === undefined) {
+      this.ABIVersion = nodeAbi.getAbi(this.electronVersion, 'electron');
+    }
+
+    return this.ABIVersion!;
   }
 
   async rebuild(): Promise<void> {
