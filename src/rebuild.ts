@@ -47,7 +47,7 @@ const defaultTypes: ModuleType[] = ['prod', 'optional'];
 const ELECTRON_REBUILD_CACHE_ID = 1;
 
 export class Rebuilder {
-  ABIVersion: string | undefined;
+  private ABIVersion: string | undefined;
   nodeGypPath: string;
   prodDeps: Set<string>;
   rebuilds: (() => Promise<void>)[];
