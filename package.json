@@ -60,6 +60,7 @@
     "@types/lzma-native": "^4.0.0",
     "@types/mocha": "^8.0.3",
     "@types/node": "^14.6.0",
+    "@types/node-abi": "^2.10.0",
     "@types/tar": "^4.0.3",
     "@types/yargs": "^15.0.5",
     "@typescript-eslint/eslint-plugin": "^4.0.1",
@@ -80,7 +81,7 @@
   "eslintConfig": {
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
-      "ecmaVersion": "2018",
+      "ecmaVersion": 2018,
       "sourceType": "module"
     },
     "plugins": [
