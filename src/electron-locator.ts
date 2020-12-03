@@ -20,7 +20,8 @@ async function locateModuleByRequire(): Promise<string | null> {
 
 export async function locateElectronModule(projectRootPath?: string): Promise<string | null> {
   for (const moduleName of electronModuleNames) {
-    const electronPath = await searchForModule(process.cwd(), moduleName, projectRootPath)[0];
+    let paths = await searchForModule(process.cwd(), moduleName, projectRootPath);
+    const electronPath = paths[0];
 
     if (electronPath && await fs.pathExists(path.join(electronPath, 'package.json'))) {
       return electronPath;
