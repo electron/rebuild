@@ -37,7 +37,7 @@
     "node": ">=10.12.0"
   },
   "dependencies": {
-    "@malept/cross-spawn-promise": "^1.1.0",
+    "@malept/cross-spawn-promise": "^1.1.1",
     "colors": "^1.3.3",
     "debug": "^4.1.1",
     "detect-libc": "^1.0.3",
