@@ -85,8 +85,7 @@ export class ModuleRebuilder {
       `--target=${this.rebuilder.electronVersion}`,
       `--arch=${this.rebuilder.arch}`,
       `--dist-url=${this.rebuilder.headerURL}`,
-      '--build-from-source',
-      `--devdir="${ELECTRON_GYP_DIR}"`
+      '--build-from-source'
     ];
 
     if (process.env.DEBUG) {
@@ -206,6 +205,7 @@ export class ModuleRebuilder {
 
     const nodeGyp = NodeGyp();
     nodeGyp.parseArgv(nodeGypArgs);
+    nodeGyp.devDir = ELECTRON_GYP_DIR;
     let command = nodeGyp.todo.shift();
     const originalWorkingDir = process.cwd();
     try {

@@ -92,6 +92,13 @@ describe('rebuilder', () => {
         await expectNativeModuleToNotBeRebuilt(testModulePath, 'ffi-napi');
       });
 
+      it('should not download files in the module directory', async () => {
+        const modulePath = path.resolve(testModulePath, 'node_modules/ref-napi');
+        const fileNames = await fs.readdir(modulePath);
+
+        expect(fileNames).to.not.contain(testElectronVersion);
+      });
+
       after(async () => {
         delete process.env.ELECTRON_REBUILD_TESTS;
         await cleanupTestModule();
