@@ -96,7 +96,7 @@ describe('rebuilder', () => {
         const modulePath = path.resolve(testModulePath, 'node_modules/ref-napi');
         const fileNames = await fs.readdir(modulePath);
 
-        expect(fileNames).not.contain(testElectronVersion);
+        expect(fileNames).to.not.contain(testElectronVersion);
       });
 
       after(async () => {
