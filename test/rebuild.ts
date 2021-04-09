@@ -9,11 +9,12 @@ import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from 
 import { getExactElectronVersionSync } from './helpers/electron-version';
 import { rebuild, RebuildOptions } from '../src/rebuild';
 
+const MINUTES_IN_MILLISECONDS = 60 * 1000;
 const testElectronVersion = getExactElectronVersionSync();
 
 describe('rebuilder', () => {
   const testModulePath = path.resolve(os.tmpdir(), 'electron-rebuild-test');
-  const timeoutSeconds = process.platform === 'win32' ? 5 : 2;
+  const timeoutMinutes = process.platform === 'win32' ? 5 : 2;
   const msvs_version: string | undefined = process.env.GYP_MSVS_VERSION;
 
   const resetMSVSVersion = () => {
@@ -50,7 +51,7 @@ describe('rebuilder', () => {
   ];
   for (const options of optionSets) {
     describe(`core behavior -- ${options.name}`, function() {
-      this.timeout(timeoutSeconds * 60 * 1000);
+      this.timeout(timeoutMinutes * MINUTES_IN_MILLISECONDS);
 
       before(async () => {
         await resetTestModule();
@@ -107,7 +108,7 @@ describe('rebuilder', () => {
   }
 
   describe('force rebuild', function() {
-    this.timeout(timeoutSeconds * 60 * 1000);
+    this.timeout(timeoutMinutes * MINUTES_IN_MILLISECONDS);
 
     before(resetTestModule);
     after(cleanupTestModule);
@@ -137,7 +138,10 @@ describe('rebuilder', () => {
       expect(skipped).to.equal(0);
     });
 
-    it('should rebuild all modules again when enabled', async () => {
+    it('should rebuild all modules again when enabled', async function() {
+      if (process.platform === 'darwin') {
+        this.timeout(5 * MINUTES_IN_MILLISECONDS);
+      }
       await rebuild(testModulePath, testElectronVersion, process.arch);
       resetMSVSVersion();
       const rebuilder = rebuild(testModulePath, testElectronVersion, process.arch, [], true);
@@ -151,7 +155,7 @@ describe('rebuilder', () => {
   });
 
   describe('only rebuild', function() {
-    this.timeout(2 * 60 * 1000);
+    this.timeout(2 * MINUTES_IN_MILLISECONDS);
 
     beforeEach(resetTestModule);
     afterEach(cleanupTestModule);
@@ -190,7 +194,7 @@ describe('rebuilder', () => {
   });
 
   describe('debug rebuild', function() {
-    this.timeout(10 * 60 * 1000);
+    this.timeout(10 * MINUTES_IN_MILLISECONDS);
 
     before(resetTestModule);
     after(cleanupTestModule);
@@ -210,7 +214,7 @@ describe('rebuilder', () => {
   });
 
   describe('useElectronClang rebuild', function() {
-    this.timeout(10 * 60 * 1000);
+    this.timeout(10 * MINUTES_IN_MILLISECONDS);
 
     before(resetTestModule);
     after(cleanupTestModule);
