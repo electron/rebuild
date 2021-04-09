@@ -138,7 +138,7 @@ describe('rebuilder', () => {
       expect(skipped).to.equal(0);
     });
 
-    it('should rebuild all modules again when enabled', async () => {
+    it('should rebuild all modules again when enabled', function() {
       if (process.platform === 'darwin') {
         this.timeout(5 * MINUTES_IN_MILLISECONDS);
       }
