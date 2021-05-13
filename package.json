@@ -48,7 +48,7 @@
     "node-gyp": "^7.1.0",
     "ora": "^5.1.0",
     "tar": "^6.0.5",
-    "yargs": "^16.0.0"
+    "yargs": "^17.0.1"
   },
   "devDependencies": {
     "@continuous-auth/semantic-release-npm": "^2.0.0",
