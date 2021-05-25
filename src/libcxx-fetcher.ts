@@ -3,6 +3,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as tar from 'tar';
 import * as zlib from 'zlib';
+import { downloadArtifact } from '@electron/get';
 import { ELECTRON_GYP_DIR } from './constants';
 import { fetch } from './fetcher';
 
@@ -14,8 +15,14 @@ export async function downloadLibcxxHeaders(electronVersion: string, name: strin
   if (await fs.pathExists(path.resolve(headersDirPath, 'include'))) return headersDirPath;
   if (!await fs.pathExists(ELECTRON_GYP_DIR)) await fs.mkdirp(ELECTRON_GYP_DIR);
 
-  // download libcxxabi_headers.zip
-  const contents = await fetch(`https://github.com/electron/electron/releases/download/v${electronVersion}/${lib_name}_headers.zip`, 'buffer')
+  // download libcxx_headers.zip / libcxxabi_headers.zip
+  const headerZipPath = await downloadArtifact({
+    version: electronVersion,
+    platform: 'linux',
+    artifactName: `${lib_name}_headers`,
+  });
+
+  const contents = await fetch(headerZipPath, 'buffer')
   d(`deflating ${lib_name}_headers`);
   zlib.deflateSync(contents);
   const tarPath = path.resolve(ELECTRON_GYP_DIR, `${electronVersion}-${lib_name}_headers.tar`);
@@ -35,28 +42,34 @@ export async function downloadLibcxxHeaders(electronVersion: string, name: strin
 }
 
 export async function downloadLibcxxObjects(electronVersion: string, targetArch: string): Promise<string> {
-  const platform = process.platform;
   const libcxxObjectsDirPath = path.resolve(ELECTRON_GYP_DIR, 'libcxx-objects');
   
   if (await fs.pathExists(path.resolve(libcxxObjectsDirPath, 'libc++.a'))) return libcxxObjectsDirPath;
   if (!await fs.pathExists(ELECTRON_GYP_DIR)) await fs.mkdirp(ELECTRON_GYP_DIR);
 
   // download objects (e.g. libcxx-objects-v13.0.0-linux-x64.zip)
-  const contents = await fetch(`https://github.com/electron/electron/releases/download/v${electronVersion}/libcxx-objects-v${electronVersion}-${platform}-${targetArch}.zip`, 'buffer')
-  d(`deflating libcxx-objects-${platform}-${targetArch}`);
+  const headerZipPath = await downloadArtifact({
+    version: electronVersion,
+    platform: 'linux',
+    artifactName: 'libcxx-objects',
+    arch: targetArch,
+  });
+
+  const contents = await fetch(headerZipPath, 'buffer')
+  d(`deflating libcxx-objects-linux-${targetArch}`);
   zlib.deflateSync(contents);
-  const tarPath = path.resolve(ELECTRON_GYP_DIR, `libcxx-objects-v${electronVersion}-${platform}-${targetArch}.tar`);
+  const tarPath = path.resolve(ELECTRON_GYP_DIR, `libcxx-objects-v${electronVersion}-linux-${targetArch}.tar`);
   if (await fs.pathExists(tarPath)) await fs.remove(tarPath)
   await fs.writeFile(tarPath, Buffer.from(contents));
   await fs.mkdirp(libcxxObjectsDirPath);
 
-  d(`tar running on libcxx-objects-${platform}-${targetArch}`);
+  d(`tar running on libcxx-objects-linux-${targetArch}`);
   await tar.x({
     file: tarPath,
     cwd: libcxxObjectsDirPath,
   });
 
   await fs.remove(tarPath);
-  d(`cleaning up libcxx-objects-${platform}-${targetArch} tar file`);
+  d(`cleaning up libcxx-objects-linux-${targetArch} tar file`);
   return libcxxObjectsDirPath;
 }
