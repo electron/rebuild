@@ -65,7 +65,6 @@ export async function getClangEnvironmentVars(electronVersion: string, targetArc
       const libcxxabiHeaders = path.resolve(libcxxabiHeadersDownloadDir, 'include')
 
       const cxxflags = [
-        '-std=c++14',
         '-nostdinc++',
         '-D_LIBCPP_HAS_NO_VENDOR_AVAILABILITY_ANNOTATIONS',
         `-isystem"${libcxxHeaders}"`,
