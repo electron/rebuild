@@ -19,8 +19,9 @@
   },
   "dependencies": {
     "@newrelic/native-metrics": "5.3.0",
-    "farmhash": "3.0.0",
+    "farmhash": "3.2.1",
     "level": "6.0.0",
+    "native-hello-world": "2.0.0",
     "ref-napi": "1.4.2"
   },
   "optionalDependencies": {

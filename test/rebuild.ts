@@ -1,13 +1,14 @@
+import EventEmitter = require('events');
 import { expect } from 'chai';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as os from 'os';
 import { spawn } from '@malept/cross-spawn-promise';
 
-import { determineChecksum } from './helpers/checksum';
 import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild';
 import { getExactElectronVersionSync } from './helpers/electron-version';
-import { rebuild } from '../src/rebuild';
+import { rebuild, Rebuilder } from '../src/rebuild';
+import { ModuleRebuilder } from '../src/module-rebuilder';
 
 const MINUTES_IN_MILLISECONDS = 60 * 1000;
 const testElectronVersion = getExactElectronVersionSync();
@@ -89,6 +90,44 @@ describe('rebuilder', () => {
     });
   });
 
+  describe('prebuild-install napi', function () {
+    this.timeout(timeoutMinutes * MINUTES_IN_MILLISECONDS);
+
+    before(resetTestModule);
+    after(cleanupTestModule);
+    afterEach(resetMSVSVersion);
+
+    it('should find correct napi version and select napi args', async () => {
+      const rebuilder = new Rebuilder({ buildPath: testModulePath, electronVersion: '8.0.0', arch: process.arch, lifecycle: new EventEmitter() });
+      const modulePath = path.join(testModulePath, 'node_modules', 'farmhash');
+      const modRebuilder = new ModuleRebuilder(rebuilder, modulePath);
+      expect(await modRebuilder.getNapiVersion()).to.equal(3);
+      expect(await modRebuilder.getPrebuildRuntimeArgs()).to.deep.equal([
+        '--runtime=napi',
+        `--target=3`,
+      ])
+    });
+
+    it('should not fail running prebuild-install', async () => {
+      process.env.ELECTRON_REBUILD_TESTS = 'true';
+
+      const rebuilder = new Rebuilder({ buildPath: testModulePath, electronVersion: '8.0.0', arch: process.arch, lifecycle: new EventEmitter() });
+      const modulePath = path.join(testModulePath, 'node_modules', 'farmhash');
+      const modRebuilder = new ModuleRebuilder(rebuilder, modulePath);
+      expect(await modRebuilder.rebuildPrebuildModule('')).to.equal(true);
+    });
+
+    it('should throw error with unsupported Electron version', async () => {
+      try {
+        await rebuild({ buildPath: testModulePath, electronVersion: '2.0.0', arch: process.arch });
+        throw new Error('Expected error');
+      } catch (error) {
+        expect(error?.message).to.equal("Native module 'farmhash' requires Node-API but Electron v2.0.0 does not support Node-API");
+      }
+    });
+  });
+
+
   describe('force rebuild', function() {
     this.timeout(timeoutMinutes * MINUTES_IN_MILLISECONDS);
 
@@ -110,7 +149,7 @@ describe('rebuilder', () => {
         skipped++;
       });
       await rebuilder;
-      expect(skipped).to.equal(5);
+      expect(skipped).to.equal(6);
     });
 
     it('should rebuild all modules again when disabled but the electron ABI changed', async () => {
@@ -148,21 +187,22 @@ describe('rebuilder', () => {
     afterEach(cleanupTestModule);
 
     it('should rebuild only specified modules', async () => {
-      const nativeModuleBinary = path.join(testModulePath, 'node_modules', 'farmhash', 'build', 'Release', 'farmhash.node');
-      const nodeModuleChecksum = await determineChecksum(nativeModuleBinary);
+      const nativeModuleBinary = path.join(testModulePath, 'node_modules', 'native-hello-world', 'build', 'Release', 'hello_world.node');
+      expect(await fs.pathExists(nativeModuleBinary)).to.be.true;
+      await fs.remove(nativeModuleBinary);
+      expect(await fs.pathExists(nativeModuleBinary)).to.be.false;
       const rebuilder = rebuild({
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch: process.arch,
-        onlyModules: ['farmhash'],
+        onlyModules: ['native-hello-world'],
         force: true
       });
       let built = 0;
       rebuilder.lifecycle.on('module-done', () => built++);
       await rebuilder;
       expect(built).to.equal(1);
-      const electronModuleChecksum = await determineChecksum(nativeModuleBinary);
-      expect(electronModuleChecksum).to.not.equal(nodeModuleChecksum);
+      expect(await fs.pathExists(nativeModuleBinary)).to.be.true;
     });
 
     it('should rebuild multiple specified modules via --only option', async () => {
