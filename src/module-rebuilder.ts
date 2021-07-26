@@ -112,11 +112,22 @@ export class ModuleRebuilder {
       {}
     )) as Record<string, number[]>;
 
-    if ('napi_versions' in binary) {
-      return binary.napi_versions;
-    }
+    return binary?.napi_versions;
+  }
 
-    return undefined;
+  async getRebuildRuntimeArgs(): Promise<string[]> {
+    const napiVersion = await this.getNapiVersion();
+    if (napiVersion) {
+      return [
+        '--runtime=napi',
+        `--target=${napiVersion}`,
+      ]
+    } else {
+      return [
+        '--runtime=electron',
+        `--target=${this.rebuilder.electronVersion}`,
+      ]
+    }
   }
 
   async getNapiVersion(): Promise<number | undefined> {
@@ -124,7 +135,7 @@ export class ModuleRebuilder {
 
     if (!moduleNapiVersions) {
       // This is not a Node-API module
-      return undefined;
+      return;
     }
 
     const electronNapiVersion = napiVersionFromElectronVersion(this.rebuilder.electronVersion);
@@ -134,14 +145,10 @@ export class ModuleRebuilder {
     }
 
     // Filter out Node-API versions that are too high
-    const filteredVersions = moduleNapiVersions.filter((v) => v <= electronNapiVersion);
+    const filteredVersions = moduleNapiVersions.filter((v) => (v <= electronNapiVersion));
     
     if (filteredVersions.length === 0) {
       throw new Error(`Native module '${this.moduleName}' supports Node-API versions ${moduleNapiVersions} but Electron v${this.rebuilder.electronVersion} only supports Node-API v${electronNapiVersion}`)
-    }
-
-    if (filteredVersions.length === 1) {
-      return filteredVersions[0];
     }
 
     return Math.max(...filteredVersions);
@@ -339,17 +346,6 @@ export class ModuleRebuilder {
     const shimExt = process.env.ELECTRON_REBUILD_TESTS ? 'ts' : 'js';
     const executable = process.env.ELECTRON_REBUILD_TESTS ? path.resolve(__dirname, '..', 'node_modules', '.bin', 'ts-node') : process.execPath;
 
-    const napiVersion = await this.getNapiVersion();
-    const args = napiVersion
-      ? [
-        '--runtime=napi',
-        `--target=${napiVersion}`,
-      ]
-      : [
-        '--runtime=electron',
-        `--target=${this.rebuilder.electronVersion}`,
-      ];
-
     await spawn(
       executable,
       [
@@ -358,7 +354,7 @@ export class ModuleRebuilder {
         `--arch=${this.rebuilder.arch}`,
         `--platform=${process.platform}`,
         `--tag-prefix=${this.rebuilder.prebuildTagPrefix}`,
-        ...args,
+        ...await this.getRebuildRuntimeArgs(),
       ],
       {
         cwd: this.modulePath,

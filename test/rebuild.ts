@@ -77,6 +77,10 @@ describe('rebuilder', () => {
         await expectNativeModuleToBeRebuilt(testModulePath, 'farmhash');
       });
 
+      it('should have rebuilt top level prod dependencies that are using prebuild + napi', async () => {
+        await expectNativeModuleToBeRebuilt(testModulePath, 'node-hid');
+      });
+
       it('should have rebuilt children of top level prod dependencies', async () => {
         await expectNativeModuleToBeRebuilt(testModulePath, 'leveldown');
       });
