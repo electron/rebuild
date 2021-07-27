@@ -7,7 +7,9 @@ import { spawn } from '@malept/cross-spawn-promise';
 import { determineChecksum } from './helpers/checksum';
 import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild';
 import { getExactElectronVersionSync } from './helpers/electron-version';
-import { rebuild, RebuildOptions } from '../src/rebuild';
+import { rebuild, Rebuilder, RebuildOptions } from '../src/rebuild';
+import { ModuleRebuilder } from '../src/module-rebuilder';
+import EventEmitter = require('events');
 
 const MINUTES_IN_MILLISECONDS = 60 * 1000;
 const testElectronVersion = getExactElectronVersionSync();
@@ -77,10 +79,6 @@ describe('rebuilder', () => {
         await expectNativeModuleToBeRebuilt(testModulePath, 'farmhash');
       });
 
-      it('should have rebuilt top level prod dependencies that are using prebuild + napi', async () => {
-        await expectNativeModuleToBeRebuilt(testModulePath, 'node-hid');
-      });
-
       it('should have rebuilt children of top level prod dependencies', async () => {
         await expectNativeModuleToBeRebuilt(testModulePath, 'leveldown');
       });
@@ -110,6 +108,44 @@ describe('rebuilder', () => {
       });
     });
   }
+
+  describe('prebuild-install napi', function () {
+    this.timeout(timeoutMinutes * MINUTES_IN_MILLISECONDS);
+
+    before(resetTestModule);
+    after(cleanupTestModule);
+    afterEach(resetMSVSVersion);
+
+    it('should find correct napi version and select napi args', async () => {
+      const rebuilder = new Rebuilder({ buildPath: testModulePath, electronVersion: '8.0.0', arch: process.arch, lifecycle: new EventEmitter() });
+      const modulePath = path.join(testModulePath, 'node_modules', 'farmhash');
+      const modRebuilder = new ModuleRebuilder(rebuilder, modulePath);
+      expect(await modRebuilder.getNapiVersion()).to.equal(3);
+      expect(await modRebuilder.getPrebuildRuntimeArgs()).to.deep.equal([
+        '--runtime=napi',
+        `--target=3`,
+      ])
+    });
+
+    it('prebuild-install should not fail', async () => {
+      process.env.ELECTRON_REBUILD_TESTS = 'true';
+
+      const rebuilder = new Rebuilder({ buildPath: testModulePath, electronVersion: '8.0.0', arch: process.arch, lifecycle: new EventEmitter() });
+      const modulePath = path.join(testModulePath, 'node_modules', 'farmhash');
+      const modRebuilder = new ModuleRebuilder(rebuilder, modulePath);
+      expect(await modRebuilder.rebuildPrebuildModule('')).to.equal(true);
+    });
+
+    it('should throw error with unsupported Electron version', async () => {
+      try {
+        await rebuild({ buildPath: testModulePath, electronVersion: '2.0.0', arch: process.arch });
+        throw new Error('Expected error');
+      } catch (error) {
+        expect(error?.message).to.equal("Native module 'farmhash' requires Node-API but Electron v2.0.0 does not support Node-API");
+      }
+    });
+  });
+
 
   describe('force rebuild', function() {
     this.timeout(timeoutMinutes * MINUTES_IN_MILLISECONDS);

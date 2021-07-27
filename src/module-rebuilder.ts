@@ -115,7 +115,7 @@ export class ModuleRebuilder {
     return binary?.napi_versions;
   }
 
-  async getRebuildRuntimeArgs(): Promise<string[]> {
+  async getPrebuildRuntimeArgs(): Promise<string[]> {
     const napiVersion = await this.getNapiVersion();
     if (napiVersion) {
       return [
@@ -307,6 +307,10 @@ export class ModuleRebuilder {
         success = true;
       } catch (err) {
         d('failed to use prebuild-install:', err);
+
+        if (err?.message?.includes('requires Node-API but Electron')) {
+          throw err;
+        }
       }
       if (success) {
         d('built:', this.moduleName);
@@ -354,7 +358,7 @@ export class ModuleRebuilder {
         `--arch=${this.rebuilder.arch}`,
         `--platform=${process.platform}`,
         `--tag-prefix=${this.rebuilder.prebuildTagPrefix}`,
-        ...await this.getRebuildRuntimeArgs(),
+        ...await this.getPrebuildRuntimeArgs(),
       ],
       {
         cwd: this.modulePath,
