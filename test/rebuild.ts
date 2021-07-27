@@ -201,13 +201,13 @@ describe('rebuilder', () => {
     afterEach(cleanupTestModule);
 
     it('should rebuild only specified modules', async () => {
-      const nativeModuleBinary = path.join(testModulePath, 'node_modules', 'farmhash', 'build', 'Release', 'farmhash.node');
+      const nativeModuleBinary = path.join(testModulePath, 'node_modules', 'ref-napi', 'build', 'Release', 'binding.node');
       const nodeModuleChecksum = await determineChecksum(nativeModuleBinary);
       const rebuilder = rebuild({
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch: process.arch,
-        onlyModules: ['farmhash'],
+        onlyModules: ['ref-napi'],
         force: true
       });
       let built = 0;
