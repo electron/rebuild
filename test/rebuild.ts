@@ -126,7 +126,7 @@ describe('rebuilder', () => {
       ])
     });
 
-    it('prebuild-install should not fail', async () => {
+    it('should not fail running prebuild-install', async () => {
       process.env.ELECTRON_REBUILD_TESTS = 'true';
 
       const rebuilder = new Rebuilder({ buildPath: testModulePath, electronVersion: '8.0.0', arch: process.arch, lifecycle: new EventEmitter() });
