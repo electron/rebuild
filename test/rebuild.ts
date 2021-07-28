@@ -4,7 +4,6 @@ import * as path from 'path';
 import * as os from 'os';
 import { spawn } from '@malept/cross-spawn-promise';
 
-import { determineChecksum } from './helpers/checksum';
 import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild';
 import { getExactElectronVersionSync } from './helpers/electron-version';
 import { rebuild, Rebuilder, RebuildOptions } from '../src/rebuild';
@@ -201,21 +200,22 @@ describe('rebuilder', () => {
     afterEach(cleanupTestModule);
 
     it('should rebuild only specified modules', async () => {
-      const nativeModuleBinary = path.join(testModulePath, 'node_modules', 'bcrypt', 'build', 'Release', 'bcrypt_lib.node');
-      const nodeModuleChecksum = await determineChecksum(nativeModuleBinary);
+      const nativeModuleBinary = path.join(testModulePath, 'node_modules', 'native-hello-world', 'build', 'Release', 'hello_world.node');
+      expect(await fs.pathExists(nativeModuleBinary)).to.be.true;
+      await fs.remove(nativeModuleBinary);
+      expect(await fs.pathExists(nativeModuleBinary)).to.be.false;
       const rebuilder = rebuild({
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch: process.arch,
-        onlyModules: ['bcrypt'],
+        onlyModules: ['native-hello-world'],
         force: true
       });
       let built = 0;
       rebuilder.lifecycle.on('module-done', () => built++);
       await rebuilder;
       expect(built).to.equal(1);
-      const electronModuleChecksum = await determineChecksum(nativeModuleBinary);
-      expect(electronModuleChecksum).to.not.equal(nodeModuleChecksum);
+      expect(await fs.pathExists(nativeModuleBinary)).to.be.true;
     });
 
     it('should rebuild multiple specified modules via --only option', async () => {
