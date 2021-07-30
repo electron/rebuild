@@ -1,7 +1,7 @@
 step-restore-cache: &step-restore-cache
   restore_cache:
     keys:
-      - v1-dependencies-{{ arch }}-{{ checksum "package-lock.json" }}
+      - v1-dependencies-{{ arch }}-{{ checksum "yarn.lock" }}
 
 steps-test: &steps-test
   steps:
@@ -15,34 +15,30 @@ steps-test: &steps-test
               curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
               export NVM_DIR="$HOME/.nvm"
               [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-              nvm install 10
-              nvm alias default 10
+              nvm install 12
+              nvm alias default 12
               echo 'export NVM_DIR=${HOME}/.nvm' >> $BASH_ENV
               echo "[ -s '${NVM_DIR}/nvm.sh' ] && . '${NVM_DIR}/nvm.sh'" >> $BASH_ENV
               ;;
             Windows*|CYGWIN*|MINGW*|MSYS*)
-              nvm install 10.22.0
-              nvm use 10.22.0
+              nvm install 12.22.1
+              nvm use 12.22.1
               ;;
           esac
-    - run: npm install --engine-strict
+    - run: yarn install --frozen-lockfile
     - save_cache:
         paths:
           - node_modules
-        key: v1-dependencies-{{ arch }}-{{ checksum "package-lock.json" }}
-    - run: npm run lint
-    - run: npm run coverage
-    - run: npm run codecov
+        key: v1-dependencies-{{ arch }}-{{ checksum "yarn.lock" }}
+    - run: yarn run lint
+    - run: yarn run coverage
+    - run: yarn run codecov
 
 
 version: 2.1
 orbs:
   win: circleci/windows@1.0.0
 jobs:
-  test-linux-10:
-    docker:
-      - image: circleci/node:10
-    <<: *steps-test
   test-linux-12:
     docker:
       - image: circleci/node:12
@@ -50,6 +46,10 @@ jobs:
   test-linux-14:
     docker:
       - image: circleci/node:14
+    <<: *steps-test
+  test-linux-16:
+    docker:
+      - image: circleci/node:16
     <<: *steps-test
   test-mac:
     macos:
@@ -69,21 +69,21 @@ jobs:
     steps:
       - checkout
       - *step-restore-cache
-      - run: npm install
+      - run: yarn install --frozen-lockfile
       - run: npx semantic-release
 workflows:
   version: 2
   test_and_release:
     # Run the test jobs first, then the release only when all the test jobs are successful
     jobs:
-      - test-linux-10
+      - test-linux-16
       - test-linux-12
       - test-linux-14
       - test-mac
       - test-windows
       - release:
           requires:
-            - test-linux-10
+            - test-linux-16
             - test-linux-12
             - test-linux-14
             - test-mac
