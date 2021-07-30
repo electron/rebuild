@@ -31,7 +31,11 @@ steps-test: &steps-test
           - node_modules
         key: v1-dependencies-{{ arch }}-{{ checksum "yarn.lock" }}
     - run: yarn run lint
-    - run: yarn run coverage
+    - run:
+        name: Tests with code coverage
+        command: yarn run coverage
+        environment:
+          DEBUG: electron-rebuild
     - run: yarn run codecov
 
 
