@@ -21,8 +21,8 @@ steps-test: &steps-test
               echo "[ -s '${NVM_DIR}/nvm.sh' ] && . '${NVM_DIR}/nvm.sh'" >> $BASH_ENV
               ;;
             Windows*|CYGWIN*|MINGW*|MSYS*)
-              nvm install 12.22.1
-              nvm use 12.22.1
+              nvm install 12.22.4
+              nvm use 12.22.4
               ;;
           esac
     - run: yarn install --frozen-lockfile
