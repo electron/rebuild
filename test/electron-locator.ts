@@ -9,14 +9,14 @@ import { locateElectronModule } from '../src/electron-locator';
 const testElectronRange = require(path.resolve(__dirname, '..', 'package.json')).devDependencies.electron;
 
 function packageCommand(command: string, packageName: string): Promise<string> {
-  return spawn('yarn', [command, packageName], {
+  return spawn('npm', [command, '--no-save', '--no-package-lock', packageName], {
     cwd: path.resolve(__dirname, '..'),
     stdio: 'ignore',
   });
 }
 
-const install: ((s: string) => Promise<void>) = packageCommand.bind(null, 'add');
-const uninstall: ((s: string) => Promise<void>) = packageCommand.bind(null, 'remove');
+const install: ((s: string) => Promise<void>) = packageCommand.bind(null, 'install');
+const uninstall: ((s: string) => Promise<void>) = packageCommand.bind(null, 'uninstall');
 
 const testElectronCanBeFound = (): void => {
   it('should return a valid path', async () => {
