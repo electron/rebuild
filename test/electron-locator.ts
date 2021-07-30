@@ -9,7 +9,7 @@ import { locateElectronModule } from '../src/electron-locator';
 const testElectronRange = require(path.resolve(__dirname, '..', 'package.json')).devDependencies.electron;
 
 function packageCommand(command: string, packageName: string): Promise<string> {
-  return spawn('npm', [command, '--no-save', '--no-package-lock', packageName], {
+  return spawn('npm', [command, '--no-save', packageName], {
     cwd: path.resolve(__dirname, '..'),
     stdio: 'ignore',
   });
