@@ -45,15 +45,15 @@ orbs:
 jobs:
   test-linux-12:
     docker:
-      - image: circleci/node:12
+      - image: circleci/node:12-buster
     <<: *steps-test
   test-linux-14:
     docker:
-      - image: circleci/node:14
+      - image: circleci/node:14-buster
     <<: *steps-test
   test-linux-16:
     docker:
-      - image: circleci/node:16
+      - image: circleci/node:16-buster
     <<: *steps-test
   test-mac:
     macos:
