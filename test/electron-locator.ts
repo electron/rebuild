@@ -1,60 +1,55 @@
-import debug from 'debug';
+import { expect } from 'chai';
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import { expect } from 'chai';
-import { spawn } from '@malept/cross-spawn-promise';
 
 import { locateElectronModule } from '../src/electron-locator';
 
-const d = debug('electron-rebuild');
+const baseFixtureDir = path.resolve(__dirname, 'fixture', 'electron-locator')
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const testElectronRange = require(path.resolve(__dirname, '..', 'package.json')).devDependencies.electron;
-
-function packageCommand(command: string, packageName: string): Promise<string> {
-  return spawn('npm', [command, '--no-save', packageName], {
-    cwd: path.resolve(__dirname, '..'),
-    stdio: d.enabled ? 'inherit' : 'ignore',
-  });
-}
-
-const install: ((s: string) => Promise<void>) = packageCommand.bind(null, 'install');
-const uninstall: ((s: string) => Promise<void>) = packageCommand.bind(null, 'uninstall');
-
-const testElectronCanBeFound = (): void => {
+async function expectElectronCanBeFound(projectRootPath: string, startDir: string): Promise<void> {
   it('should return a valid path', async () => {
-    const electronPath = await locateElectronModule();
+    const electronPath = await locateElectronModule(projectRootPath, startDir);
     expect(electronPath).to.be.a('string');
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     expect(await fs.pathExists(electronPath!)).to.be.equal(true);
   });
-};
+}
 
-describe('locateElectronModule', function() {
-  this.timeout(30 * 1000);
+describe('locateElectronModule', () => {
+  describe('when electron is not installed', () => {
+    const electronDir = path.resolve(__dirname, '..', 'node_modules', 'electron');
 
-  before(() => uninstall('electron'));
+    before(async () => {
+      await fs.rename(electronDir, `${electronDir}-moved`);
+    });
 
-  it('should return null when electron is not installed', async () => {
-    await fs.remove(path.resolve(__dirname, '..', 'node_modules', 'electron'));
-    expect(await locateElectronModule()).to.be.equal(null);
+    it('should return null when electron is not installed', async () => {
+      const fixtureDir = path.join(baseFixtureDir, 'not-installed');
+      expect(await locateElectronModule(fixtureDir, fixtureDir)).to.be.equal(null);
+    });
+
+    after(async () => {
+      await fs.rename(`${electronDir}-moved`, electronDir);
+    });
   });
 
-  describe('with electron-prebuilt installed', async () => {
-    before(() => install('electron-prebuilt'));
-
-    testElectronCanBeFound();
-
-    after(() => uninstall('electron-prebuilt'));
+  describe('using require.resolve() in the current project to search', () => {
+    const fixtureDir = path.join(baseFixtureDir, 'not-installed');
+    expectElectronCanBeFound(fixtureDir, fixtureDir);
   });
 
-  describe('with electron installed', async () => {
-    before(() => install(`electron@${testElectronRange}`));
-
-    testElectronCanBeFound();
-
-    after(() => uninstall('electron'));
+  describe('with electron-prebuilt installed', () => {
+    const fixtureDir = path.join(baseFixtureDir, 'prebuilt');
+    expectElectronCanBeFound(fixtureDir, fixtureDir);
   });
 
-  after(() => install(`electron@${testElectronRange}`));
+  describe('with electron installed', () => {
+    const fixtureDir = path.join(baseFixtureDir, 'single');
+    expectElectronCanBeFound(fixtureDir, fixtureDir);
+
+    describe('in a workspace', () => {
+      const fixtureDir = path.join(baseFixtureDir, 'workspace');
+      expectElectronCanBeFound(fixtureDir, path.join(fixtureDir, 'packages', 'descendant'));
+    });
+  });
 });
