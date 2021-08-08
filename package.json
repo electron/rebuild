@@ -34,7 +34,7 @@
   },
   "homepage": "https://github.com/electron/electron-rebuild",
   "engines": {
-    "node": ">=10.12.0"
+    "node": ">=12.13.0"
   },
   "dependencies": {
     "@malept/cross-spawn-promise": "^2.0.0",
