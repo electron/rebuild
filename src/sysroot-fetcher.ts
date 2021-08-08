@@ -1,5 +1,5 @@
 import * as crypto from 'crypto';
-import * as debug from 'debug';
+import debug from 'debug';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as tar from 'tar';

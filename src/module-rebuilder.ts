@@ -1,4 +1,4 @@
-import * as debug from 'debug';
+import debug from 'debug';
 import * as detectLibc from 'detect-libc';
 import * as fs from 'fs-extra';
 import * as NodeGyp from 'node-gyp';

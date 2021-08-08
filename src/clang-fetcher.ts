@@ -1,5 +1,5 @@
 import * as cp from 'child_process';
-import * as debug from 'debug';
+import debug from 'debug';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as tar from 'tar';

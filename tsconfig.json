@@ -13,6 +13,7 @@
     "noUnusedParameters": true,
     "module": "commonjs",
     "moduleResolution": "node",
+    "esModuleInterop": true,
     "pretty": true,
     "target": "ES2018",
     "outDir": "lib"
