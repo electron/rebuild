@@ -11,8 +11,7 @@ async function locateModuleByRequire(): Promise<string | null> {
       if (await fs.pathExists(path.join(modulePath, 'package.json'))) {
         return modulePath;
       }
-    } catch (_error) { // eslint-disable-line no-empty
-      // TODO(Node 12): Can remove (_error)
+    } catch { // eslint-disable-line no-empty
     }
   }
 
