@@ -11,18 +11,24 @@ async function locateModuleByRequire(): Promise<string | null> {
       if (await fs.pathExists(path.join(modulePath, 'package.json'))) {
         return modulePath;
       }
-    } catch (_error) { // eslint-disable-line no-empty
+    } catch { // eslint-disable-line no-empty
     }
   }
 
   return null
 }
 
-export async function locateElectronModule(projectRootPath?: string): Promise<string | null> {
-  for (const moduleName of electronModuleNames) {
-    const electronPath = await searchForModule(process.cwd(), moduleName, projectRootPath)[0];
+export async function locateElectronModule(
+  projectRootPath: string | undefined = undefined,
+  startDir: string | undefined = undefined,
+): Promise<string | null> {
+  startDir ??= process.cwd();
 
-    if (electronPath && await fs.pathExists(path.join(electronPath, 'package.json'))) {
+  for (const moduleName of electronModuleNames) {
+    const electronPaths = await searchForModule(startDir, moduleName, projectRootPath);
+    const electronPath = electronPaths.find(async (ePath: string) => await fs.pathExists(path.join(ePath, 'package.json')));
+
+    if (electronPath) {
       return electronPath;
     }
   }

@@ -1,7 +1,7 @@
-import * as debug from 'debug';
+import debug from 'debug';
 import * as detectLibc from 'detect-libc';
 import * as fs from 'fs-extra';
-import * as NodeGyp from 'node-gyp';
+import NodeGyp from 'node-gyp';
 import * as path from 'path';
 import { fromElectronVersion as napiVersionFromElectronVersion } from 'node-api-version';
 import { cacheModuleState } from './cache';
