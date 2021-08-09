@@ -1,4 +1,4 @@
-import * as debug from 'debug';
+import debug from 'debug';
 import got from 'got';
 
 const d = debug('electron-rebuild');
