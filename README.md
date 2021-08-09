@@ -87,9 +87,9 @@ Copyright 2016
 
 This package is automatically used with Electron Forge when packaging an Electron app.
 
-### How can I integrate this into [Electron Packager](https://github.com/electron-userland/electron-packager)?
+### How can I integrate this into [Electron Packager](https://github.com/electron/electron-packager)?
 
-electron-rebuild provides a function compatible with the [`afterCopy` hook](https://github.com/electron-userland/electron-packager/blob/master/docs/api.md#aftercopy)
+electron-rebuild provides a function compatible with the [`afterCopy` hook](https://electron.github.io/electron-packager/main/interfaces/electronpackager.options.html#aftercopy)
 for Electron Packager. For example:
 
 ```javascript
