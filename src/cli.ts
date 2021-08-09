@@ -19,7 +19,7 @@ const argv = yargs(process.argv.slice(2)).version(false).options({
   'which-module': { alias: 'w', type: 'string', description: 'A specific module to build, or comma separated list of modules. Modules will only be rebuilt if they also match the types of dependencies being rebuilt (see --types).' },
   // TODO: should be type: array
   only: { alias: 'o', type: 'string', description: 'Only build specified module, or comma separated list of modules. All others are ignored.' },
-  'electron-prebuilt-dir': { alias: 'e', type: 'string', description: 'The path to prebuilt electron module' },
+  'electron-prebuilt-dir': { alias: 'e', type: 'string', description: 'The path to the prebuilt electron module' },
   'dist-url': { alias: 'd', type: 'string', description: 'Custom header tarball URL' },
   // TODO: should be type: array
   types: { alias: 't', type: 'string', description: 'The types of dependencies to rebuild.  Comma separated list of "prod", "dev" and "optional".  Default is "prod,optional"' },

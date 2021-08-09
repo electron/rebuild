@@ -38,8 +38,8 @@ describe('locateElectronModule', () => {
     expectElectronCanBeFound(fixtureDir, fixtureDir);
   });
 
-  describe('with electron-prebuilt installed', () => {
-    const fixtureDir = path.join(baseFixtureDir, 'prebuilt');
+  describe('with electron-prebuilt-compile installed', () => {
+    const fixtureDir = path.join(baseFixtureDir, 'prebuilt-compile');
     expectElectronCanBeFound(fixtureDir, fixtureDir);
   });
 

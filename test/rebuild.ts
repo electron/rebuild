@@ -6,7 +6,7 @@ import { spawn } from '@malept/cross-spawn-promise';
 
 import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild';
 import { getExactElectronVersionSync } from './helpers/electron-version';
-import { rebuild, Rebuilder, RebuildOptions } from '../src/rebuild';
+import { rebuild, Rebuilder } from '../src/rebuild';
 import { ModuleRebuilder } from '../src/module-rebuilder';
 import EventEmitter = require('events');
 
@@ -39,74 +39,56 @@ describe('rebuilder', () => {
     resetMSVSVersion();
   }
 
-  const optionSets: {
-    name: string;
-    args: RebuildOptions | string[];
-  }[] = [
-    { args: [testModulePath, testElectronVersion, process.arch], name: 'sequential args' },
-    { args: {
-      buildPath: testModulePath,
-      electronVersion: testElectronVersion,
-      arch: process.arch
-    }, name: 'options object' }
-  ];
-  for (const options of optionSets) {
-    describe(`core behavior -- ${options.name}`, function() {
-      this.timeout(timeoutMinutes * MINUTES_IN_MILLISECONDS);
+  describe('core behavior', function() {
+    this.timeout(timeoutMinutes * MINUTES_IN_MILLISECONDS);
 
-      before(async () => {
-        await resetTestModule();
+    before(async () => {
+      await resetTestModule();
 
-        let args: RebuildOptions | string | string[] = options.args;
-        if (!Array.isArray(args) && typeof args === 'string') {
-          args = [args];
-        }
-        process.env.ELECTRON_REBUILD_TESTS = 'true';
-        if (Array.isArray(args)) {
-          // eslint-disable-next-line @typescript-eslint/ban-types
-          await (rebuild as Function)(...(args as string[]));
-        } else {
-          await rebuild(args);
-        }
-      });
-
-      it('should have rebuilt top level prod dependencies', async () => {
-        await expectNativeModuleToBeRebuilt(testModulePath, 'ref-napi');
-      });
-
-      it('should have rebuilt top level prod dependencies that are using prebuild', async () => {
-        await expectNativeModuleToBeRebuilt(testModulePath, 'farmhash');
-      });
-
-      it('should have rebuilt children of top level prod dependencies', async () => {
-        await expectNativeModuleToBeRebuilt(testModulePath, 'leveldown');
-      });
-
-      it('should have rebuilt children of scoped top level prod dependencies', async () => {
-        await expectNativeModuleToBeRebuilt(testModulePath, '@newrelic/native-metrics');
-      });
-
-      it('should have rebuilt top level optional dependencies', async () => {
-        await expectNativeModuleToBeRebuilt(testModulePath, 'bcrypt');
-      });
-
-      it('should not have rebuilt top level devDependencies', async () => {
-        await expectNativeModuleToNotBeRebuilt(testModulePath, 'ffi-napi');
-      });
-
-      it('should not download files in the module directory', async () => {
-        const modulePath = path.resolve(testModulePath, 'node_modules/ref-napi');
-        const fileNames = await fs.readdir(modulePath);
-
-        expect(fileNames).to.not.contain(testElectronVersion);
-      });
-
-      after(async () => {
-        delete process.env.ELECTRON_REBUILD_TESTS;
-        await cleanupTestModule();
+      process.env.ELECTRON_REBUILD_TESTS = 'true';
+      await rebuild({
+        buildPath: testModulePath,
+        electronVersion: testElectronVersion,
+        arch: process.arch
       });
     });
-  }
+
+    it('should have rebuilt top level prod dependencies', async () => {
+      await expectNativeModuleToBeRebuilt(testModulePath, 'ref-napi');
+    });
+
+    it('should have rebuilt top level prod dependencies that are using prebuild', async () => {
+      await expectNativeModuleToBeRebuilt(testModulePath, 'farmhash');
+    });
+
+    it('should have rebuilt children of top level prod dependencies', async () => {
+      await expectNativeModuleToBeRebuilt(testModulePath, 'leveldown');
+    });
+
+    it('should have rebuilt children of scoped top level prod dependencies', async () => {
+      await expectNativeModuleToBeRebuilt(testModulePath, '@newrelic/native-metrics');
+    });
+
+    it('should have rebuilt top level optional dependencies', async () => {
+      await expectNativeModuleToBeRebuilt(testModulePath, 'bcrypt');
+    });
+
+    it('should not have rebuilt top level devDependencies', async () => {
+      await expectNativeModuleToNotBeRebuilt(testModulePath, 'ffi-napi');
+    });
+
+    it('should not download files in the module directory', async () => {
+      const modulePath = path.resolve(testModulePath, 'node_modules/ref-napi');
+      const fileNames = await fs.readdir(modulePath);
+
+      expect(fileNames).to.not.contain(testElectronVersion);
+    });
+
+    after(async () => {
+      delete process.env.ELECTRON_REBUILD_TESTS;
+      await cleanupTestModule();
+    });
+  });
 
   describe('prebuild-install napi', function () {
     this.timeout(timeoutMinutes * MINUTES_IN_MILLISECONDS);
@@ -153,10 +135,15 @@ describe('rebuilder', () => {
     after(cleanupTestModule);
     afterEach(resetMSVSVersion);
 
+    const buildPath = testModulePath;
+    const electronVersion = testElectronVersion;
+    const arch = process.arch;
+    const extraModules: string[] = [];
+
     it('should skip the rebuild step when disabled', async () => {
-      await rebuild(testModulePath, testElectronVersion, process.arch);
+      await rebuild({ buildPath, electronVersion, arch });
       resetMSVSVersion();
-      const rebuilder = rebuild(testModulePath, testElectronVersion, process.arch, [], false);
+      const rebuilder = rebuild({ buildPath, electronVersion, arch, extraModules, force: false });
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
         skipped++;
@@ -165,10 +152,10 @@ describe('rebuilder', () => {
       expect(skipped).to.equal(6);
     });
 
-    it('should rebuild all modules again when disabled but the electron ABI bumped', async () => {
-      await rebuild(testModulePath, testElectronVersion, process.arch);
+    it('should rebuild all modules again when disabled but the electron ABI changed', async () => {
+      await rebuild({ buildPath, electronVersion, arch });
       resetMSVSVersion();
-      const rebuilder = rebuild(testModulePath, '3.0.0', process.arch, [], false);
+      const rebuilder = rebuild({ buildPath, electronVersion: '3.0.0', arch, extraModules, force: false });
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
         skipped++;
@@ -181,9 +168,9 @@ describe('rebuilder', () => {
       if (process.platform === 'darwin') {
         this.timeout(5 * MINUTES_IN_MILLISECONDS);
       }
-      await rebuild(testModulePath, testElectronVersion, process.arch);
+      await rebuild({ buildPath, electronVersion, arch });
       resetMSVSVersion();
-      const rebuilder = rebuild(testModulePath, testElectronVersion, process.arch, [], true);
+      const rebuilder = rebuild({ buildPath, electronVersion, arch, extraModules, force: true });
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
         skipped++;
