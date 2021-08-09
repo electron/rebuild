@@ -2,7 +2,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import { searchForModule } from './search-module';
 
-const electronModuleNames = ['electron', 'electron-prebuilt', 'electron-prebuilt-compile'];
+const electronModuleNames = ['electron',  'electron-prebuilt-compile'];
 
 async function locateModuleByRequire(): Promise<string | null> {
   for (const moduleName of electronModuleNames) {
