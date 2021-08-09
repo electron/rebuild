@@ -363,89 +363,17 @@ export class Rebuilder {
   }
 }
 
-function rebuildWithOptions(options: RebuildOptions): Promise<void> {
+export type RebuildResult = Promise<void> & { lifecycle: EventEmitter };
+
+export function rebuild(options: RebuildOptions): RebuildResult {
   // eslint-disable-next-line prefer-rest-params
   d('rebuilding with args:', arguments);
   const lifecycle = new EventEmitter();
   const rebuilderOptions: RebuilderOptions = { ...options, lifecycle };
   const rebuilder = new Rebuilder(rebuilderOptions);
 
-  const ret = rebuilder.rebuild() as Promise<void> & { lifecycle: EventEmitter };
+  const ret = rebuilder.rebuild() as RebuildResult;
   ret.lifecycle = lifecycle;
 
   return ret;
-}
-
-export type RebuilderResult = Promise<void> & { lifecycle: EventEmitter };
-export type RebuildFunctionWithOptions = (options: RebuildOptions) => RebuilderResult;
-export type RebuildFunctionWithArgs = (
-  buildPath: string,
-  electronVersion: string,
-  arch?: string,
-  extraModules?: string[],
-  force?: boolean,
-  headerURL?: string,
-  types?: ModuleType[],
-  mode?: RebuildMode,
-  onlyModules?: string[] | null,
-  debug?: boolean
-) => RebuilderResult;
-export type RebuildFunction = RebuildFunctionWithArgs & RebuildFunctionWithOptions;
-
-export function createOptions(
-    buildPath: string,
-    electronVersion: string,
-    arch: string,
-    extraModules: string[],
-    force: boolean,
-    headerURL: string,
-    types: ModuleType[],
-    mode: RebuildMode,
-    onlyModules: string[] | null,
-    debug: boolean ): RebuildOptions {
-
-  return {
-    buildPath,
-    electronVersion,
-    arch,
-    extraModules,
-    onlyModules,
-    force,
-    headerURL,
-    types,
-    mode,
-    debug
-  };
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function doRebuild(options: any, ...args: any[]): Promise<void> {
-  if (typeof options === 'object') {
-    return rebuildWithOptions(options as RebuildOptions);
-  }
-  console.warn('You are using the deprecated electron-rebuild API, please switch to using the options object instead');
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  return rebuildWithOptions((createOptions as Function)(options, ...args));
-}
-
-export const rebuild = (doRebuild as RebuildFunction);
-
-export function rebuildNativeModules(
-    electronVersion: string,
-    modulePath: string,
-    whichModule= '',
-    _headersDir: string | null = null,
-    arch= process.arch,
-    _command: string,
-    _ignoreDevDeps= false,
-    _ignoreOptDeps= false,
-    _verbose= false): Promise<void> {
-  if (path.basename(modulePath) === 'node_modules') {
-    modulePath = path.dirname(modulePath);
-  }
-
-  d('rebuilding in:', modulePath);
-  console.warn('You are using the old API, please read the new docs and update to the new API');
-
-  return rebuild(modulePath, electronVersion, arch, whichModule.split(','));
 }
