@@ -30,7 +30,7 @@ const locateBinary = async (basePath: string, suffix: string): Promise<string | 
   return null;
 };
 
-async function locatePrebuild(modulePath: string): Promise<string | null> {
+async function locatePrebuildInstall(modulePath: string): Promise<string | null> {
   return await locateBinary(modulePath, 'node_modules/prebuild-install/bin.js');
 }
 
@@ -297,8 +297,8 @@ export class ModuleRebuilder {
       return false;
     }
 
-    d(`assuming is prebuild powered: ${this.moduleName}`);
-    const prebuildInstallPath = await locatePrebuild(this.modulePath);
+    d(`assuming is prebuild-install powered: ${this.moduleName}`);
+    const prebuildInstallPath = await locatePrebuildInstall(this.modulePath);
     if (prebuildInstallPath) {
       d(`triggering prebuild download step: ${this.moduleName}`);
       let success = false;
