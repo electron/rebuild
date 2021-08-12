@@ -289,11 +289,11 @@ export class ModuleRebuilder {
 
     if (await fs.pathExists(electronNapiModuleFilename) || await fs.pathExists(nodejsNapiModuleFilename)) {
       this.ensureElectronSupportsNodeAPI();
-      d(`Found prebuilt Node-API module in ${prebuildModuleDir}"`);
+      d(`Found prebuilt Node-API module in ${prebuiltModuleDir}"`);
     } else if (await fs.pathExists(abiModuleFilename)) {
       d(`Found prebuilt module: "${abiModuleFilename}"`);
     } else {
-      d(`Could not locate "${napiModuleFilename}" or "${abiModuleFilename}"`);
+      d(`Could not locate "${electronNapiModuleFilename}", "${nodejsNapiModuleFilename}", or "${abiModuleFilename}"`);
       return false;
     }
 
