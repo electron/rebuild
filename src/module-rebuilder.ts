@@ -236,10 +236,49 @@ export class ModuleRebuilder {
     }
   }
 
+  determineNativePrebuildExtension(): string {
+    if (this.rebuilder.arch === 'arm64') {
+      return 'armv8.node';
+    }
+
+    return 'node';
+  }
+
   /**
    * Uses the node-gyp-build module to handle rebuilding if it exists as a dependency.
    */
-  async rebuildWithNodeGypBuild(cacheKey: string): Promise<void> {
+  async rebuildWithNodeGypBuild(cacheKey: string): Promise<boolean> {
+    if (!(await this.isNodeGypBuildNativeModule())) {
+      return false;
+    }
+
+    d(`Checking for prebuilds for "${this.moduleName}"`);
+
+    const prebuildsDir = path.join(this.modulePath, 'prebuilds');
+    if (!(await fs.pathExists(prebuildsDir))) {
+      d(`Could not find the prebuilds directory at "${prebuildsDir}"`)
+      return false;
+    }
+
+    const prebuiltModuleDir = path.join(prebuildsDir, `${this.rebuilder.platform}-${this.rebuilder.arch}`);
+    const nativeExt = this.determineNativePrebuildExtension();
+    const napiModuleFilename = path.join(prebuiltModuleDir, `electron.napi.${nativeExt}`);
+    const abiModuleFilename = path.join(prebuiltModuleDir, `electron.abi${this.rebuilder.ABI}.${nativeExt}`);
+
+
+    if (await fs.pathExists(napiModuleFilename)) {
+      d(`Found prebuilt module: "${napiModuleFilename}"`);
+    } else if (await fs.pathExists(abiModuleFilename)) {
+      d(`Found prebuilt module: "${abiModuleFilename}"`);
+    } else {
+      d(`Could not locate "${napiModuleFilename}" or "${abiModuleFilename}"`);
+      return false;
+    }
+
+    await this.writeMetadata();
+    await this.cacheModuleState(cacheKey);
+
+    return true;
   }
 
   async rebuildNodeGypModule(cacheKey: string): Promise<void> {

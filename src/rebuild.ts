@@ -57,6 +57,7 @@ export class Rebuilder {
   public lifecycle: EventEmitter;
   public buildPath: string;
   public electronVersion: string;
+  public platform: string = process.platform;
   public arch: string;
   public extraModules: string[];
   public onlyModules: string[] | null;
@@ -274,6 +275,11 @@ export class Rebuilder {
         this.lifecycle.emit('module-done');
         return;
       }
+    }
+
+    if (await moduleRebuilder.rebuildWithNodeGypBuild(cacheKey)) {
+      this.lifecycle.emit('module-done');
+      return;
     }
 
     if (await moduleRebuilder.rebuildPrebuildModule(cacheKey)) {
