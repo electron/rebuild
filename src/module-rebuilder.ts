@@ -130,6 +130,20 @@ export class ModuleRebuilder {
     }
   }
 
+  ensureElectronSupportsNodeAPI(): void {
+    this.getElectronNodeAPIVersion();
+  }
+
+  getElectronNodeAPIVersion(): number {
+    const electronNapiVersion = napiVersionFromElectronVersion(this.rebuilder.electronVersion);
+
+    if (!electronNapiVersion) {
+      throw new Error(`Native module '${this.moduleName}' requires Node-API but Electron v${this.rebuilder.electronVersion} does not support Node-API`);
+    }
+
+    return electronNapiVersion;
+  }
+
   async getNapiVersion(): Promise<number | undefined> {
     const moduleNapiVersions = await this.getSupportedNapiVersions();
 
@@ -138,15 +152,11 @@ export class ModuleRebuilder {
       return;
     }
 
-    const electronNapiVersion = napiVersionFromElectronVersion(this.rebuilder.electronVersion);
-    
-    if (!electronNapiVersion) {
-      throw new Error(`Native module '${this.moduleName}' requires Node-API but Electron v${this.rebuilder.electronVersion} does not support Node-API`);
-    }
+    const electronNapiVersion = this.getElectronNodeAPIVersion();
 
     // Filter out Node-API versions that are too high
     const filteredVersions = moduleNapiVersions.filter((v) => (v <= electronNapiVersion));
-    
+
     if (filteredVersions.length === 0) {
       throw new Error(`Native module '${this.moduleName}' supports Node-API versions ${moduleNapiVersions} but Electron v${this.rebuilder.electronVersion} only supports Node-API v${electronNapiVersion}`)
     }
@@ -236,9 +246,20 @@ export class ModuleRebuilder {
     }
   }
 
+  determineNativePrebuildArch(): string {
+    if (this.rebuilder.arch === 'armv7l') {
+      return 'arm';
+    }
+
+    return this.rebuilder.arch;
+  }
+
   determineNativePrebuildExtension(): string {
-    if (this.rebuilder.arch === 'arm64') {
-      return 'armv8.node';
+    switch (this.rebuilder.arch) {
+      case 'arm64':
+        return 'armv8.node';
+      case 'armv7l':
+        return 'armv7.node';
     }
 
     return 'node';
@@ -260,14 +281,15 @@ export class ModuleRebuilder {
       return false;
     }
 
-    const prebuiltModuleDir = path.join(prebuildsDir, `${this.rebuilder.platform}-${this.rebuilder.arch}`);
+    const prebuiltModuleDir = path.join(prebuildsDir, `${this.rebuilder.platform}-${this.determineNativePrebuildArch()}`);
     const nativeExt = this.determineNativePrebuildExtension();
-    const napiModuleFilename = path.join(prebuiltModuleDir, `electron.napi.${nativeExt}`);
+    const electronNapiModuleFilename = path.join(prebuiltModuleDir, `electron.napi.${nativeExt}`);
+    const nodejsNapiModuleFilename = path.join(prebuiltModuleDir, `node.napi.${nativeExt}`);
     const abiModuleFilename = path.join(prebuiltModuleDir, `electron.abi${this.rebuilder.ABI}.${nativeExt}`);
 
-
-    if (await fs.pathExists(napiModuleFilename)) {
-      d(`Found prebuilt module: "${napiModuleFilename}"`);
+    if (await fs.pathExists(electronNapiModuleFilename) || await fs.pathExists(nodejsNapiModuleFilename)) {
+      this.ensureElectronSupportsNodeAPI();
+      d(`Found prebuilt Node-API module in ${prebuildModuleDir}"`);
     } else if (await fs.pathExists(abiModuleFilename)) {
       d(`Found prebuilt module: "${abiModuleFilename}"`);
     } else {
