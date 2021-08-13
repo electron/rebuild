@@ -200,9 +200,9 @@ export class ModuleRebuilder {
     }
   }
 
-  async isNodeGypBuildNativeModule(): Promise<boolean> {
-    const dependencies = await this.packageJSONFieldWithDefault('dependencies', {});
-    return !!dependencies['node-gyp-build']
+  async isPrebuildifyNativeModule(): Promise<boolean> {
+    const devDependencies = await this.packageJSONFieldWithDefault('devDependencies', {});
+    return !!devDependencies['prebuildify']
   }
 
   async isPrebuildInstallNativeModule(): Promise<boolean> {
@@ -266,10 +266,11 @@ export class ModuleRebuilder {
   }
 
   /**
-   * Uses the node-gyp-build module to handle rebuilding if it exists as a dependency.
+   * If the native module uses prebuildify, check to see if it comes with a prebuilt module for
+   * the given platform and arch.
    */
-  async rebuildWithNodeGypBuild(cacheKey: string): Promise<boolean> {
-    if (!(await this.isNodeGypBuildNativeModule())) {
+  async findPrebuildifyModule(cacheKey: string): Promise<boolean> {
+    if (!(await this.isPrebuildifyNativeModule())) {
       return false;
     }
 

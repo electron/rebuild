@@ -277,7 +277,7 @@ export class Rebuilder {
       }
     }
 
-    if (await moduleRebuilder.rebuildWithNodeGypBuild(cacheKey)) {
+    if (await moduleRebuilder.findPrebuildifyModule(cacheKey)) {
       this.lifecycle.emit('module-done');
       return;
     }
