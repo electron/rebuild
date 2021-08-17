@@ -5,6 +5,7 @@ import NodeGyp from 'node-gyp';
 import * as path from 'path';
 import { fromElectronVersion as napiVersionFromElectronVersion } from 'node-api-version';
 import { cacheModuleState } from './cache';
+import { findPrebuildifyModule } from './module-type/prebuildify';
 import { promisify } from 'util';
 import { readPackageJson } from './read-package-json';
 import { Rebuilder } from './rebuild';
@@ -200,11 +201,6 @@ export class ModuleRebuilder {
     }
   }
 
-  async isPrebuildifyNativeModule(): Promise<boolean> {
-    const devDependencies = await this.packageJSONFieldWithDefault('devDependencies', {});
-    return !!devDependencies['prebuildify']
-  }
-
   async isPrebuildInstallNativeModule(): Promise<boolean> {
     const dependencies = await this.packageJSONFieldWithDefault('dependencies', {});
     return !!dependencies['prebuild-install']
@@ -246,62 +242,20 @@ export class ModuleRebuilder {
     }
   }
 
-  determineNativePrebuildArch(): string {
-    if (this.rebuilder.arch === 'armv7l') {
-      return 'arm';
-    }
-
-    return this.rebuilder.arch;
-  }
-
-  determineNativePrebuildExtension(): string {
-    switch (this.rebuilder.arch) {
-      case 'arm64':
-        return 'armv8.node';
-      case 'armv7l':
-        return 'armv7.node';
-    }
-
-    return 'node';
-  }
-
   /**
    * If the native module uses prebuildify, check to see if it comes with a prebuilt module for
    * the given platform and arch.
    */
   async findPrebuildifyModule(cacheKey: string): Promise<boolean> {
-    if (!(await this.isPrebuildifyNativeModule())) {
-      return false;
+    const devDependencies = await this.packageJSONFieldWithDefault('devDependencies', {});
+    if (await findPrebuildifyModule(this.modulePath, this.rebuilder.platform, this.rebuilder.arch, this.rebuilder.ABI, devDependencies)) {
+      await this.writeMetadata();
+      await this.cacheModuleState(cacheKey);
+
+      return true;
     }
 
-    d(`Checking for prebuilds for "${this.moduleName}"`);
-
-    const prebuildsDir = path.join(this.modulePath, 'prebuilds');
-    if (!(await fs.pathExists(prebuildsDir))) {
-      d(`Could not find the prebuilds directory at "${prebuildsDir}"`)
-      return false;
-    }
-
-    const prebuiltModuleDir = path.join(prebuildsDir, `${this.rebuilder.platform}-${this.determineNativePrebuildArch()}`);
-    const nativeExt = this.determineNativePrebuildExtension();
-    const electronNapiModuleFilename = path.join(prebuiltModuleDir, `electron.napi.${nativeExt}`);
-    const nodejsNapiModuleFilename = path.join(prebuiltModuleDir, `node.napi.${nativeExt}`);
-    const abiModuleFilename = path.join(prebuiltModuleDir, `electron.abi${this.rebuilder.ABI}.${nativeExt}`);
-
-    if (await fs.pathExists(electronNapiModuleFilename) || await fs.pathExists(nodejsNapiModuleFilename)) {
-      this.ensureElectronSupportsNodeAPI();
-      d(`Found prebuilt Node-API module in ${prebuiltModuleDir}"`);
-    } else if (await fs.pathExists(abiModuleFilename)) {
-      d(`Found prebuilt module: "${abiModuleFilename}"`);
-    } else {
-      d(`Could not locate "${electronNapiModuleFilename}", "${nodejsNapiModuleFilename}", or "${abiModuleFilename}"`);
-      return false;
-    }
-
-    await this.writeMetadata();
-    await this.cacheModuleState(cacheKey);
-
-    return true;
+    return false;
   }
 
   async rebuildNodeGypModule(cacheKey: string): Promise<void> {
