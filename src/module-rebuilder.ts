@@ -218,9 +218,9 @@ export class ModuleRebuilder {
   }
 
   /**
-   * Whether a prebuild-based native module exists.
+   * Whether a prebuild-install-based native module exists.
    */
-  async prebuildNativeModuleExists(): Promise<boolean> {
+  async prebuildInstallNativeModuleExists(): Promise<boolean> {
     return fs.pathExists(path.resolve(this.modulePath, 'prebuilds', `${process.platform}-${this.rebuilder.arch}`, `electron-${this.rebuilder.ABI}.node`))
   }
 

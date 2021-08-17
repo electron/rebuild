@@ -258,7 +258,7 @@ export class Rebuilder {
       return;
     }
 
-    if (await moduleRebuilder.prebuildNativeModuleExists(modulePath)) {
+    if (await moduleRebuilder.prebuildInstallNativeModuleExists(modulePath)) {
       d(`skipping: ${path.basename(modulePath)} as it was prebuilt`);
       return;
     }
