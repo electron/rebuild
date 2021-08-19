@@ -3,9 +3,9 @@ import * as detectLibc from 'detect-libc';
 import * as fs from 'fs-extra';
 import NodeGyp from 'node-gyp';
 import * as path from 'path';
-import { fromElectronVersion as napiVersionFromElectronVersion } from 'node-api-version';
 import { cacheModuleState } from './cache';
 import { findPrebuildifyModule } from './module-type/prebuildify';
+import { getElectronNodeAPIVersion } from './node-api';
 import { promisify } from 'util';
 import { readPackageJson } from './read-package-json';
 import { Rebuilder } from './rebuild';
@@ -131,18 +131,8 @@ export class ModuleRebuilder {
     }
   }
 
-  ensureElectronSupportsNodeAPI(): void {
-    this.getElectronNodeAPIVersion();
-  }
-
   getElectronNodeAPIVersion(): number {
-    const electronNapiVersion = napiVersionFromElectronVersion(this.rebuilder.electronVersion);
-
-    if (!electronNapiVersion) {
-      throw new Error(`Native module '${this.moduleName}' requires Node-API but Electron v${this.rebuilder.electronVersion} does not support Node-API`);
-    }
-
-    return electronNapiVersion;
+    return getElectronNodeAPIVersion(this.moduleName, this.rebuilder.electronVersion);
   }
 
   async getNapiVersion(): Promise<number | undefined> {
@@ -248,7 +238,7 @@ export class ModuleRebuilder {
    */
   async findPrebuildifyModule(cacheKey: string): Promise<boolean> {
     const devDependencies = await this.packageJSONFieldWithDefault('devDependencies', {});
-    if (await findPrebuildifyModule(this.modulePath, this.rebuilder.platform, this.rebuilder.arch, this.rebuilder.ABI, devDependencies)) {
+    if (await findPrebuildifyModule(this.modulePath, this.rebuilder.platform, this.rebuilder.arch, this.rebuilder.electronVersion, this.rebuilder.ABI, devDependencies)) {
       await this.writeMetadata();
       await this.cacheModuleState(cacheKey);
 
