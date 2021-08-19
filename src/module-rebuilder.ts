@@ -116,7 +116,7 @@ export class ModuleRebuilder {
     return binary?.napi_versions;
   }
 
-  async getPrebuildRuntimeArgs(): Promise<string[]> {
+  async getPrebuildInstallRuntimeArgs(): Promise<string[]> {
     const napiVersion = await this.getNapiVersion();
     if (napiVersion) {
       return [
@@ -375,7 +375,7 @@ export class ModuleRebuilder {
         `--arch=${this.rebuilder.arch}`,
         `--platform=${process.platform}`,
         `--tag-prefix=${this.rebuilder.prebuildTagPrefix}`,
-        ...await this.getPrebuildRuntimeArgs(),
+        ...await this.getPrebuildInstallRuntimeArgs(),
       ],
       {
         cwd: this.modulePath,

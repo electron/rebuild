@@ -102,7 +102,7 @@ describe('rebuilder', () => {
       const modulePath = path.join(testModulePath, 'node_modules', 'farmhash');
       const modRebuilder = new ModuleRebuilder(rebuilder, modulePath);
       expect(await modRebuilder.getNapiVersion()).to.equal(3);
-      expect(await modRebuilder.getPrebuildRuntimeArgs()).to.deep.equal([
+      expect(await modRebuilder.getPrebuildInstallRuntimeArgs()).to.deep.equal([
         '--runtime=napi',
         `--target=3`,
       ])
