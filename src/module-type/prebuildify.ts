@@ -5,7 +5,7 @@ import path from 'path';
 
 import { ensureElectronSupportsNodeAPI } from '../node-api';
 
-type DevDependencies = Record<string, string>;
+export type DevDependencies = Record<string, string>;
 
 const d = debug('electron-rebuild');
 

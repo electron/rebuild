@@ -4,7 +4,7 @@ import * as fs from 'fs-extra';
 import NodeGyp from 'node-gyp';
 import * as path from 'path';
 import { cacheModuleState } from './cache';
-import { findPrebuildifyModule } from './module-type/prebuildify';
+import { DevDependencies, findPrebuildifyModule } from './module-type/prebuildify';
 import { getElectronNodeAPIVersion } from './node-api';
 import { promisify } from 'util';
 import { readPackageJson } from './read-package-json';
@@ -238,7 +238,7 @@ export class ModuleRebuilder {
    */
   async findPrebuildifyModule(cacheKey: string): Promise<boolean> {
     const devDependencies = await this.packageJSONFieldWithDefault('devDependencies', {});
-    if (await findPrebuildifyModule(this.modulePath, this.rebuilder.platform, this.rebuilder.arch, this.rebuilder.electronVersion, this.rebuilder.ABI, devDependencies)) {
+    if (await findPrebuildifyModule(this.modulePath, this.rebuilder.platform, this.rebuilder.arch, this.rebuilder.electronVersion, this.rebuilder.ABI, devDependencies as DevDependencies)) {
       await this.writeMetadata();
       await this.cacheModuleState(cacheKey);
 
