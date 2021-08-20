@@ -3,8 +3,9 @@ import * as detectLibc from 'detect-libc';
 import * as fs from 'fs-extra';
 import NodeGyp from 'node-gyp';
 import * as path from 'path';
-import { fromElectronVersion as napiVersionFromElectronVersion } from 'node-api-version';
 import { cacheModuleState } from './cache';
+import { DevDependencies, findPrebuildifyModule } from './module-type/prebuildify';
+import { getElectronNodeAPIVersion } from './node-api';
 import { promisify } from 'util';
 import { readPackageJson } from './read-package-json';
 import { Rebuilder } from './rebuild';
@@ -30,7 +31,7 @@ const locateBinary = async (basePath: string, suffix: string): Promise<string | 
   return null;
 };
 
-async function locatePrebuild(modulePath: string): Promise<string | null> {
+async function locatePrebuildInstall(modulePath: string): Promise<string | null> {
   return await locateBinary(modulePath, 'node_modules/prebuild-install/bin.js');
 }
 
@@ -130,6 +131,10 @@ export class ModuleRebuilder {
     }
   }
 
+  getElectronNodeAPIVersion(): number {
+    return getElectronNodeAPIVersion(this.moduleName, this.rebuilder.electronVersion);
+  }
+
   async getNapiVersion(): Promise<number | undefined> {
     const moduleNapiVersions = await this.getSupportedNapiVersions();
 
@@ -138,15 +143,11 @@ export class ModuleRebuilder {
       return;
     }
 
-    const electronNapiVersion = napiVersionFromElectronVersion(this.rebuilder.electronVersion);
-    
-    if (!electronNapiVersion) {
-      throw new Error(`Native module '${this.moduleName}' requires Node-API but Electron v${this.rebuilder.electronVersion} does not support Node-API`);
-    }
+    const electronNapiVersion = this.getElectronNodeAPIVersion();
 
     // Filter out Node-API versions that are too high
     const filteredVersions = moduleNapiVersions.filter((v) => (v <= electronNapiVersion));
-    
+
     if (filteredVersions.length === 0) {
       throw new Error(`Native module '${this.moduleName}' supports Node-API versions ${moduleNapiVersions} but Electron v${this.rebuilder.electronVersion} only supports Node-API v${electronNapiVersion}`)
     }
@@ -190,7 +191,7 @@ export class ModuleRebuilder {
     }
   }
 
-  async isPrebuildNativeModule(): Promise<boolean> {
+  async isPrebuildInstallNativeModule(): Promise<boolean> {
     const dependencies = await this.packageJSONFieldWithDefault('dependencies', {});
     return !!dependencies['prebuild-install']
   }
@@ -207,9 +208,9 @@ export class ModuleRebuilder {
   }
 
   /**
-   * Whether a prebuild-based native module exists.
+   * Whether a prebuild-install-based native module exists.
    */
-  async prebuildNativeModuleExists(): Promise<boolean> {
+  async prebuildInstallNativeModuleExists(): Promise<boolean> {
     return fs.pathExists(path.resolve(this.modulePath, 'prebuilds', `${process.platform}-${this.rebuilder.arch}`, `electron-${this.rebuilder.ABI}.node`))
   }
 
@@ -229,6 +230,22 @@ export class ModuleRebuilder {
         process.env[key] = env[key];
       }
     }
+  }
+
+  /**
+   * If the native module uses prebuildify, check to see if it comes with a prebuilt module for
+   * the given platform and arch.
+   */
+  async findPrebuildifyModule(cacheKey: string): Promise<boolean> {
+    const devDependencies = await this.packageJSONFieldWithDefault('devDependencies', {});
+    if (await findPrebuildifyModule(this.modulePath, this.rebuilder.platform, this.rebuilder.arch, this.rebuilder.electronVersion, this.rebuilder.ABI, devDependencies as DevDependencies)) {
+      await this.writeMetadata();
+      await this.cacheModuleState(cacheKey);
+
+      return true;
+    }
+
+    return false;
   }
 
   async rebuildNodeGypModule(cacheKey: string): Promise<void> {
@@ -293,12 +310,12 @@ export class ModuleRebuilder {
   }
 
   async rebuildPrebuildModule(cacheKey: string): Promise<boolean> {
-    if (!(await this.isPrebuildNativeModule())) {
+    if (!(await this.isPrebuildInstallNativeModule())) {
       return false;
     }
 
-    d(`assuming is prebuild powered: ${this.moduleName}`);
-    const prebuildInstallPath = await locatePrebuild(this.modulePath);
+    d(`assuming is prebuild-install powered: ${this.moduleName}`);
+    const prebuildInstallPath = await locatePrebuildInstall(this.modulePath);
     if (prebuildInstallPath) {
       d(`triggering prebuild download step: ${this.moduleName}`);
       let success = false;

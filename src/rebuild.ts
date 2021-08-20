@@ -57,6 +57,7 @@ export class Rebuilder {
   public lifecycle: EventEmitter;
   public buildPath: string;
   public electronVersion: string;
+  public platform: string = process.platform;
   public arch: string;
   public extraModules: string[];
   public onlyModules: string[] | null;
@@ -257,7 +258,7 @@ export class Rebuilder {
       return;
     }
 
-    if (await moduleRebuilder.prebuildNativeModuleExists(modulePath)) {
+    if (await moduleRebuilder.prebuildInstallNativeModuleExists(modulePath)) {
       d(`skipping: ${path.basename(modulePath)} as it was prebuilt`);
       return;
     }
@@ -274,6 +275,11 @@ export class Rebuilder {
         this.lifecycle.emit('module-done');
         return;
       }
+    }
+
+    if (await moduleRebuilder.findPrebuildifyModule(cacheKey)) {
+      this.lifecycle.emit('module-done');
+      return;
     }
 
     if (await moduleRebuilder.rebuildPrebuildModule(cacheKey)) {
