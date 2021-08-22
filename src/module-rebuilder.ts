@@ -5,7 +5,7 @@ import NodeGyp from 'node-gyp';
 import * as path from 'path';
 import { cacheModuleState } from './cache';
 import { DevDependencies, findPrebuildifyModule } from './module-type/prebuildify';
-import { getElectronNodeAPIVersion } from './node-api';
+import { getNapiVersion } from './node-api';
 import { promisify } from 'util';
 import { readPackageJson } from './read-package-json';
 import { Rebuilder } from './rebuild';
@@ -131,10 +131,6 @@ export class ModuleRebuilder {
     }
   }
 
-  getElectronNodeAPIVersion(): number {
-    return getElectronNodeAPIVersion(this.moduleName, this.rebuilder.electronVersion);
-  }
-
   async getNapiVersion(): Promise<number | undefined> {
     const moduleNapiVersions = await this.getSupportedNapiVersions();
 
@@ -143,16 +139,7 @@ export class ModuleRebuilder {
       return;
     }
 
-    const electronNapiVersion = this.getElectronNodeAPIVersion();
-
-    // Filter out Node-API versions that are too high
-    const filteredVersions = moduleNapiVersions.filter((v) => (v <= electronNapiVersion));
-
-    if (filteredVersions.length === 0) {
-      throw new Error(`Native module '${this.moduleName}' supports Node-API versions ${moduleNapiVersions} but Electron v${this.rebuilder.electronVersion} only supports Node-API v${electronNapiVersion}`)
-    }
-
-    return Math.max(...filteredVersions);
+    return getNapiVersion(this.moduleName, this.rebuilder.electronVersion, moduleNapiVersions);
   }
 
   async buildNodeGypArgsFromBinaryField(): Promise<string[]> {

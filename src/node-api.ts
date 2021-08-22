@@ -13,3 +13,20 @@ export function getElectronNodeAPIVersion(moduleName: string, electronVersion: s
 
     return electronNapiVersion;
 }
+
+export function getNapiVersion(
+  moduleName: string,
+  electronVersion: string,
+  moduleNapiVersions: number[]
+): number {
+  const electronNapiVersion = getElectronNodeAPIVersion(moduleName, electronVersion);
+
+  // Filter out Node-API versions that are too high
+  const filteredVersions = moduleNapiVersions.filter((v) => (v <= electronNapiVersion));
+
+  if (filteredVersions.length === 0) {
+    throw new Error(`Native module '${moduleName}' supports Node-API versions ${moduleNapiVersions} but Electron v${electronVersion} only supports Node-API v${electronNapiVersion}`)
+  }
+
+  return Math.max(...filteredVersions);
+}
