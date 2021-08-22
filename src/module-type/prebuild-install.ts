@@ -26,7 +26,7 @@ export class PrebuildInstall extends NativeModule {
         path.resolve(__dirname, '..', `prebuild-shim.${shimExt}`),
         prebuildInstallPath,
         `--arch=${this.rebuilder.arch}`,
-        `--platform=${process.platform}`,
+        `--platform=${this.rebuilder.platform}`,
         `--tag-prefix=${this.rebuilder.prebuildTagPrefix}`,
         ...await this.getPrebuildInstallRuntimeArgs(),
       ],
@@ -60,8 +60,8 @@ export class PrebuildInstall extends NativeModule {
   /**
    * Whether a prebuild-install-based native module exists.
    */
-  async prebuildInstallNativeModuleExists(): Promise<boolean> {
-    return fs.pathExists(path.resolve(this.modulePath, 'prebuilds', `${process.platform}-${this.rebuilder.arch}`, `electron-${this.rebuilder.ABI}.node`))
+  async prebuiltModuleExists(): Promise<boolean> {
+    return fs.pathExists(path.resolve(this.modulePath, 'prebuilds', `${this.rebuilder.platform}-${this.rebuilder.arch}`, `electron-${this.rebuilder.ABI}.node`))
   }
 
   async getPrebuildInstallRuntimeArgs(): Promise<string[]> {
