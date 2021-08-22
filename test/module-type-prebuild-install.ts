@@ -34,6 +34,7 @@ describe('prebuild-install', () => {
     it('should find correct napi version and select napi args', async () => {
       const rebuilder = new Rebuilder(rebuilderArgs);
       const prebuildInstall = new PrebuildInstall(rebuilder, modulePath);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       expect(prebuildInstall.nodeAPI.getNapiVersion((await prebuildInstall.getSupportedNapiVersions())!)).to.equal(3);
       expect(await prebuildInstall.getPrebuildInstallRuntimeArgs()).to.deep.equal([
         '--runtime=napi',
