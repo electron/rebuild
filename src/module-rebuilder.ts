@@ -271,6 +271,7 @@ export class ModuleRebuilder {
     await this.cacheModuleState(cacheKey);
 
     if (this.rebuilder.useElectronClang) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       this.restoreEnv(env!);
     }
   }

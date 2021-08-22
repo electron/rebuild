@@ -122,6 +122,7 @@ export class Rebuilder {
       this.ABIVersion = nodeAbi.getAbi(this.electronVersion, 'electron');
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return this.ABIVersion!;
   }
 

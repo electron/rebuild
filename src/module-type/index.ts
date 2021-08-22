@@ -69,4 +69,4 @@ export async function locateBinary(basePath: string, suffix: string): Promise<st
   }
 
   return null;
-};
+}
