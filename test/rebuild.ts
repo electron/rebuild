@@ -1,49 +1,23 @@
-import EventEmitter = require('events');
 import { expect } from 'chai';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as os from 'os';
-import { spawn } from '@malept/cross-spawn-promise';
 
+import { cleanupTestModule, MINUTES_IN_MILLISECONDS, resetMSVSVersion, resetTestModule, TIMEOUT_IN_MILLISECONDS } from './helpers/module-setup';
 import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild';
 import { getExactElectronVersionSync } from './helpers/electron-version';
-import { rebuild, Rebuilder } from '../src/rebuild';
-import { ModuleRebuilder } from '../src/module-rebuilder';
+import { rebuild } from '../src/rebuild';
 
-const MINUTES_IN_MILLISECONDS = 60 * 1000;
 const testElectronVersion = getExactElectronVersionSync();
 
 describe('rebuilder', () => {
   const testModulePath = path.resolve(os.tmpdir(), 'electron-rebuild-test');
-  const timeoutMinutes = process.platform === 'win32' ? 5 : 2;
-  const msvs_version: string | undefined = process.env.GYP_MSVS_VERSION;
-
-  const resetMSVSVersion = () => {
-    if (msvs_version) {
-      process.env.GYP_MSVS_VERSION = msvs_version;
-    }
-  };
-  const resetTestModule = async (): Promise<void> => {
-    await fs.remove(testModulePath);
-    await fs.mkdirs(testModulePath);
-    await fs.copy(
-      path.resolve(__dirname, '../test/fixture/native-app1/package.json'),
-      path.resolve(testModulePath, 'package.json')
-    );
-    await spawn('npm', ['install'], { cwd: testModulePath });
-    resetMSVSVersion();
-  };
-
-  const cleanupTestModule = async (): Promise<void> => {
-    await fs.remove(testModulePath);
-    resetMSVSVersion();
-  }
 
   describe('core behavior', function() {
-    this.timeout(timeoutMinutes * MINUTES_IN_MILLISECONDS);
+    this.timeout(TIMEOUT_IN_MILLISECONDS);
 
     before(async () => {
-      await resetTestModule();
+      await resetTestModule(testModulePath);
 
       process.env.ELECTRON_REBUILD_TESTS = 'true';
       await rebuild({
@@ -86,53 +60,15 @@ describe('rebuilder', () => {
 
     after(async () => {
       delete process.env.ELECTRON_REBUILD_TESTS;
-      await cleanupTestModule();
+      await cleanupTestModule(testModulePath);
     });
   });
-
-  describe('prebuild-install napi', function () {
-    this.timeout(timeoutMinutes * MINUTES_IN_MILLISECONDS);
-
-    before(resetTestModule);
-    after(cleanupTestModule);
-    afterEach(resetMSVSVersion);
-
-    it('should find correct napi version and select napi args', async () => {
-      const rebuilder = new Rebuilder({ buildPath: testModulePath, electronVersion: '8.0.0', arch: process.arch, lifecycle: new EventEmitter() });
-      const modulePath = path.join(testModulePath, 'node_modules', 'farmhash');
-      const modRebuilder = new ModuleRebuilder(rebuilder, modulePath);
-      expect(await modRebuilder.getNapiVersion()).to.equal(3);
-      expect(await modRebuilder.getPrebuildInstallRuntimeArgs()).to.deep.equal([
-        '--runtime=napi',
-        `--target=3`,
-      ])
-    });
-
-    it('should not fail running prebuild-install', async () => {
-      process.env.ELECTRON_REBUILD_TESTS = 'true';
-
-      const rebuilder = new Rebuilder({ buildPath: testModulePath, electronVersion: '8.0.0', arch: process.arch, lifecycle: new EventEmitter() });
-      const modulePath = path.join(testModulePath, 'node_modules', 'farmhash');
-      const modRebuilder = new ModuleRebuilder(rebuilder, modulePath);
-      expect(await modRebuilder.rebuildPrebuildModule('')).to.equal(true);
-    });
-
-    it('should throw error with unsupported Electron version', async () => {
-      try {
-        await rebuild({ buildPath: testModulePath, electronVersion: '2.0.0', arch: process.arch });
-        throw new Error('Expected error');
-      } catch (error) {
-        expect(error?.message).to.equal("Native module 'farmhash' requires Node-API but Electron v2.0.0 does not support Node-API");
-      }
-    });
-  });
-
 
   describe('force rebuild', function() {
-    this.timeout(timeoutMinutes * MINUTES_IN_MILLISECONDS);
+    this.timeout(TIMEOUT_IN_MILLISECONDS);
 
-    before(resetTestModule);
-    after(cleanupTestModule);
+    before(async () => await resetTestModule(testModulePath));
+    after(async () => await cleanupTestModule(testModulePath));
     afterEach(resetMSVSVersion);
 
     const buildPath = testModulePath;
@@ -183,8 +119,8 @@ describe('rebuilder', () => {
   describe('only rebuild', function() {
     this.timeout(2 * MINUTES_IN_MILLISECONDS);
 
-    beforeEach(resetTestModule);
-    afterEach(cleanupTestModule);
+    beforeEach(async () => await resetTestModule(testModulePath));
+    afterEach(async() => await cleanupTestModule(testModulePath));
 
     it('should rebuild only specified modules', async () => {
       const nativeModuleBinary = path.join(testModulePath, 'node_modules', 'native-hello-world', 'build', 'Release', 'hello_world.node');
@@ -223,8 +159,8 @@ describe('rebuilder', () => {
   describe('debug rebuild', function() {
     this.timeout(10 * MINUTES_IN_MILLISECONDS);
 
-    before(resetTestModule);
-    after(cleanupTestModule);
+    beforeEach(async () => await resetTestModule(testModulePath));
+    afterEach(async() => await cleanupTestModule(testModulePath));
 
     it('should have rebuilt ffi-napi module in Debug mode', async () => {
       await rebuild({
@@ -243,8 +179,8 @@ describe('rebuilder', () => {
   describe('useElectronClang rebuild', function() {
     this.timeout(10 * MINUTES_IN_MILLISECONDS);
 
-    before(resetTestModule);
-    after(cleanupTestModule);
+    beforeEach(async () => await resetTestModule(testModulePath));
+    afterEach(async() => await cleanupTestModule(testModulePath));
 
     it('should have rebuilt ffi-napi module using clang mode', async () => {
       await rebuild({
