@@ -7,12 +7,13 @@
   "scripts": {
     "codecov": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "compile": "tsc",
-    "coverage": "nyc npm run mocha",
+    "coverage": "nyc npm run spec",
     "watch": "tsc -w",
     "prepare": "npm run compile",
-    "mocha": "cross-env TS_NODE_FILES=true mocha --require ts-node/register ./test/*.ts",
+    "mocha": "cross-env TS_NODE_FILES=true mocha",
     "lint": "eslint --ext .ts .",
-    "test": "npm run lint && npm run mocha"
+    "spec": "npm run mocha -- test/*.ts",
+    "test": "npm run lint && npm run spec"
   },
   "bin": {
     "electron-rebuild": "lib/src/cli.js"

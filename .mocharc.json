@@ -1,0 +1,4 @@
+{
+  "extension": ["ts"],
+  "require": "ts-node/register"
+}
