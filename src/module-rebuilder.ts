@@ -122,7 +122,7 @@ export class ModuleRebuilder {
 
       value = value.replace('{configuration}', this.buildType)
         .replace('{node_abi}', `electron-v${this.rebuilder.electronVersion.split('.').slice(0, 2).join('.')}`)
-        .replace('{platform}', process.platform)
+        .replace('{platform}', this.rebuilder.platform)
         .replace('{arch}', this.rebuilder.arch)
         .replace('{version}', await this.packageJSONField('version') as string)
         .replace('{libc}', detectLibc.family || 'unknown');
@@ -158,7 +158,7 @@ export class ModuleRebuilder {
    * Whether a prebuild-install-based native module exists.
    */
   async prebuildInstallNativeModuleExists(): Promise<boolean> {
-    return fs.pathExists(path.resolve(this.modulePath, 'prebuilds', `${process.platform}-${this.rebuilder.arch}`, `electron-${this.rebuilder.ABI}.node`))
+    return fs.pathExists(path.resolve(this.modulePath, 'prebuilds', `${this.rebuilder.platform}-${this.rebuilder.arch}`, `electron-${this.rebuilder.ABI}.node`))
   }
 
   private restoreEnv(env: Record<string, string | undefined>): void {
@@ -287,7 +287,7 @@ export class ModuleRebuilder {
     if (nodePath && await fs.pathExists(nodePath)) {
       d('found .node file', nodePath);
       if (!this.rebuilder.disablePreGypCopy) {
-        const abiPath = path.resolve(this.modulePath, `bin/${process.platform}-${this.rebuilder.arch}-${this.rebuilder.ABI}`);
+        const abiPath = path.resolve(this.modulePath, `bin/${this.rebuilder.platform}-${this.rebuilder.arch}-${this.rebuilder.ABI}`);
         d('copying to prebuilt place:', abiPath);
         await fs.ensureDir(abiPath);
         await fs.copy(nodePath, path.resolve(abiPath, `${this.moduleName}.node`));
