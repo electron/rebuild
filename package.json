@@ -118,6 +118,10 @@
     "*.d.ts",
     "node_modules"
   ],
+  "mocha": {
+    "extensions": ["ts"],
+    "require": "ts-node/register"
+  },
   "nyc": {
     "extends": "@istanbuljs/nyc-config-typescript"
   }
