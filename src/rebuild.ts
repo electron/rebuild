@@ -282,7 +282,7 @@ export class Rebuilder {
       return;
     }
 
-    if (await moduleRebuilder.rebuildPrebuildModule(cacheKey)) {
+    if (await moduleRebuilder.findPrebuildInstallModule(cacheKey)) {
       this.lifecycle.emit('module-done');
       return;
     }

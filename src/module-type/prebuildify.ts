@@ -3,7 +3,7 @@ import debug from 'debug';
 import fs from 'fs-extra';
 import path from 'path';
 
-import { ensureElectronSupportsNodeAPI } from '../node-api';
+import { NodeAPI } from '../node-api';
 
 export type DevDependencies = Record<string, string>;
 
@@ -103,7 +103,7 @@ export async function findPrebuildifyModule(
   const abiModuleFilename = path.join(prebuiltModuleDir, `electron.abi${abi}.${nativeExt}`);
 
   if (await fs.pathExists(electronNapiModuleFilename) || await fs.pathExists(nodejsNapiModuleFilename)) {
-    ensureElectronSupportsNodeAPI(moduleName, electronVersion);
+    new NodeAPI(moduleName, electronVersion).ensureElectronSupport();
     d(`Found prebuilt Node-API module in ${prebuiltModuleDir}"`);
   } else if (await fs.pathExists(abiModuleFilename)) {
     d(`Found prebuilt module: "${abiModuleFilename}"`);

@@ -5,35 +5,15 @@ import NodeGyp from 'node-gyp';
 import * as path from 'path';
 import { cacheModuleState } from './cache';
 import { DevDependencies, findPrebuildifyModule } from './module-type/prebuildify';
-import { getNapiVersion } from './node-api';
+import { NodeAPI } from './node-api';
+import { PrebuildInstall } from './module-type/prebuild-install';
 import { promisify } from 'util';
 import { readPackageJson } from './read-package-json';
 import { Rebuilder } from './rebuild';
-import { spawn } from '@malept/cross-spawn-promise';
 import { ELECTRON_GYP_DIR } from './constants';
 import { getClangEnvironmentVars } from './clang-fetcher';
 
 const d = debug('electron-rebuild');
-
-const locateBinary = async (basePath: string, suffix: string): Promise<string | null> => {
-  let parentPath = basePath;
-  let testPath: string | undefined;
-
-  while (testPath !== parentPath) {
-    testPath = parentPath;
-    const checkPath = path.resolve(testPath, suffix);
-    if (await fs.pathExists(checkPath)) {
-      return checkPath;
-    }
-    parentPath = path.resolve(testPath, '..');
-  }
-
-  return null;
-};
-
-async function locatePrebuildInstall(modulePath: string): Promise<string | null> {
-  return await locateBinary(modulePath, 'node_modules/prebuild-install/bin.js');
-}
 
 type PackageJSONValue = string | Record<string, unknown>;
 
@@ -116,21 +96,6 @@ export class ModuleRebuilder {
     return binary?.napi_versions;
   }
 
-  async getPrebuildInstallRuntimeArgs(): Promise<string[]> {
-    const napiVersion = await this.getNapiVersion();
-    if (napiVersion) {
-      return [
-        '--runtime=napi',
-        `--target=${napiVersion}`,
-      ]
-    } else {
-      return [
-        '--runtime=electron',
-        `--target=${this.rebuilder.electronVersion}`,
-      ]
-    }
-  }
-
   async getNapiVersion(): Promise<number | undefined> {
     const moduleNapiVersions = await this.getSupportedNapiVersions();
 
@@ -139,7 +104,7 @@ export class ModuleRebuilder {
       return;
     }
 
-    return getNapiVersion(this.moduleName, this.rebuilder.electronVersion, moduleNapiVersions);
+    return new NodeAPI(this.moduleName, this.rebuilder.electronVersion).getNapiVersion(moduleNapiVersions);
   }
 
   async buildNodeGypArgsFromBinaryField(): Promise<string[]> {
@@ -176,11 +141,6 @@ export class ModuleRebuilder {
     if (this.rebuilder.useCache) {
       await cacheModuleState(this.modulePath, this.rebuilder.cachePath, cacheKey);
     }
-  }
-
-  async isPrebuildInstallNativeModule(): Promise<boolean> {
-    const dependencies = await this.packageJSONFieldWithDefault('dependencies', {});
-    return !!dependencies['prebuild-install']
   }
 
   async packageJSONFieldWithDefault(key: string, defaultValue: PackageJSONValue): Promise<PackageJSONValue> {
@@ -229,6 +189,24 @@ export class ModuleRebuilder {
       await this.writeMetadata();
       await this.cacheModuleState(cacheKey);
 
+      return true;
+    }
+
+    return false;
+  }
+
+  async findPrebuildInstallModule(cacheKey: string): Promise<boolean> {
+    const prebuildInstall = new PrebuildInstall(this.rebuilder, this.modulePath);
+    if (await prebuildInstall.usesTool()) {
+      d(`assuming is prebuild-install powered: ${this.moduleName}`);
+    } else {
+      return false;
+    }
+
+    if (await prebuildInstall.findPrebuiltModule()) {
+      d('built:', this.moduleName);
+      await this.writeMetadata();
+      await this.cacheModuleState(cacheKey);
       return true;
     }
 
@@ -296,39 +274,6 @@ export class ModuleRebuilder {
     }
   }
 
-  async rebuildPrebuildModule(cacheKey: string): Promise<boolean> {
-    if (!(await this.isPrebuildInstallNativeModule())) {
-      return false;
-    }
-
-    d(`assuming is prebuild-install powered: ${this.moduleName}`);
-    const prebuildInstallPath = await locatePrebuildInstall(this.modulePath);
-    if (prebuildInstallPath) {
-      d(`triggering prebuild download step: ${this.moduleName}`);
-      let success = false;
-      try {
-        await this.runPrebuildInstall(prebuildInstallPath);
-        success = true;
-      } catch (err) {
-        d('failed to use prebuild-install:', err);
-
-        if (err?.message?.includes('requires Node-API but Electron')) {
-          throw err;
-        }
-      }
-      if (success) {
-        d('built:', this.moduleName);
-        await this.writeMetadata();
-        await this.cacheModuleState(cacheKey);
-        return true;
-      }
-    } else {
-      d(`could not find prebuild-install relative to: ${this.modulePath}`);
-    }
-
-    return false;
-  }
-
   async replaceExistingNativeModule(): Promise<void> {
     const buildLocation = path.resolve(this.modulePath, 'build', this.buildType);
 
@@ -348,26 +293,6 @@ export class ModuleRebuilder {
         await fs.copy(nodePath, path.resolve(abiPath, `${this.moduleName}.node`));
       }
     }
-  }
-
-  async runPrebuildInstall(prebuildInstallPath: string): Promise<void> {
-    const shimExt = process.env.ELECTRON_REBUILD_TESTS ? 'ts' : 'js';
-    const executable = process.env.ELECTRON_REBUILD_TESTS ? path.resolve(__dirname, '..', 'node_modules', '.bin', 'ts-node') : process.execPath;
-
-    await spawn(
-      executable,
-      [
-        path.resolve(__dirname, `prebuild-shim.${shimExt}`),
-        prebuildInstallPath,
-        `--arch=${this.rebuilder.arch}`,
-        `--platform=${process.platform}`,
-        `--tag-prefix=${this.rebuilder.prebuildTagPrefix}`,
-        ...await this.getPrebuildInstallRuntimeArgs(),
-      ],
-      {
-        cwd: this.modulePath,
-      }
-    );
   }
 
   async writeMetadata(): Promise<void> {
