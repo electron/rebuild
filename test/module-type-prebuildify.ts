@@ -1,12 +1,13 @@
+import { EventEmitter } from 'events';
 import { expect } from 'chai';
 import path from 'path';
 
 import {
   determineNativePrebuildArch,
   determineNativePrebuildExtension,
-  findPrebuildifyModule,
-  isPrebuildifyNativeModule
+  Prebuildify
 } from '../src/module-type/prebuildify';
+import { Rebuilder } from '../src/rebuild';
 
 describe('determineNativePrebuildArch', () => {
   it('returns arm if passed in armv7l', () => {
@@ -32,64 +33,79 @@ describe('determineNativePrebuildExtension', () => {
   });
 });
 
-describe('isPrebuildifyNativeModule', () => {
-  it('succeeds if prebuildify exists in devDependencies', () => {
-    expect(isPrebuildifyNativeModule({ prebuildify: 'validvalue' })).to.equal(true);
-  });
-
-  it('fails if prebuildify does not exist in devDependencies', () => {
-    expect(isPrebuildifyNativeModule({})).to.equal(false);
-  });
-});
-
-describe('findPrebuildifyModule', () => {
+describe('prebuildify', () => {
   const fixtureBaseDir = path.join(__dirname, 'fixture', 'prebuildify');
+  const rebuilderArgs = {
+    buildPath: 'nonexistent-path',
+    electronVersion: '13.0.0',
+    platform: 'linux',
+    arch: 'x64',
+    lifecycle: new EventEmitter()
+  };
 
-  const platform = 'linux';
-  const arch = 'x64';
-  const electronVersion = '13.0.0';
-  const abi = '89';
-  const devDependencies = { prebuildify: '^1.0.0' };
-  describe('not a prebuildify native module', () => {
-    it('should not find a prebuilt native module', async () => {
-      expect(await findPrebuildifyModule('modulePath', platform, arch, electronVersion, abi, {})).to.equal(false);
+  describe('usesTool', () => {
+    it('succeeds if prebuildify exists in devDependencies', async () => {
+      const rebuilder = new Rebuilder(rebuilderArgs);
+      const prebuildify = new Prebuildify(rebuilder, path.join(fixtureBaseDir, 'has-prebuildify-devdep'));
+      expect(await prebuildify.usesTool()).to.equal(true);
     });
-  });
-  describe('with no prebuilds directory', () => {
-    it('should not find a prebuilt native module', async () => {
-      const noPrebuildsDir = __dirname;
-      expect(await findPrebuildifyModule(noPrebuildsDir, platform, arch, electronVersion, abi, devDependencies)).to.equal(false);
-    });
-  });
 
-  describe('with prebuilt module for the given ABI', async () => {
-    it('should find a prebuilt native module for x64/electron', async () => {
-      const fixtureDir = path.join(fixtureBaseDir, 'abi');
-      expect(await findPrebuildifyModule(fixtureDir, platform, arch, electronVersion, abi, devDependencies)).to.equal(true);
+    it('fails if prebuildify does not exist in devDependencies', async () => {
+      const rebuilder = new Rebuilder(rebuilderArgs);
+      const prebuildify = new Prebuildify(rebuilder, path.join(fixtureBaseDir, 'no-prebuildify-devdep'));
+      expect(await prebuildify.usesTool()).to.equal(false);
     });
   });
 
-  describe('with prebuilt Node-API module', async () => {
-    it('should find a prebuilt native module for x64/node', async () => {
-      const fixtureDir = path.join(fixtureBaseDir, 'napi');
-      expect(await findPrebuildifyModule(fixtureDir, platform, arch, electronVersion, abi, devDependencies)).to.equal(true);
+  describe('findPrebuiltModule', () => {
+    describe('with no prebuilds directory', () => {
+      it('should not find a prebuilt native module', async () => {
+        const noPrebuildsDir = __dirname;
+        const rebuilder = new Rebuilder(rebuilderArgs);
+        const prebuildify = new Prebuildify(rebuilder, noPrebuildsDir);
+        expect(await prebuildify.findPrebuiltModule()).to.equal(false);
+      });
     });
 
-    it('should find a prebuilt native module for armv7l/node', async () => {
-      const fixtureDir = path.join(fixtureBaseDir, 'napi');
-      expect(await findPrebuildifyModule(fixtureDir, platform, 'armv7l', electronVersion, abi, devDependencies)).to.equal(true);
+    describe('with prebuilt module for the given ABI', async () => {
+      it('should find a prebuilt native module for x64/electron', async () => {
+        const fixtureDir = path.join(fixtureBaseDir, 'abi');
+        const rebuilder = new Rebuilder(rebuilderArgs);
+        const prebuildify = new Prebuildify(rebuilder, fixtureDir);
+        expect(await prebuildify.findPrebuiltModule()).to.equal(true);
+      });
     });
 
-    it('should find a prebuilt native module for arm64/electron', async () => {
-      const fixtureDir = path.join(fixtureBaseDir, 'napi');
-      expect(await findPrebuildifyModule(fixtureDir, platform, 'arm64', electronVersion, abi, devDependencies)).to.equal(true);
-    });
-  });
+    describe('with prebuilt Node-API module', async () => {
+      it('should find a prebuilt native module for x64/node', async () => {
+        const fixtureDir = path.join(fixtureBaseDir, 'napi');
+        const rebuilder = new Rebuilder(rebuilderArgs);
+        const prebuildify = new Prebuildify(rebuilder, fixtureDir);
+        expect(await prebuildify.findPrebuiltModule()).to.equal(true);
+      });
 
-  describe('when it cannot find a prebuilt module', async () => {
-    it('should not find a prebuilt native module', async () => {
-      const fixtureDir = path.join(fixtureBaseDir, 'not-found');
-      expect(await findPrebuildifyModule(fixtureDir, platform, arch, electronVersion, abi, devDependencies)).to.equal(false);
+      it('should find a prebuilt native module for armv7l/node', async () => {
+        const fixtureDir = path.join(fixtureBaseDir, 'napi');
+        const rebuilder = new Rebuilder(rebuilderArgs);
+        const prebuildify = new Prebuildify(rebuilder, fixtureDir);
+        expect(await prebuildify.findPrebuiltModule()).to.equal(true);
+      });
+
+      it('should find a prebuilt native module for arm64/electron', async () => {
+        const fixtureDir = path.join(fixtureBaseDir, 'napi');
+        const rebuilder = new Rebuilder(rebuilderArgs);
+        const prebuildify = new Prebuildify(rebuilder, fixtureDir);
+        expect(await prebuildify.findPrebuiltModule()).to.equal(true);
+      });
+    });
+
+    describe('when it cannot find a prebuilt module', async () => {
+      it('should not find a prebuilt native module', async () => {
+        const fixtureDir = path.join(fixtureBaseDir, 'not-found');
+        const rebuilder = new Rebuilder(rebuilderArgs);
+        const prebuildify = new Prebuildify(rebuilder, fixtureDir);
+        expect(await prebuildify.findPrebuiltModule()).to.equal(false);
+      });
     });
   });
 });

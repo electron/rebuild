@@ -4,8 +4,8 @@ import * as fs from 'fs-extra';
 import NodeGyp from 'node-gyp';
 import * as path from 'path';
 import { cacheModuleState } from './cache';
-import { DevDependencies, findPrebuildifyModule } from './module-type/prebuildify';
 import { NodeAPI } from './node-api';
+import { Prebuildify } from './module-type/prebuildify';
 import { PrebuildInstall } from './module-type/prebuild-install';
 import { promisify } from 'util';
 import { readPackageJson } from './read-package-json';
@@ -184,12 +184,15 @@ export class ModuleRebuilder {
    * the given platform and arch.
    */
   async findPrebuildifyModule(cacheKey: string): Promise<boolean> {
-    const devDependencies = await this.packageJSONFieldWithDefault('devDependencies', {});
-    if (await findPrebuildifyModule(this.modulePath, this.rebuilder.platform, this.rebuilder.arch, this.rebuilder.electronVersion, this.rebuilder.ABI, devDependencies as DevDependencies)) {
-      await this.writeMetadata();
-      await this.cacheModuleState(cacheKey);
+    const prebuildify = new Prebuildify(this.rebuilder, this.modulePath);
+    if (await prebuildify.usesTool()) {
+      d(`assuming is prebuildify powered: ${this.moduleName}`);
 
-      return true;
+      if (await prebuildify.findPrebuiltModule()) {
+        await this.writeMetadata();
+        await this.cacheModuleState(cacheKey);
+        return true;
+      }
     }
 
     return false;
@@ -199,15 +202,13 @@ export class ModuleRebuilder {
     const prebuildInstall = new PrebuildInstall(this.rebuilder, this.modulePath);
     if (await prebuildInstall.usesTool()) {
       d(`assuming is prebuild-install powered: ${this.moduleName}`);
-    } else {
-      return false;
-    }
 
-    if (await prebuildInstall.findPrebuiltModule()) {
-      d('built:', this.moduleName);
-      await this.writeMetadata();
-      await this.cacheModuleState(cacheKey);
-      return true;
+      if (await prebuildInstall.findPrebuiltModule()) {
+        d('installed prebuilt module:', this.moduleName);
+        await this.writeMetadata();
+        await this.cacheModuleState(cacheKey);
+        return true;
+      }
     }
 
     return false;
