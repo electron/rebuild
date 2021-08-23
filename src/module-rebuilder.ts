@@ -4,7 +4,6 @@ import * as fs from 'fs-extra';
 import NodeGyp from 'node-gyp';
 import * as path from 'path';
 import { cacheModuleState } from './cache';
-import { NodeAPI } from './node-api';
 import { Prebuildify } from './module-type/prebuildify';
 import { PrebuildInstall } from './module-type/prebuild-install';
 import { promisify } from 'util';
@@ -26,10 +25,14 @@ export class ModuleRebuilder {
   private modulePath: string;
   private packageJSON: Record<string, PackageJSONValue | undefined>;
   private rebuilder: Rebuilder;
+  private prebuildify: Prebuildify;
+  private prebuildInstall: PrebuildInstall;
 
   constructor(rebuilder: Rebuilder, modulePath: string) {
     this.modulePath = modulePath;
     this.rebuilder = rebuilder;
+    this.prebuildify = new Prebuildify(rebuilder, modulePath);
+    this.prebuildInstall = new PrebuildInstall(rebuilder, modulePath);
   }
 
   get buildType(): BuildType {
@@ -87,26 +90,6 @@ export class ModuleRebuilder {
     return args;
   }
 
-  async getSupportedNapiVersions(): Promise<number[] | undefined> {
-    const binary = (await this.packageJSONFieldWithDefault(
-      'binary',
-      {}
-    )) as Record<string, number[]>;
-
-    return binary?.napi_versions;
-  }
-
-  async getNapiVersion(): Promise<number | undefined> {
-    const moduleNapiVersions = await this.getSupportedNapiVersions();
-
-    if (!moduleNapiVersions) {
-      // This is not a Node-API module
-      return;
-    }
-
-    return new NodeAPI(this.moduleName, this.rebuilder.electronVersion).getNapiVersion(moduleNapiVersions);
-  }
-
   async buildNodeGypArgsFromBinaryField(): Promise<string[]> {
     const binary = await this.packageJSONFieldWithDefault('binary', {}) as Record<string, string>;
     const flags = await Promise.all(Object.entries(binary).map(async ([binaryKey, binaryValue]) => {
@@ -155,10 +138,10 @@ export class ModuleRebuilder {
   }
 
   /**
-   * Whether a prebuild-install-based native module exists.
+   * Whether a prebuild-install-generated native module exists.
    */
   async prebuildInstallNativeModuleExists(): Promise<boolean> {
-    return fs.pathExists(path.resolve(this.modulePath, 'prebuilds', `${this.rebuilder.platform}-${this.rebuilder.arch}`, `electron-${this.rebuilder.ABI}.node`))
+    return this.prebuildInstall.prebuiltModuleExists();
   }
 
   private restoreEnv(env: Record<string, string | undefined>): void {
@@ -184,11 +167,10 @@ export class ModuleRebuilder {
    * the given platform and arch.
    */
   async findPrebuildifyModule(cacheKey: string): Promise<boolean> {
-    const prebuildify = new Prebuildify(this.rebuilder, this.modulePath);
-    if (await prebuildify.usesTool()) {
+    if (await this.prebuildify.usesTool()) {
       d(`assuming is prebuildify powered: ${this.moduleName}`);
 
-      if (await prebuildify.findPrebuiltModule()) {
+      if (await this.prebuildify.findPrebuiltModule()) {
         await this.writeMetadata();
         await this.cacheModuleState(cacheKey);
         return true;
@@ -199,11 +181,10 @@ export class ModuleRebuilder {
   }
 
   async findPrebuildInstallModule(cacheKey: string): Promise<boolean> {
-    const prebuildInstall = new PrebuildInstall(this.rebuilder, this.modulePath);
-    if (await prebuildInstall.usesTool()) {
+    if (await this.prebuildInstall.usesTool()) {
       d(`assuming is prebuild-install powered: ${this.moduleName}`);
 
-      if (await prebuildInstall.findPrebuiltModule()) {
+      if (await this.prebuildInstall.findPrebuiltModule()) {
         d('installed prebuilt module:', this.moduleName);
         await this.writeMetadata();
         await this.cacheModuleState(cacheKey);
