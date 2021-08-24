@@ -7,7 +7,7 @@ import {
   determineNativePrebuildExtension,
   Prebuildify
 } from '../src/module-type/prebuildify';
-import { Rebuilder } from '../src/rebuild';
+import { Rebuilder, RebuilderOptions } from '../src/rebuild';
 
 describe('determineNativePrebuildArch', () => {
   it('returns arm if passed in armv7l', () => {
@@ -38,20 +38,25 @@ describe('prebuildify', () => {
   const rebuilderArgs = {
     buildPath: 'nonexistent-path',
     electronVersion: '13.0.0',
-    platform: 'linux',
     arch: 'x64',
     lifecycle: new EventEmitter()
   };
 
+  const createRebuilder = (args: Partial<RebuilderOptions> = {}): Rebuilder => {
+    const rebuilder = new Rebuilder({ ...rebuilderArgs, ...args});
+    rebuilder.platform = 'linux';
+    return rebuilder;
+  };
+
   describe('usesTool', () => {
     it('succeeds if prebuildify exists in devDependencies', async () => {
-      const rebuilder = new Rebuilder(rebuilderArgs);
+      const rebuilder = createRebuilder();
       const prebuildify = new Prebuildify(rebuilder, path.join(fixtureBaseDir, 'has-prebuildify-devdep'));
       expect(await prebuildify.usesTool()).to.equal(true);
     });
 
     it('fails if prebuildify does not exist in devDependencies', async () => {
-      const rebuilder = new Rebuilder(rebuilderArgs);
+      const rebuilder = createRebuilder();
       const prebuildify = new Prebuildify(rebuilder, path.join(fixtureBaseDir, 'no-prebuildify-devdep'));
       expect(await prebuildify.usesTool()).to.equal(false);
     });
@@ -61,7 +66,7 @@ describe('prebuildify', () => {
     describe('with no prebuilds directory', () => {
       it('should not find a prebuilt native module', async () => {
         const noPrebuildsDir = __dirname;
-        const rebuilder = new Rebuilder(rebuilderArgs);
+        const rebuilder = createRebuilder();
         const prebuildify = new Prebuildify(rebuilder, noPrebuildsDir);
         expect(await prebuildify.findPrebuiltModule()).to.equal(false);
       });
@@ -70,7 +75,7 @@ describe('prebuildify', () => {
     describe('with prebuilt module for the given ABI', async () => {
       it('should find a prebuilt native module for x64/electron', async () => {
         const fixtureDir = path.join(fixtureBaseDir, 'abi');
-        const rebuilder = new Rebuilder(rebuilderArgs);
+        const rebuilder = createRebuilder();
         const prebuildify = new Prebuildify(rebuilder, fixtureDir);
         expect(await prebuildify.findPrebuiltModule()).to.equal(true);
       });
@@ -79,21 +84,21 @@ describe('prebuildify', () => {
     describe('with prebuilt Node-API module', async () => {
       it('should find a prebuilt native module for x64/node', async () => {
         const fixtureDir = path.join(fixtureBaseDir, 'napi');
-        const rebuilder = new Rebuilder(rebuilderArgs);
+        const rebuilder = createRebuilder();
         const prebuildify = new Prebuildify(rebuilder, fixtureDir);
         expect(await prebuildify.findPrebuiltModule()).to.equal(true);
       });
 
       it('should find a prebuilt native module for armv7l/node', async () => {
         const fixtureDir = path.join(fixtureBaseDir, 'napi');
-        const rebuilder = new Rebuilder(rebuilderArgs);
+        const rebuilder = createRebuilder({ arch: 'armv7l' });
         const prebuildify = new Prebuildify(rebuilder, fixtureDir);
         expect(await prebuildify.findPrebuiltModule()).to.equal(true);
       });
 
       it('should find a prebuilt native module for arm64/electron', async () => {
         const fixtureDir = path.join(fixtureBaseDir, 'napi');
-        const rebuilder = new Rebuilder(rebuilderArgs);
+        const rebuilder = createRebuilder({ arch: 'arm64' });
         const prebuildify = new Prebuildify(rebuilder, fixtureDir);
         expect(await prebuildify.findPrebuiltModule()).to.equal(true);
       });
@@ -102,7 +107,7 @@ describe('prebuildify', () => {
     describe('when it cannot find a prebuilt module', async () => {
       it('should not find a prebuilt native module', async () => {
         const fixtureDir = path.join(fixtureBaseDir, 'not-found');
-        const rebuilder = new Rebuilder(rebuilderArgs);
+        const rebuilder = createRebuilder();
         const prebuildify = new Prebuildify(rebuilder, fixtureDir);
         expect(await prebuildify.findPrebuiltModule()).to.equal(false);
       });
