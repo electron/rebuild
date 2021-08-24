@@ -24,9 +24,7 @@ export class NodeGyp extends NativeModule {
       '--build-from-source'
     ];
 
-    if (process.env.DEBUG) {
-      args.push('--verbose');
-    }
+    args.push(d.enabled ? '--verbose' : '--quiet');
 
     if (this.rebuilder.debug) {
       args.push('--debug');
@@ -115,8 +113,10 @@ export class NodeGyp extends NativeModule {
         command = nodeGyp.todo.shift();
       }
     } catch (err) {
-      let errorMessage = `node-gyp failed to rebuild '${this.modulePath}'.\n`;
-      errorMessage += `Error: ${err.message || err}\n\n`;
+      const errorMessage = `node-gyp failed to rebuild '${this.modulePath}'.
+For more information, rerun with the DEBUG environment variable set to "electron-rebuild".
+
+Error: ${err.message || err}\n\n`;
       throw new Error(errorMessage);
     } finally {
       process.chdir(originalWorkingDir);
