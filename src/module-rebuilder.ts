@@ -112,14 +112,13 @@ export class ModuleRebuilder {
       if (!this.rebuilder.disablePreGypCopy) {
         const abiPath = path.resolve(this.modulePath, `bin/${this.rebuilder.platform}-${this.rebuilder.arch}-${this.rebuilder.ABI}`);
         d('copying to prebuilt place:', abiPath);
-        await fs.ensureDir(abiPath);
-        await fs.copy(nodePath, path.resolve(abiPath, `${this.nodeGyp.moduleName}.node`));
+        await fs.mkdir(abiPath, { recursive: true });
+        await fs.copyFile(nodePath, path.join(abiPath, `${this.nodeGyp.moduleName}.node`));
       }
     }
   }
 
   async writeMetadata(): Promise<void> {
-    await fs.ensureDir(path.dirname(this.metaPath));
-    await fs.writeFile(this.metaPath, this.metaData);
+    await fs.outputFile(this.metaPath, this.metaData);
   }
 }
