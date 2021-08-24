@@ -5103,9 +5103,9 @@ node-gyp@^7.1.0, node-gyp@^7.1.2:
     which "^2.0.2"
 
 node-gyp@^8.1.0:
-  version "8.1.0"
-  resolved "https://registry.yarnpkg.com/node-gyp/-/node-gyp-8.1.0.tgz#81f43283e922d285c886fb0e0f520a7fd431d8c2"
-  integrity sha512-o2elh1qt7YUp3lkMwY3/l4KF3j/A3fI/Qt4NH+CQQgPJdqGE9y7qnP84cjIWN27Q0jJkrSAhCVDg+wBVNBYdBg==
+  version "8.2.0"
+  resolved "https://registry.yarnpkg.com/node-gyp/-/node-gyp-8.2.0.tgz#ef509ccdf5cef3b4d93df0690b90aa55ff8c7977"
+  integrity sha512-KG8SdcoAnw2d6augGwl1kOayALUrXW/P2uOAm2J2+nmW/HjZo7y+8TDg7LejxbekOOSv3kzhq+NSUYkIDAX8eA==
   dependencies:
     env-paths "^2.2.0"
     glob "^7.1.4"
@@ -5115,7 +5115,7 @@ node-gyp@^8.1.0:
     npmlog "^4.1.2"
     rimraf "^3.0.2"
     semver "^7.3.5"
-    tar "^6.1.0"
+    tar "^6.1.2"
     which "^2.0.2"
 
 node-preload@^0.2.1:
@@ -7247,7 +7247,7 @@ tar@^4.4.10, tar@^4.4.12, tar@^4.4.15:
     safe-buffer "^5.1.2"
     yallist "^3.0.3"
 
-tar@^6.0.2, tar@^6.0.5, tar@^6.1.0, tar@^6.1.6:
+tar@^6.0.2, tar@^6.0.5, tar@^6.1.0, tar@^6.1.2, tar@^6.1.6:
   version "6.1.10"
   resolved "https://registry.yarnpkg.com/tar/-/tar-6.1.10.tgz#8a320a74475fba54398fa136cd9883aa8ad11175"
   integrity sha512-kvvfiVvjGMxeUNB6MyYv5z7vhfFRwbwCXJAeL0/lnbrttBVqcMOnpHUf0X42LrPMR8mMpgapkJMchFH4FSHzNA==
