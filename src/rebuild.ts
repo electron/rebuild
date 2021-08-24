@@ -39,6 +39,11 @@ export interface RebuilderOptions extends RebuildOptions {
   lifecycle: EventEmitter;
 }
 
+export enum BuildType {
+  Debug = 'Debug',
+  Release = 'Release',
+}
+
 const d = debug('electron-rebuild');
 
 const defaultMode: RebuildMode = 'sequential';
@@ -124,6 +129,10 @@ export class Rebuilder {
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return this.ABIVersion!;
+  }
+
+  get buildType(): BuildType {
+    return this.debug ? BuildType.Debug : BuildType.Release;
   }
 
   async rebuild(): Promise<void> {
