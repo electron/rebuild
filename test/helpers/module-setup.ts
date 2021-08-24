@@ -15,7 +15,7 @@ export function resetMSVSVersion(): void {
 }
 
 export async function resetTestModule(testModulePath: string): Promise<void> {
-  await fs.rmdir(testModulePath, { recursive: true });
+  await fs.remove(testModulePath);
   await fs.mkdir(testModulePath, { recursive: true });
   await fs.copyFile(
     path.resolve(__dirname, '../../test/fixture/native-app1/package.json'),
@@ -26,6 +26,6 @@ export async function resetTestModule(testModulePath: string): Promise<void> {
 }
 
 export async function cleanupTestModule(testModulePath: string): Promise<void> {
-  await fs.rmdir(testModulePath, { recursive: true });
+  await fs.remove(testModulePath);
   resetMSVSVersion();
 }
