@@ -159,8 +159,8 @@ describe('rebuilder', () => {
   describe('debug rebuild', function() {
     this.timeout(10 * MINUTES_IN_MILLISECONDS);
 
-    beforeEach(async () => await resetTestModule(testModulePath));
-    afterEach(async() => await cleanupTestModule(testModulePath));
+    before(async () => await resetTestModule(testModulePath));
+    after(async() => await cleanupTestModule(testModulePath));
 
     it('should have rebuilt ffi-napi module in Debug mode', async () => {
       await rebuild({
@@ -179,8 +179,8 @@ describe('rebuilder', () => {
   describe('useElectronClang rebuild', function() {
     this.timeout(10 * MINUTES_IN_MILLISECONDS);
 
-    beforeEach(async () => await resetTestModule(testModulePath));
-    afterEach(async() => await cleanupTestModule(testModulePath));
+    before(async () => await resetTestModule(testModulePath));
+    after(async() => await cleanupTestModule(testModulePath));
 
     it('should have rebuilt ffi-napi module using clang mode', async () => {
       await rebuild({
