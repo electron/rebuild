@@ -24,7 +24,7 @@ export class NodeGyp extends NativeModule {
       '--build-from-source'
     ];
 
-    args.push(d.enabled ? '--verbose' : '--quiet');
+    args.push(d.enabled ? '--verbose' : '--silent');
 
     if (this.rebuilder.debug) {
       args.push('--debug');
