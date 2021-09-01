@@ -4995,12 +4995,12 @@ nice-try@^1.0.4:
   resolved "https://registry.yarnpkg.com/nice-try/-/nice-try-1.0.5.tgz#a3378a7696ce7d223e88fc9b764bd7ef1089e366"
   integrity sha512-1nh45deeb5olNY7eX82BkPO7SSxR5SSYJiPTrTdFUVYwAl8CKMA5N9PjTYkHiRjisVcxcQ1HXdLhx2qxxJzLNQ==
 
-node-abi@^2.19.2:
-  version "2.30.1"
-  resolved "https://registry.yarnpkg.com/node-abi/-/node-abi-2.30.1.tgz#c437d4b1fe0e285aaf290d45b45d4d7afedac4cf"
-  integrity sha512-/2D0wOQPgaUWzVSVgRMx+trKJRC2UG4SUc4oCJoXx9Uxjtp0Vy3/kt7zcbxHF8+Z/pK3UloLWzBISg72brfy1w==
+node-abi@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/node-abi/-/node-abi-3.0.0.tgz#aaeec41ffa8dd436de7a97345ff6f5c99eeafeec"
+  integrity sha512-bAfE5Pp+qqHiz4GkpH64HqHUgK2DippKB3QuYbsOp8QoR8c7S646jJMfsOj+WHZO5dPssO3j+54LwG3w3HeYWg==
   dependencies:
-    semver "^5.4.1"
+    semver "^7.3.5"
 
 node-addon-api@^3.1.0:
   version "3.2.1"
