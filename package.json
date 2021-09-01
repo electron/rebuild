@@ -45,7 +45,7 @@
     "fs-extra": "^10.0.0",
     "got": "^11.7.0",
     "lzma-native": "^8.0.1",
-    "node-abi": "^2.19.2",
+    "node-abi": "^3.0.0",
     "node-api-version": "^0.1.4",
     "node-gyp": "^8.1.0",
     "ora": "^5.1.0",
