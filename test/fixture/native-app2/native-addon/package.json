@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "name": "@scoped/native-addon",
+  "version": "1.2.3",
+  "main": "index.js",
+  "license": "MIT"
+}
