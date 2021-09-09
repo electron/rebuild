@@ -6,9 +6,10 @@ import * as path from 'path';
 import ora = require('ora');
 import yargs from 'yargs/yargs';
 
-import { rebuild, ModuleType } from './rebuild';
 import { getProjectRootPath } from './search-module';
 import { locateElectronModule } from './electron-locator';
+import { ModuleType } from './module-walker';
+import { rebuild } from './rebuild';
 
 const argv = yargs(process.argv.slice(2)).version(false).options({
   version: { alias: 'v', type: 'string', description: 'The version of Electron to build against' },

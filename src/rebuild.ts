@@ -6,11 +6,9 @@ import * as nodeAbi from 'node-abi';
 import * as os from 'os';
 import * as path from 'path';
 
-import { readPackageJson } from './read-package-json';
 import { lookupModuleState } from './cache';
-import { searchForModule, searchForNodeModules } from './search-module';
+import { ModuleType, ModuleWalker } from './module-walker';
 
-export type ModuleType = 'prod' | 'dev' | 'optional';
 export type RebuildMode = 'sequential' | 'parallel';
 
 export interface RebuildOptions {
@@ -53,11 +51,9 @@ const ELECTRON_REBUILD_CACHE_ID = 1;
 
 export class Rebuilder {
   private ABIVersion: string | undefined;
+  private moduleWalker: ModuleWalker;
   nodeGypPath: string;
-  prodDeps: Set<string>;
   rebuilds: (() => Promise<void>)[];
-  realModulePaths: Set<string>;
-  realNodeModulesPaths: Set<string>;
 
   public lifecycle: EventEmitter;
   public buildPath: string;
@@ -116,10 +112,14 @@ export class Rebuilder {
     }
 
     this.ABIVersion = options.forceABI?.toString();
-    this.prodDeps = this.extraModules.reduce((acc: Set<string>, x: string) => acc.add(x), new Set<string>());
+    this.moduleWalker = new ModuleWalker(
+      this.buildPath,
+      this.projectRootPath,
+      this.types,
+      this.extraModules.reduce((acc: Set<string>, x: string) => acc.add(x), new Set<string>()),
+      this.onlyModules,
+    );
     this.rebuilds = [];
-    this.realModulePaths = new Set();
-    this.realNodeModulesPaths = new Set();
   }
 
   get ABI(): string {
@@ -153,42 +153,14 @@ export class Rebuilder {
 
     this.lifecycle.emit('start');
 
-    const rootPackageJson = await readPackageJson(this.buildPath);
-    const markWaiters: Promise<void>[] = [];
-    const depKeys = [];
+    await this.moduleWalker.walkModules();
 
-    if (this.types.indexOf('prod') !== -1 || this.onlyModules) {
-      depKeys.push(...Object.keys(rootPackageJson.dependencies || {}));
-    }
-    if (this.types.indexOf('optional') !== -1 || this.onlyModules) {
-      depKeys.push(...Object.keys(rootPackageJson.optionalDependencies || {}));
-    }
-    if (this.types.indexOf('dev') !== -1 || this.onlyModules) {
-      depKeys.push(...Object.keys(rootPackageJson.devDependencies || {}));
+    for (const nodeModulesPath of await this.moduleWalker.nodeModulesPaths) {
+      await this.moduleWalker.findAllModulesIn(nodeModulesPath);
     }
 
-    for (const key of depKeys) {
-      this.prodDeps[key] = true;
-      const modulePaths: string[] = await searchForModule(
-        this.buildPath,
-        key,
-        this.projectRootPath
-      );
-      for (const modulePath of modulePaths) {
-        markWaiters.push(this.markChildrenAsProdDeps(modulePath));
-      }
-    }
-
-    await Promise.all(markWaiters);
-
-    d('identified prod deps:', this.prodDeps);
-
-    const nodeModulesPaths = await searchForNodeModules(
-      this.buildPath,
-      this.projectRootPath
-    );
-    for (const nodeModulesPath of nodeModulesPaths) {
-      await this.rebuildAllModulesIn(nodeModulesPath);
+    for (const modulePath of this.moduleWalker.modulesToRebuild) {
+      this.rebuilds.push(() => this.rebuildModuleAt(modulePath));
     }
 
     this.rebuilds.push(() => this.rebuildModuleAt(this.buildPath));
@@ -299,85 +271,8 @@ export class Rebuilder {
     await moduleRebuilder.rebuildNodeGypModule(cacheKey);
     this.lifecycle.emit('module-done');
   }
-
-  async rebuildAllModulesIn(nodeModulesPath: string, prefix = ''): Promise<void> {
-    // Some package managers use symbolic links when installing node modules
-    // we need to be sure we've never tested the a package before by resolving
-    // all symlinks in the path and testing against a set
-    const realNodeModulesPath = await fs.realpath(nodeModulesPath);
-    if (this.realNodeModulesPaths.has(realNodeModulesPath)) {
-      return;
-    }
-    this.realNodeModulesPaths.add(realNodeModulesPath);
-
-    d('scanning:', realNodeModulesPath);
-
-    for (const modulePath of await fs.readdir(realNodeModulesPath)) {
-      // Ignore the magical .bin directory
-      if (modulePath === '.bin') continue;
-      // Ensure that we don't mark modules as needing to be rebuilt more than once
-      // by ignoring / resolving symlinks
-      const realPath = await fs.realpath(path.resolve(nodeModulesPath, modulePath));
-
-      if (this.realModulePaths.has(realPath)) {
-        continue;
-      }
-      this.realModulePaths.add(realPath);
-
-      if (this.prodDeps[`${prefix}${modulePath}`] && (!this.onlyModules || this.onlyModules.includes(modulePath))) {
-        this.rebuilds.push(() => this.rebuildModuleAt(realPath));
-      }
-
-      if (modulePath.startsWith('@')) {
-        await this.rebuildAllModulesIn(realPath, `${modulePath}/`);
-      }
-
-      if (await fs.pathExists(path.resolve(nodeModulesPath, modulePath, 'node_modules'))) {
-        await this.rebuildAllModulesIn(path.resolve(realPath, 'node_modules'));
-      }
-    }
-  }
-
-  async findModule(moduleName: string, fromDir: string, foundFn: ((p: string) => Promise<void>)): Promise<void[]> {
-
-    const testPaths = await searchForModule(
-      fromDir,
-      moduleName,
-      this.projectRootPath
-    );
-    const foundFns = testPaths.map(testPath => foundFn(testPath));
-
-    return Promise.all(foundFns);
-  }
-
-  async markChildrenAsProdDeps(modulePath: string): Promise<void> {
-    if (!await fs.pathExists(modulePath)) {
-      return;
-    }
-
-    d('exploring', modulePath);
-    let childPackageJson;
-    try {
-      childPackageJson = await readPackageJson(modulePath, true);
-    } catch (err) {
-      return;
-    }
-    const moduleWait: Promise<void[]>[] = [];
-
-    const callback = this.markChildrenAsProdDeps.bind(this);
-    for (const key of Object.keys(childPackageJson.dependencies || {}).concat(Object.keys(childPackageJson.optionalDependencies || {}))) {
-      if (this.prodDeps[key]) {
-        continue;
-      }
-
-      this.prodDeps[key] = true;
-
-      moduleWait.push(this.findModule(key, modulePath, callback));
-    }
-
-    await Promise.all(moduleWait);
-  }
 }
+
 
 export type RebuildResult = Promise<void> & { lifecycle: EventEmitter };
 
