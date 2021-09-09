@@ -70,7 +70,6 @@ export class Rebuilder {
   public useCache: boolean;
   public cachePath: string;
   public prebuildTagPrefix: string;
-  public projectRootPath?: string;
   public msvsVersion?: string;
   public useElectronClang: boolean;
   public disablePreGypCopy: boolean;
@@ -98,7 +97,6 @@ export class Rebuilder {
       console.warn('[WARNING]: Electron Rebuild has force enabled and cache enabled, force take precedence and the cache will not be used.');
       this.useCache = false;
     }
-    this.projectRootPath = options.projectRootPath;
 
     if (typeof this.electronVersion === 'number') {
       if (`${this.electronVersion}`.split('.').length === 1) {
@@ -114,7 +112,7 @@ export class Rebuilder {
     this.ABIVersion = options.forceABI?.toString();
     this.moduleWalker = new ModuleWalker(
       this.buildPath,
-      this.projectRootPath,
+      options.projectRootPath,
       this.types,
       this.extraModules.reduce((acc: Set<string>, x: string) => acc.add(x), new Set<string>()),
       this.onlyModules,
