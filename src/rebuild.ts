@@ -257,17 +257,9 @@ export class Rebuilder {
       }
     }
 
-    if (await moduleRebuilder.findPrebuildifyModule(cacheKey)) {
+    if (await moduleRebuilder.rebuild(cacheKey)) {
       this.lifecycle.emit('module-done');
-      return;
     }
-
-    if (await moduleRebuilder.findPrebuildInstallModule(cacheKey)) {
-      this.lifecycle.emit('module-done');
-      return;
-    }
-    await moduleRebuilder.rebuildNodeGypModule(cacheKey);
-    this.lifecycle.emit('module-done');
   }
 }
 

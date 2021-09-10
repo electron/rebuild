@@ -89,12 +89,13 @@ export class ModuleRebuilder {
     return false;
   }
 
-  async rebuildNodeGypModule(cacheKey: string): Promise<void> {
+  async rebuildNodeGypModule(cacheKey: string): Promise<boolean> {
     await this.nodeGyp.rebuildModule();
     d('built via node-gyp:', this.nodeGyp.moduleName);
     await this.writeMetadata();
     await this.replaceExistingNativeModule();
     await this.cacheModuleState(cacheKey);
+    return true;
   }
 
   async replaceExistingNativeModule(): Promise<void> {
@@ -120,5 +121,11 @@ export class ModuleRebuilder {
 
   async writeMetadata(): Promise<void> {
     await fs.outputFile(this.metaPath, this.metaData);
+  }
+
+  async rebuild(cacheKey: string): Promise<boolean> {
+    return (await this.findPrebuildifyModule(cacheKey)) ||
+      (await this.findPrebuildInstallModule(cacheKey)) ||
+      (await this.rebuildNodeGypModule(cacheKey));
   }
 }
