@@ -60,10 +60,8 @@ export class Rebuilder {
   public electronVersion: string;
   public platform: string = process.platform;
   public arch: string;
-  public extraModules: string[];
   public force: boolean;
   public headerURL: string;
-  public types: ModuleType[];
   public mode: RebuildMode;
   public debug: boolean;
   public useCache: boolean;
@@ -78,10 +76,8 @@ export class Rebuilder {
     this.buildPath = options.buildPath;
     this.electronVersion = options.electronVersion;
     this.arch = options.arch || process.arch;
-    this.extraModules = options.extraModules || [];
     this.force = options.force || false;
     this.headerURL = options.headerURL || 'https://www.electronjs.org/headers';
-    this.types = options.types || defaultTypes;
     this.mode = options.mode || defaultMode;
     this.debug = options.debug || false;
     this.useCache = options.useCache || false;
@@ -108,14 +104,29 @@ export class Rebuilder {
     }
 
     this.ABIVersion = options.forceABI?.toString();
+    const onlyModules = options.onlyModules || null;
+    const extraModules = (options.extraModules || []).reduce((acc: Set<string>, x: string) => acc.add(x), new Set<string>());
+    const types = options.types || defaultTypes;
     this.moduleWalker = new ModuleWalker(
       this.buildPath,
       options.projectRootPath,
-      this.types,
-      this.extraModules.reduce((acc: Set<string>, x: string) => acc.add(x), new Set<string>()),
-      options.onlyModules || null,
+      types,
+      extraModules,
+      onlyModules,
     );
     this.rebuilds = [];
+
+    d(
+      'rebuilding with args:',
+      this.buildPath,
+      this.electronVersion,
+      this.arch,
+      extraModules,
+      this.force,
+      this.headerURL,
+      types,
+      this.debug
+    );
   }
 
   get ABI(): string {
@@ -135,17 +146,6 @@ export class Rebuilder {
     if (!path.isAbsolute(this.buildPath)) {
       throw new Error('Expected buildPath to be an absolute path');
     }
-    d(
-      'rebuilding with args:',
-      this.buildPath,
-      this.electronVersion,
-      this.arch,
-      this.extraModules,
-      this.force,
-      this.headerURL,
-      this.types,
-      this.debug
-    );
 
     this.lifecycle.emit('start');
 
