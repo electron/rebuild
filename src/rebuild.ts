@@ -61,7 +61,6 @@ export class Rebuilder {
   public platform: string = process.platform;
   public arch: string;
   public extraModules: string[];
-  public onlyModules: string[] | null;
   public force: boolean;
   public headerURL: string;
   public types: ModuleType[];
@@ -80,7 +79,6 @@ export class Rebuilder {
     this.electronVersion = options.electronVersion;
     this.arch = options.arch || process.arch;
     this.extraModules = options.extraModules || [];
-    this.onlyModules = options.onlyModules || null;
     this.force = options.force || false;
     this.headerURL = options.headerURL || 'https://www.electronjs.org/headers';
     this.types = options.types || defaultTypes;
@@ -115,7 +113,7 @@ export class Rebuilder {
       options.projectRootPath,
       this.types,
       this.extraModules.reduce((acc: Set<string>, x: string) => acc.add(x), new Set<string>()),
-      this.onlyModules,
+      options.onlyModules || null,
     );
     this.rebuilds = [];
   }
