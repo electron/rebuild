@@ -3,18 +3,18 @@ import path from 'path';
 
 import { NodeAPI } from '../node-api';
 import { readPackageJson } from '../read-package-json';
-import { Rebuilder } from '../rebuild';
+import { IRebuilder } from '../types';
 
 type PackageJSONValue = string | Record<string, unknown>;
 
 export class NativeModule {
-  protected rebuilder: Rebuilder;
+  protected rebuilder: IRebuilder;
   private _moduleName: string | undefined;
   protected modulePath: string
   public nodeAPI: NodeAPI;
   private packageJSON: Record<string, PackageJSONValue | undefined>;
 
-  constructor(rebuilder: Rebuilder, modulePath: string) {
+  constructor(rebuilder: IRebuilder, modulePath: string) {
     this.rebuilder = rebuilder;
     this.modulePath = modulePath;
     this.nodeAPI = new NodeAPI(this.moduleName, this.rebuilder.electronVersion);

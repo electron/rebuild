@@ -6,18 +6,18 @@ import { cacheModuleState } from './cache';
 import { NodeGyp } from './module-type/node-gyp';
 import { Prebuildify } from './module-type/prebuildify';
 import { PrebuildInstall } from './module-type/prebuild-install';
-import { Rebuilder } from './rebuild';
+import { IRebuilder } from './types';
 
 const d = debug('electron-rebuild');
 
 export class ModuleRebuilder {
   private modulePath: string;
   private nodeGyp: NodeGyp;
-  private rebuilder: Rebuilder;
+  private rebuilder: IRebuilder;
   private prebuildify: Prebuildify;
   private prebuildInstall: PrebuildInstall;
 
-  constructor(rebuilder: Rebuilder, modulePath: string) {
+  constructor(rebuilder: IRebuilder, modulePath: string) {
     this.modulePath = modulePath;
     this.rebuilder = rebuilder;
 

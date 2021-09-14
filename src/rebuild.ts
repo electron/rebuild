@@ -6,9 +6,9 @@ import * as os from 'os';
 import * as path from 'path';
 
 import { generateCacheKey, lookupModuleState } from './cache';
+import { BuildType, IRebuilder, RebuildMode } from './types';
+import { ModuleRebuilder } from './module-rebuilder';
 import { ModuleType, ModuleWalker } from './module-walker';
-
-export type RebuildMode = 'sequential' | 'parallel';
 
 export interface RebuildOptions {
   buildPath: string;
@@ -34,17 +34,12 @@ export interface RebuilderOptions extends RebuildOptions {
   lifecycle: EventEmitter;
 }
 
-export enum BuildType {
-  Debug = 'Debug',
-  Release = 'Release',
-}
-
 const d = debug('electron-rebuild');
 
 const defaultMode: RebuildMode = 'sequential';
 const defaultTypes: ModuleType[] = ['prod', 'optional'];
 
-export class Rebuilder {
+export class Rebuilder implements IRebuilder {
   private ABIVersion: string | undefined;
   private moduleWalker: ModuleWalker;
   nodeGypPath: string;
@@ -170,8 +165,6 @@ export class Rebuilder {
       return;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { ModuleRebuilder } = require('./module-rebuilder');
     const moduleRebuilder = new ModuleRebuilder(this, modulePath);
 
     this.lifecycle.emit('module-found', path.basename(modulePath));
@@ -183,7 +176,7 @@ export class Rebuilder {
       return;
     }
 
-    if (await moduleRebuilder.prebuildInstallNativeModuleExists(modulePath)) {
+    if (await moduleRebuilder.prebuildInstallNativeModuleExists()) {
       d(`skipping: ${path.basename(modulePath)} as it was prebuilt`);
       return;
     }
