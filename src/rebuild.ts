@@ -1,4 +1,3 @@
-import * as crypto from 'crypto';
 import debug from 'debug';
 import { EventEmitter } from 'events';
 import * as fs from 'fs-extra';
@@ -6,7 +5,7 @@ import * as nodeAbi from 'node-abi';
 import * as os from 'os';
 import * as path from 'path';
 
-import { lookupModuleState } from './cache';
+import { generateCacheKey, lookupModuleState } from './cache';
 import { ModuleType, ModuleWalker } from './module-walker';
 
 export type RebuildMode = 'sequential' | 'parallel';
@@ -31,8 +30,6 @@ export interface RebuildOptions {
   disablePreGypCopy?: boolean;
 }
 
-export type HashTree = { [path: string]: string | HashTree };
-
 export interface RebuilderOptions extends RebuildOptions {
   lifecycle: EventEmitter;
 }
@@ -46,8 +43,6 @@ const d = debug('electron-rebuild');
 
 const defaultMode: RebuildMode = 'sequential';
 const defaultTypes: ModuleType[] = ['prod', 'optional'];
-// Update this number if you change the caching logic to ensure no bad cache hits
-const ELECTRON_REBUILD_CACHE_ID = 1;
 
 export class Rebuilder {
   private ABIVersion: string | undefined;
@@ -170,54 +165,6 @@ export class Rebuilder {
     }
   }
 
-  private hashDirectory = async (dir: string, relativeTo = dir): Promise<HashTree> => {
-    d('hashing dir', dir);
-    const dirTree: HashTree = {};
-    await Promise.all((await fs.readdir(dir)).map(async (child) => {
-      d('found child', child, 'in dir', dir);
-      // Ignore output directories
-      if (dir === relativeTo && (child === 'build' || child === 'bin')) return;
-      // Don't hash nested node_modules
-      if (child === 'node_modules') return;
-
-      const childPath = path.resolve(dir, child);
-      const relative = path.relative(relativeTo, childPath);
-      if ((await fs.stat(childPath)).isDirectory()) {
-        dirTree[relative] = await this.hashDirectory(childPath, relativeTo);
-      } else {
-        dirTree[relative] = crypto.createHash('SHA256').update(await fs.readFile(childPath)).digest('hex');
-      }
-    }));
-    return dirTree;
-  }
-
-  private dHashTree = (tree: HashTree, hash: crypto.Hash): void => {
-    for (const key of Object.keys(tree).sort()) {
-      hash.update(key);
-      if (typeof tree[key] === 'string') {
-        hash.update(tree[key] as string);
-      } else {
-        this.dHashTree(tree[key] as HashTree, hash);
-      }
-    }
-  }
-
-  private generateCacheKey = async (opts: { modulePath: string }): Promise<string> => {
-    const tree = await this.hashDirectory(opts.modulePath);
-    const hasher = crypto.createHash('SHA256')
-      .update(`${ELECTRON_REBUILD_CACHE_ID}`)
-      .update(path.basename(opts.modulePath))
-      .update(this.ABI)
-      .update(this.arch)
-      .update(this.debug ? 'debug' : 'not debug')
-      .update(this.headerURL)
-      .update(this.electronVersion);
-    this.dHashTree(tree, hasher);
-    const hash = hasher.digest('hex');
-    d('calculated hash of', opts.modulePath, 'to be', hash);
-    return hash;
-  }
-
   async rebuildModuleAt(modulePath: string): Promise<void> {
     if (!(await fs.pathExists(path.resolve(modulePath, 'binding.gyp')))) {
       return;
@@ -243,7 +190,12 @@ export class Rebuilder {
 
     let cacheKey!: string;
     if (this.useCache) {
-      cacheKey = await this.generateCacheKey({
+      cacheKey = await generateCacheKey({
+        ABI: this.ABI,
+        arch: this.arch,
+        debug: this.debug,
+        electronVersion: this.electronVersion,
+        headerURL: this.headerURL,
         modulePath,
       });
 
@@ -260,7 +212,6 @@ export class Rebuilder {
     }
   }
 }
-
 
 export type RebuildResult = Promise<void> & { lifecycle: EventEmitter };
 
