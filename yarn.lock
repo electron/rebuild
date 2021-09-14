@@ -807,10 +807,10 @@
   resolved "https://registry.yarnpkg.com/@types/ms/-/ms-0.7.31.tgz#31b7ca6407128a3d2bbc27fe2d21b345397f6197"
   integrity sha512-iiUgKzV9AuaEkZqkOLDIvlQiL6ltuZd9tGcW3gwpnX8JbuiuhFlEGmmFXEXkN50Cvq7Os88IY2v0dkDqXYWVgA==
 
-"@types/node-abi@^2.10.0":
-  version "2.10.0"
-  resolved "https://registry.yarnpkg.com/@types/node-abi/-/node-abi-2.10.0.tgz#8ae074e908a56d8312aa6096ce00f5775bd2109d"
-  integrity sha512-f2xuMo23SGHNL3v9NEduvaHEGUF+bFeaC6QFHmBYn14dbd4E5JqftXLwKBrGiNsxZafnFHxmNhSC3r2I3JNl3g==
+"@types/node-abi@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@types/node-abi/-/node-abi-3.0.0.tgz#dd9745f82b744ddf06ab364f31371514bdc9a445"
+  integrity sha512-lhjcQxXaKhbP3SpIjJONnx4cy6cUW2bdCSwPJISuznG3S889TUPQZsYswxYhS4vg8eJDIG5/6pg533HorQI0rw==
 
 "@types/node@*", "@types/node@^16.0.1":
   version "16.9.1"
