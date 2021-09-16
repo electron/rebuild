@@ -146,7 +146,7 @@ describe('rebuilder', () => {
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch: process.arch,
-        onlyModules: ['ffi-napi', 'ref-napi'], // TODO: check to see if there's a bug with scoped modules
+        onlyModules: ['ffi-napi', 'ref-napi'],
         force: true
       });
       let built = 0;
@@ -192,6 +192,44 @@ describe('rebuilder', () => {
         useElectronClang: true
       });
       await expectNativeModuleToBeRebuilt(testModulePath, 'ffi-napi');
+    });
+  });
+
+  describe('only rebuild (with scoped module)', function() {
+    this.timeout(2 * MINUTES_IN_MILLISECONDS);
+
+    before(async () => await resetTestModule(testModulePath, {
+      packageManager: 'yarn',
+      fixturePath: path.resolve(__dirname, 'fixture/native-app2'),
+    }));
+    after(async () => await cleanupTestModule(testModulePath));
+
+    it('should rebuild multiple specified modules via --only option even when not prefixed with its scope', async () => {
+      const rebuilder = rebuild({
+        buildPath: path.resolve(testModulePath, 'app'),
+        electronVersion: testElectronVersion,
+        arch: process.arch,
+        onlyModules: ['ffi-napi', 'ref-napi', 'native-addon'],
+        force: true
+      });
+      let built = 0;
+      rebuilder.lifecycle.on('module-done', () => built++);
+      await rebuilder;
+      expect(built).to.equal(3);
+    });
+
+    it('should rebuild multiple specified modules via --only option when prefixed with its scope', async () => {
+      const rebuilder = rebuild({
+        buildPath: path.resolve(testModulePath, 'app'),
+        electronVersion: testElectronVersion,
+        arch: process.arch,
+        onlyModules: ['ffi-napi', 'ref-napi', '@scoped/native-addon'],
+        force: true
+      });
+      let built = 0;
+      rebuilder.lifecycle.on('module-done', () => built++);
+      await rebuilder;
+      expect(built).to.equal(3);
     });
   });
 });
