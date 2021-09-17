@@ -6,18 +6,18 @@ import { cacheModuleState } from './cache';
 import { NodeGyp } from './module-type/node-gyp';
 import { Prebuildify } from './module-type/prebuildify';
 import { PrebuildInstall } from './module-type/prebuild-install';
-import { Rebuilder } from './rebuild';
+import { IRebuilder } from './types';
 
 const d = debug('electron-rebuild');
 
 export class ModuleRebuilder {
   private modulePath: string;
   private nodeGyp: NodeGyp;
-  private rebuilder: Rebuilder;
+  private rebuilder: IRebuilder;
   private prebuildify: Prebuildify;
   private prebuildInstall: PrebuildInstall;
 
-  constructor(rebuilder: Rebuilder, modulePath: string) {
+  constructor(rebuilder: IRebuilder, modulePath: string) {
     this.modulePath = modulePath;
     this.rebuilder = rebuilder;
 
@@ -89,12 +89,13 @@ export class ModuleRebuilder {
     return false;
   }
 
-  async rebuildNodeGypModule(cacheKey: string): Promise<void> {
+  async rebuildNodeGypModule(cacheKey: string): Promise<boolean> {
     await this.nodeGyp.rebuildModule();
     d('built via node-gyp:', this.nodeGyp.moduleName);
     await this.writeMetadata();
     await this.replaceExistingNativeModule();
     await this.cacheModuleState(cacheKey);
+    return true;
   }
 
   async replaceExistingNativeModule(): Promise<void> {
@@ -120,5 +121,11 @@ export class ModuleRebuilder {
 
   async writeMetadata(): Promise<void> {
     await fs.outputFile(this.metaPath, this.metaData);
+  }
+
+  async rebuild(cacheKey: string): Promise<boolean> {
+    return (await this.findPrebuildifyModule(cacheKey)) ||
+      (await this.findPrebuildInstallModule(cacheKey)) ||
+      (await this.rebuildNodeGypModule(cacheKey));
   }
 }

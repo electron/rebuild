@@ -1,7 +1,13 @@
-import * as crypto from 'crypto';
-import * as fs from 'fs-extra';
-import * as path from 'path';
-import * as zlib from 'zlib';
+import crypto from 'crypto';
+import debug from 'debug';
+import fs from 'fs-extra';
+import path from 'path';
+import zlib from 'zlib';
+
+const d = debug('electron-rebuild');
+
+// Update this number if you change the caching logic to ensure no bad cache hits
+const ELECTRON_REBUILD_CACHE_ID = 1;
 
 class Snap {
   constructor(public hash: string, public data: Buffer) {}
@@ -10,6 +16,17 @@ class Snap {
 interface Snapshot {
   [key: string]: Snap | Snapshot;
 }
+
+type HashTree = { [path: string]: string | HashTree };
+
+type CacheOptions = {
+  ABI: string;
+  arch: string;
+  debug: boolean;
+  electronVersion: string;
+  headerURL: string;
+  modulePath: string;
+};
 
 const takeSnapshot = async (dir: string, relativeTo = dir): Promise<Snapshot> => {
   const snap: Snapshot = {};
@@ -99,3 +116,54 @@ export const lookupModuleState = async (cachePath: string, key: string): Promise
   }
   return false;
 };
+
+function dHashTree(tree: HashTree, hash: crypto.Hash): void {
+  for (const key of Object.keys(tree).sort()) {
+    hash.update(key);
+    if (typeof tree[key] === 'string') {
+      hash.update(tree[key] as string);
+    } else {
+      dHashTree(tree[key] as HashTree, hash);
+    }
+  }
+}
+
+async function hashDirectory(dir: string, relativeTo?: string): Promise<HashTree> {
+  relativeTo ??= dir;
+  d('hashing dir', dir);
+  const dirTree: HashTree = {};
+  await Promise.all((await fs.readdir(dir)).map(async (child) => {
+    d('found child', child, 'in dir', dir);
+    // Ignore output directories
+    if (dir === relativeTo && (child === 'build' || child === 'bin')) return;
+    // Don't hash nested node_modules
+    if (child === 'node_modules') return;
+
+    const childPath = path.resolve(dir, child);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const relative = path.relative(relativeTo!, childPath);
+    if ((await fs.stat(childPath)).isDirectory()) {
+      dirTree[relative] = await hashDirectory(childPath, relativeTo);
+    } else {
+      dirTree[relative] = crypto.createHash('SHA256').update(await fs.readFile(childPath)).digest('hex');
+    }
+  }));
+
+  return dirTree;
+}
+
+export async function generateCacheKey(opts: CacheOptions): Promise<string> {
+  const tree = await hashDirectory(opts.modulePath);
+  const hasher = crypto.createHash('SHA256')
+    .update(`${ELECTRON_REBUILD_CACHE_ID}`)
+    .update(path.basename(opts.modulePath))
+    .update(opts.ABI)
+    .update(opts.arch)
+    .update(opts.debug ? 'debug' : 'not debug')
+    .update(opts.headerURL)
+    .update(opts.electronVersion);
+  dHashTree(tree, hasher);
+  const hash = hasher.digest('hex');
+  d('calculated hash of', opts.modulePath, 'to be', hash);
+  return hash;
+}
