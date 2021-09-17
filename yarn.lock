@@ -329,6 +329,90 @@
   dependencies:
     cross-spawn "^7.0.1"
 
+"@napi-rs/lzma-android-arm-eabi@1.1.2":
+  version "1.1.2"
+  resolved "https://registry.npmjs.org/@napi-rs/lzma-android-arm-eabi/-/lzma-android-arm-eabi-1.1.2.tgz#3866356a277ead52c6a04abff3600ad52e45d2e6"
+  integrity sha512-b30+yEjSU1XucdTu2V8pGvpCVlFYlXMFHn89OjV+RhkQj4z3DwSPTZu17iea7MRSuP4bZzZkUG7t18lNDD9O4Q==
+
+"@napi-rs/lzma-android-arm64@1.1.2":
+  version "1.1.2"
+  resolved "https://registry.npmjs.org/@napi-rs/lzma-android-arm64/-/lzma-android-arm64-1.1.2.tgz#6a4dcd77909c45710a598d99a769382356779ca9"
+  integrity sha512-SW83wFds4AK4+eNnFl8bN25ypZU12/dae3h4wxz4l1czNsxomr4zN/feuymDzRURFU1nJti4lLK6fmRJW4ej5g==
+
+"@napi-rs/lzma-darwin-arm64@1.1.2":
+  version "1.1.2"
+  resolved "https://registry.npmjs.org/@napi-rs/lzma-darwin-arm64/-/lzma-darwin-arm64-1.1.2.tgz#7074cf0ce8a2d805b163d57f321df7f93c8ea70a"
+  integrity sha512-YM3SDU5Stt+M5tR8FQke5Puk6KIWOnSb+cfNbaM4zRvASpJVqdCEpblaSsgyuhsCfC8VjeEfohL4hkuAq5Ovzw==
+
+"@napi-rs/lzma-darwin-x64@1.1.2":
+  version "1.1.2"
+  resolved "https://registry.npmjs.org/@napi-rs/lzma-darwin-x64/-/lzma-darwin-x64-1.1.2.tgz#9d1e51fd4037eb0722f9cae9c8b51b5c6e17c36a"
+  integrity sha512-CO+mXmUIyUZZcQngGK5vY71xBNMbgfA3tu4QVkExlQE/JfeQ+JiIOB/ksOMNMkBJdK12nSrFitCUyuZ0eS8JXQ==
+
+"@napi-rs/lzma-freebsd-x64@1.1.2":
+  version "1.1.2"
+  resolved "https://registry.npmjs.org/@napi-rs/lzma-freebsd-x64/-/lzma-freebsd-x64-1.1.2.tgz#08b98cbc19e3e6db8ce81a95b1a791243bf32995"
+  integrity sha512-Za+QobA52xOMSlT2n30TFtA200qfZKPgSuDjVqURc+DyzcQLgG94n+C+J1YoY0iyfvlRdK0P32MBPHSq5fN/Fw==
+
+"@napi-rs/lzma-linux-arm-gnueabihf@1.1.2":
+  version "1.1.2"
+  resolved "https://registry.npmjs.org/@napi-rs/lzma-linux-arm-gnueabihf/-/lzma-linux-arm-gnueabihf-1.1.2.tgz#6119d1718d82ac61ccfbb6413c24d9deef87f32b"
+  integrity sha512-DBLyr61rcsmjbBPiUag0O2CDUZ/g+puCqRQdgXIQkH6pDV+Mn7ey2xq12eBwmoB4qASL1xU1SVChBWjO7HIwdg==
+
+"@napi-rs/lzma-linux-arm64-gnu@1.1.2":
+  version "1.1.2"
+  resolved "https://registry.npmjs.org/@napi-rs/lzma-linux-arm64-gnu/-/lzma-linux-arm64-gnu-1.1.2.tgz#2da3ee85b9fb1a6e8dd13dd09e29975abc9e433e"
+  integrity sha512-nR5nnc3tnXZyd1jn9dHarj8RQeUJmvm83Z46mfWFKBv/TtlP4U7eyg9n3A0eEyBTifPzuR5ZjVdaMXg0hrX9cA==
+
+"@napi-rs/lzma-linux-arm64-musl@1.1.2":
+  version "1.1.2"
+  resolved "https://registry.npmjs.org/@napi-rs/lzma-linux-arm64-musl/-/lzma-linux-arm64-musl-1.1.2.tgz#be737c17646d5088a430ca6df0146f43aa05c63e"
+  integrity sha512-N4gC6VJds/wL6PY23Cc8Z3QuztIMpNfBo++zLu2uHdRV67/XkM7JXfsgTCaZVR59lSZw+Pvi01w5i00BhmEZ/g==
+
+"@napi-rs/lzma-linux-x64-gnu@1.1.2":
+  version "1.1.2"
+  resolved "https://registry.npmjs.org/@napi-rs/lzma-linux-x64-gnu/-/lzma-linux-x64-gnu-1.1.2.tgz#7e7b890e4a8b8917d7733dff036e962b8cbafd7b"
+  integrity sha512-xfSXofZnDlbSik64AayKj5xgSVmYMsK1cmRPQGBDcpwK4qnFd+Sy/qa39+x+GT2pip9QnT6stb72BT69asTRbw==
+
+"@napi-rs/lzma-linux-x64-musl@1.1.2":
+  version "1.1.2"
+  resolved "https://registry.npmjs.org/@napi-rs/lzma-linux-x64-musl/-/lzma-linux-x64-musl-1.1.2.tgz#47d0b6d7deb17b3a35b9293ae9231325aec314a8"
+  integrity sha512-wfrv3zRK+qw3+GT3o4FPGZWb8L0gtqpjAQgPiz91EtGyHWKZjvRz31zERUkU9DKEwSBZSxYoFu5zCVsvilQekA==
+
+"@napi-rs/lzma-win32-arm64-msvc@1.1.2":
+  version "1.1.2"
+  resolved "https://registry.npmjs.org/@napi-rs/lzma-win32-arm64-msvc/-/lzma-win32-arm64-msvc-1.1.2.tgz#2582d99f20baf693bb609d0ddcaf69e49f2fdf16"
+  integrity sha512-9lwYWz4g3FMxt5Pu33jfGuoHvAnXaonXYMbjWCVq3t+ReHV38rEVnueWtJD2GQcrnV2Elu0zxU4zON1PwJ1KqQ==
+
+"@napi-rs/lzma-win32-ia32-msvc@1.1.2":
+  version "1.1.2"
+  resolved "https://registry.npmjs.org/@napi-rs/lzma-win32-ia32-msvc/-/lzma-win32-ia32-msvc-1.1.2.tgz#d38dbb8f48b3050a17a0dd3c33a8197341624370"
+  integrity sha512-p9ZuF/5osCKES5oz5ZKyMck9jbVBhZ/zH4uD6fsKjLtp0VYBlvmfqSGUYQALkF6bqvL7xBeJz7qby416pnWqPg==
+
+"@napi-rs/lzma-win32-x64-msvc@1.1.2":
+  version "1.1.2"
+  resolved "https://registry.npmjs.org/@napi-rs/lzma-win32-x64-msvc/-/lzma-win32-x64-msvc-1.1.2.tgz#dbc715b85e8f15363959af1dbb08844e2214c177"
+  integrity sha512-EwNN9eH05KkeqO300UEYqZEbqzRD3R4anUJMIvhmJI1E3a/9mUbzEByrSBsjyPfYcHF5+KYenEpuPoup9a4eHQ==
+
+"@napi-rs/lzma@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.npmjs.org/@napi-rs/lzma/-/lzma-1.1.2.tgz#09ce791390d819918182fe9382a7075e90d21d55"
+  integrity sha512-WJLn/td0F7RQmQ0mhtGVQXjfXQND8CE9hAdHJovPm6fM3aNW68chn7DCAyhs7rmhX95PovTEP0iu9TZVUtnl3w==
+  optionalDependencies:
+    "@napi-rs/lzma-android-arm-eabi" "1.1.2"
+    "@napi-rs/lzma-android-arm64" "1.1.2"
+    "@napi-rs/lzma-darwin-arm64" "1.1.2"
+    "@napi-rs/lzma-darwin-x64" "1.1.2"
+    "@napi-rs/lzma-freebsd-x64" "1.1.2"
+    "@napi-rs/lzma-linux-arm-gnueabihf" "1.1.2"
+    "@napi-rs/lzma-linux-arm64-gnu" "1.1.2"
+    "@napi-rs/lzma-linux-arm64-musl" "1.1.2"
+    "@napi-rs/lzma-linux-x64-gnu" "1.1.2"
+    "@napi-rs/lzma-linux-x64-musl" "1.1.2"
+    "@napi-rs/lzma-win32-arm64-msvc" "1.1.2"
+    "@napi-rs/lzma-win32-ia32-msvc" "1.1.2"
+    "@napi-rs/lzma-win32-x64-msvc" "1.1.2"
+
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.scandir/-/fs.scandir-2.1.5.tgz#7619c2eb21b25483f6d167548b4cfd5a7488c3d5"
@@ -775,13 +859,6 @@
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/@types/keyv/-/keyv-3.1.2.tgz#5d97bb65526c20b6e0845f6b0d2ade4f28604ee5"
   integrity sha512-/FvAK2p4jQOaJ6CGDHJTqZcUtbZe820qIeTg7o0Shg7drB4JHeL+V/dhSaly7NXx6u8eSee+r7coT+yuJEvDLg==
-  dependencies:
-    "@types/node" "*"
-
-"@types/lzma-native@^4.0.0":
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/@types/lzma-native/-/lzma-native-4.0.1.tgz#29732d9a2cfcfa0f409eafa57059d47820993af0"
-  integrity sha512-JtD+glazM3mYYjTvCa72AblFg3VuGn8neRy3lviEkTDZUQJheqZZIaIxEGNq4Faln1aSeeL1H+7X3WH1xOUHKQ==
   dependencies:
     "@types/node" "*"
 
@@ -4550,15 +4627,6 @@ lru-cache@^6.0.0:
   dependencies:
     yallist "^4.0.0"
 
-lzma-native@^8.0.1:
-  version "8.0.1"
-  resolved "https://registry.yarnpkg.com/lzma-native/-/lzma-native-8.0.1.tgz#8569e2f88de461a9a2469ac9d8183637c387d682"
-  integrity sha512-Ryr9X3yDVZhRYOxR8QhUBCNe6GdEfy9BvFDIFtUvEkocvSvnrYt9lRm6FR1z0eQn0QSMenrgrDIJRMgUf9zsKQ==
-  dependencies:
-    node-addon-api "^3.1.0"
-    node-gyp-build "^4.2.1"
-    readable-stream "^3.6.0"
-
 make-dir@^1.0.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/make-dir/-/make-dir-1.3.0.tgz#79c1033b80515bd6d24ec9933e860ca75ee27f0c"
@@ -5001,11 +5069,6 @@ node-abi@^3.0.0:
   dependencies:
     semver "^7.3.5"
 
-node-addon-api@^3.1.0:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-3.2.1.tgz#81325e0a2117789c0128dab65e7e38f07ceba161"
-  integrity sha512-mmcei9JghVNDYydghQmeDX8KoAm0FAiYyIcUt/N4nhyAipB17pllZQDOJD2fotxABnt4Mdz+dKTO7eftLg4d0A==
-
 node-api-version@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/node-api-version/-/node-api-version-0.1.4.tgz#1ed46a485e462d55d66b5aa1fe2821720dedf080"
@@ -5033,11 +5096,6 @@ node-fetch@^2.6.1:
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.1.tgz#045bd323631f76ed2e2b55573394416b639a0052"
   integrity sha512-V4aYg89jEoVRxRb2fJdAg8FHvI7cEyYdVAh94HH0UIK8oJxUfkjlDQN9RbMx+bEjP7+ggMiFRprSti032Oipxw==
-
-node-gyp-build@^4.2.1:
-  version "4.2.3"
-  resolved "https://registry.yarnpkg.com/node-gyp-build/-/node-gyp-build-4.2.3.tgz#ce6277f853835f718829efb47db20f3e4d9c4739"
-  integrity sha512-MN6ZpzmfNCRM+3t57PTJHgHyw/h4OWnZ6mR8P5j/uZtqQr46RRuDE/P+g3n0YR/AiYXeWixZZzaip77gdICfRg==
 
 node-gyp@^5.0.2, node-gyp@^5.1.0:
   version "5.1.1"
