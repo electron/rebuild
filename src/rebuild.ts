@@ -95,7 +95,7 @@ export class Rebuilder implements IRebuilder {
 
     this.ABIVersion = options.forceABI?.toString();
     const onlyModules = options.onlyModules || null;
-    const extraModules = (options.extraModules || []).reduce((acc: Set<string>, x: string) => acc.add(x), new Set<string>());
+    const extraModules = new Set(options.extraModules);
     const types = options.types || defaultTypes;
     this.moduleWalker = new ModuleWalker(
       this.buildPath,

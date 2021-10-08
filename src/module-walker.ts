@@ -53,7 +53,7 @@ export class ModuleWalker {
     }
 
     for (const key of depKeys) {
-      this.prodDeps[key] = true;
+      this.prodDeps.add(key);
       const modulePaths: string[] = await searchForModule(
         this.buildPath,
         key,
@@ -97,11 +97,11 @@ export class ModuleWalker {
 
     const callback = this.markChildrenAsProdDeps.bind(this);
     for (const key of Object.keys(childPackageJson.dependencies || {}).concat(Object.keys(childPackageJson.optionalDependencies || {}))) {
-      if (this.prodDeps[key]) {
+      if (this.prodDeps.has(key)) {
         continue;
       }
 
-      this.prodDeps[key] = true;
+      this.prodDeps.add(key);
 
       moduleWait.push(this.findModule(key, modulePath, callback));
     }
@@ -133,7 +133,7 @@ export class ModuleWalker {
       }
       this.realModulePaths.add(realPath);
 
-      if (this.prodDeps[`${prefix}${modulePath}`] && (!this.onlyModules || this.onlyModules.includes(modulePath))) {
+      if (this.prodDeps.has(`${prefix}${modulePath}`) && (!this.onlyModules || this.onlyModules.includes(modulePath))) {
         this.modulesToRebuild.push(realPath);
       }
 

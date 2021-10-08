@@ -194,4 +194,57 @@ describe('rebuilder', () => {
       await expectNativeModuleToBeRebuilt(testModulePath, 'ffi-napi');
     });
   });
+
+  describe('rebuilding from different package', function() {
+    this.timeout(MINUTES_IN_MILLISECONDS);
+
+    beforeEach(async () => {
+      await resetTestModule(testModulePath);
+      const packageJsonPath = path.join(testModulePath, 'package.json');
+      const packageJson = await fs.readJSON(packageJsonPath);
+      packageJson.dependencies = {};
+      packageJson.devDependencies = {};
+      packageJson.optionalDependencies = {};
+      packageJson.peerDependencies = {};
+      await fs.writeJSON(packageJsonPath, packageJson, { spaces: 2 });
+    });
+    afterEach(async() => await cleanupTestModule(testModulePath));
+
+    it('should not rebuild anything if package.json does not depend on anything', async () => {
+      const nativeModuleBinary = path.join(testModulePath, 'node_modules', 'native-hello-world', 'build', 'Release', 'hello_world.node');
+      expect(await fs.pathExists(nativeModuleBinary)).to.be.true;
+      await fs.remove(nativeModuleBinary);
+      expect(await fs.pathExists(nativeModuleBinary)).to.be.false;
+      const rebuilder = rebuild({
+        buildPath: testModulePath,
+        electronVersion: testElectronVersion,
+        arch: process.arch,
+        force: true
+      });
+      let built = 0;
+      rebuilder.lifecycle.on('module-done', () => built++);
+      await rebuilder;
+      expect(built).to.equal(0);
+      expect(await fs.pathExists(nativeModuleBinary)).to.be.false;
+    });
+
+    it('should rebuild extraModules even if package.json does not depend on it', async () => {
+      const nativeModuleBinary = path.join(testModulePath, 'node_modules', 'native-hello-world', 'build', 'Release', 'hello_world.node');
+      expect(await fs.pathExists(nativeModuleBinary)).to.be.true;
+      await fs.remove(nativeModuleBinary);
+      expect(await fs.pathExists(nativeModuleBinary)).to.be.false;
+      const rebuilder = rebuild({
+        buildPath: testModulePath,
+        electronVersion: testElectronVersion,
+        arch: process.arch,
+        extraModules: ['native-hello-world'],
+        force: true
+      });
+      let built = 0;
+      rebuilder.lifecycle.on('module-done', () => built++);
+      await rebuilder;
+      expect(built).to.equal(1);
+      expect(await fs.pathExists(nativeModuleBinary)).to.be.true;
+    });
+  });
 });
