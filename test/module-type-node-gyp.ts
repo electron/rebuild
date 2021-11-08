@@ -25,7 +25,7 @@ describe('node-gyp', function() {
     });
     const nodeGyp = new NodeGyp(rebuilder, testModulePath);
     const args = await nodeGyp.buildArgs([]);
-    expect(args.includes('--force-process-config')).to.equal(true);
+    expect(args).to.include('--force-process-config');
   });
 
   it('does not add --force-process-config for new Electron versions', async () => {
@@ -36,6 +36,6 @@ describe('node-gyp', function() {
     });
     const nodeGyp = new NodeGyp(rebuilder, testModulePath);
     const args = await nodeGyp.buildArgs([]);
-    expect(args.includes('--force-process-config')).to.equal(false);
+    expect(args).to.not.include('--force-process-config');
   });
 });
