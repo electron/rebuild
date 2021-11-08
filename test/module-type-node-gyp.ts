@@ -1,37 +1,61 @@
-import { expect } from 'chai';
 import { EventEmitter } from 'events';
-import * as path from 'path';
-import * as os from 'os';
+import { expect } from 'chai';
+import os from 'os';
+import path from 'path';
 
 import { cleanupTestModule, resetTestModule } from './helpers/module-setup';
 import { NodeGyp } from '../src/module-type/node-gyp';
 import { Rebuilder } from '../src/rebuild';
 
-describe('node-gyp', function() {
-  const testModulePath = path.resolve(os.tmpdir(), 'electron-rebuild-test');
-  const oldElectronVersion = '12.0.0';
-  const newElectronVersion = '16.0.0';
+describe('node-gyp', () => {
+  describe('buildArgs', () => {
+    const testModulePath = path.resolve(os.tmpdir(), 'electron-rebuild-test');
 
-  before(async () => await resetTestModule(testModulePath, false));
-  after(async () => await cleanupTestModule(testModulePath));
+    before(async () => await resetTestModule(testModulePath, false));
+    after(async () => await cleanupTestModule(testModulePath));
 
-  function nodeGypArgsForElectronVersion(electronVersion: string): Promise<string[]> {
-    const rebuilder = new Rebuilder({
-      buildPath: testModulePath,
-      electronVersion: electronVersion,
-      lifecycle: new EventEmitter()
+    function nodeGypArgsForElectronVersion(electronVersion: string): Promise<string[]> {
+      const rebuilder = new Rebuilder({
+        buildPath: testModulePath,
+        electronVersion: electronVersion,
+        lifecycle: new EventEmitter()
+      });
+      const nodeGyp = new NodeGyp(rebuilder, testModulePath);
+      return nodeGyp.buildArgs([]);
+    }
+
+    context('sufficiently old Electron versions which lack a bundled config.gypi', () => {
+      it('adds --force-process-config for < 14', async () => {
+        const args = await nodeGypArgsForElectronVersion('12.0.0');
+        expect(args).to.include('--force-process-config');
+      });
+
+      it('adds --force-process-config for between 14.0.0 and < 14.2.0', async () => {
+        const args = await nodeGypArgsForElectronVersion('14.1.0');
+        expect(args).to.include('--force-process-config');
+      });
+
+      it('adds --force-process-config for versions between 15.0.0 and < 15.3.0', async () => {
+        const args = await nodeGypArgsForElectronVersion('15.2.0');
+        expect(args).to.include('--force-process-config');
+      });
     });
-    const nodeGyp = new NodeGyp(rebuilder, testModulePath);
-    return nodeGyp.buildArgs([]);
-  }
 
-  it('adds --force-process-config for old Electron versions', async () => {
-    const args = await nodeGypArgsForElectronVersion(oldElectronVersion);
-    expect(args).to.include('--force-process-config');
-  });
+    context('for sufficiently new Electron versions', () => {
+      it('does not add --force-process-config for ^14.2.0', async () => {
+        const args = await nodeGypArgsForElectronVersion('14.2.0');
+        expect(args).to.not.include('--force-process-config');
+      });
 
-  it('does not add --force-process-config for new Electron versions', async () => {
-    const args = await nodeGypArgsForElectronVersion(newElectronVersion);
-    expect(args).to.not.include('--force-process-config');
+      it('does not add --force-process-config for ^15.3.0', async () => {
+        const args = await nodeGypArgsForElectronVersion('15.3.0');
+        expect(args).to.not.include('--force-process-config');
+      });
+
+      it('does not add --force-process-config for >= 16.0.0', async () => {
+        const args = await nodeGypArgsForElectronVersion('16.0.0-beta.1');
+        expect(args).to.not.include('--force-process-config');
+      });
+    });
   });
 });
