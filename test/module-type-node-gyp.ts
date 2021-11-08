@@ -17,25 +17,23 @@ describe('node-gyp', function() {
   before(async () => await resetTestModule(testModulePath));
   after(async () => await cleanupTestModule(testModulePath));
 
-  it('adds --force-process-config for old Electron versions', async () => {
+  function nodeGypArgsForElectronVersion(electronVersion: string): Promise<string[]> {
     const rebuilder = new Rebuilder({
       buildPath: testModulePath,
-      electronVersion: oldElectronVersion,
+      electronVersion: electronVersion,
       lifecycle: new EventEmitter()
     });
     const nodeGyp = new NodeGyp(rebuilder, testModulePath);
-    const args = await nodeGyp.buildArgs([]);
+    return nodeGyp.buildArgs([]);
+  }
+
+  it('adds --force-process-config for old Electron versions', async () => {
+    const args = await nodeGypArgsForElectronVersion(oldElectronVersion);
     expect(args).to.include('--force-process-config');
   });
 
   it('does not add --force-process-config for new Electron versions', async () => {
-    const rebuilder = new Rebuilder({
-      buildPath: testModulePath,
-      electronVersion: newElectronVersion,
-      lifecycle: new EventEmitter()
-    });
-    const nodeGyp = new NodeGyp(rebuilder, testModulePath);
-    const args = await nodeGyp.buildArgs([]);
+    const args = await nodeGypArgsForElectronVersion(newElectronVersion);
     expect(args).to.not.include('--force-process-config');
   });
 });
