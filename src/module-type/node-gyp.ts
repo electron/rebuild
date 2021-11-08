@@ -36,6 +36,17 @@ export class NodeGyp extends NativeModule {
       args.push(`--msvs_version=${this.rebuilder.msvsVersion}`);
     }
 
+    // Headers of old Electron versions do not have a valid config.gypi file
+    // and --force-process-config must be passed to node-gyp >= 8.4.0 to
+    // correctly build modules for them.
+    // See also https://github.com/nodejs/node-gyp/pull/2497
+    const [major, minor] = this.rebuilder.electronVersion.split('.').slice(0, 2).map(n => parseInt(n, 10));
+    if ((major <= 13) ||
+        (major == 14 && minor <= 1) ||
+        (major == 15 && minor <= 2)) {
+      args.push('--force-process-config');
+    }
+
     return args;
   }
 

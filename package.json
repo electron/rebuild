@@ -47,7 +47,7 @@
     "lzma-native": "^8.0.1",
     "node-abi": "^3.0.0",
     "node-api-version": "^0.1.4",
-    "node-gyp": "^8.1.0",
+    "node-gyp": "^8.4.0",
     "ora": "^5.1.0",
     "tar": "^6.0.5",
     "yargs": "^17.0.1"
