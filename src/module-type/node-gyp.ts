@@ -3,6 +3,7 @@ import detectLibc from 'detect-libc';
 import NodeGypRunner from 'node-gyp';
 import path from 'path';
 import { promisify } from 'util';
+import semver from 'semver';
 
 import { ELECTRON_GYP_DIR } from '../constants';
 import { getClangEnvironmentVars } from '../clang-fetcher';
@@ -40,10 +41,7 @@ export class NodeGyp extends NativeModule {
     // and --force-process-config must be passed to node-gyp >= 8.4.0 to
     // correctly build modules for them.
     // See also https://github.com/nodejs/node-gyp/pull/2497
-    const [major, minor] = this.rebuilder.electronVersion.split('.').slice(0, 2).map(n => parseInt(n, 10));
-    if ((major <= 13) ||
-        (major == 14 && minor <= 1) ||
-        (major == 15 && minor <= 2)) {
+    if (!semver.satisfies(this.rebuilder.electronVersion, '^14.2.0 || ^15.3.0 || >= 16.0.0-alpha.1')) {
       args.push('--force-process-config');
     }
 

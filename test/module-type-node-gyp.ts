@@ -53,7 +53,7 @@ describe('node-gyp', () => {
       });
 
       it('does not add --force-process-config for >= 16.0.0', async () => {
-        const args = await nodeGypArgsForElectronVersion('16.0.0-beta.1');
+        const args = await nodeGypArgsForElectronVersion('16.0.0-alpha.1');
         expect(args).to.not.include('--force-process-config');
       });
     });
