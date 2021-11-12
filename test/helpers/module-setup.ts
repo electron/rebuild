@@ -29,3 +29,13 @@ export async function cleanupTestModule(testModulePath: string): Promise<void> {
   await fs.remove(testModulePath);
   resetMSVSVersion();
 }
+
+export async function clearTestModuleDependencies(testModulePath: string): Promise<void> {
+  const packageJsonPath = path.join(testModulePath, 'package.json');
+  const packageJson = await fs.readJSON(packageJsonPath);
+  packageJson.dependencies = {};
+  packageJson.devDependencies = {};
+  packageJson.optionalDependencies = {};
+  packageJson.peerDependencies = {};
+  await fs.writeJSON(packageJsonPath, packageJson, { spaces: 2 });
+}
