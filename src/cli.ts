@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import 'colors';
+import chalk from 'chalk';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import ora = require('ora');
@@ -49,8 +49,8 @@ if (process.argv.length === 3 && process.argv[2] === '--version') {
 }
 
 const handler = (err: Error): void => {
-  console.error('\nAn unhandled error occurred inside electron-rebuild'.red);
-  console.error(`${err.message}\n\n${err.stack}`.red);
+  console.error(chalk.red('\nAn unhandled error occurred inside electron-rebuild'));
+  console.error(chalk.red(`${err.message}\n\n${err.stack}`));
   process.exit(-1);
 };
 
