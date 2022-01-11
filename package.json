@@ -44,7 +44,7 @@
     "detect-libc": "^1.0.3",
     "fs-extra": "^10.0.0",
     "got": "^11.7.0",
-    "lzma-native": "^8.0.1",
+    "lzma-native": "^8.0.5",
     "node-abi": "^3.0.0",
     "node-api-version": "^0.1.4",
     "node-gyp": "^8.4.0",
