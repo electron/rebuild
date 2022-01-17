@@ -139,13 +139,7 @@ export class Rebuilder implements IRebuilder {
 
     this.lifecycle.emit('start');
 
-    await this.moduleWalker.walkModules();
-
-    for (const nodeModulesPath of await this.moduleWalker.nodeModulesPaths) {
-      await this.moduleWalker.findAllModulesIn(nodeModulesPath);
-    }
-
-    for (const modulePath of this.moduleWalker.modulesToRebuild) {
+    for (const modulePath of await this.modulesToRebuild()) {
       this.rebuilds.push(() => this.rebuildModuleAt(modulePath));
     }
 
@@ -158,6 +152,16 @@ export class Rebuilder implements IRebuilder {
         await rebuildFn();
       }
     }
+  }
+
+  async modulesToRebuild(): Promise<string[]> {
+    await this.moduleWalker.walkModules();
+
+    for (const nodeModulesPath of await this.moduleWalker.nodeModulesPaths) {
+      await this.moduleWalker.findAllModulesIn(nodeModulesPath);
+    }
+
+    return this.moduleWalker.modulesToRebuild;
   }
 
   async rebuildModuleAt(modulePath: string): Promise<void> {
