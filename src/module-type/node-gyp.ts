@@ -66,7 +66,7 @@ export class NodeGyp extends NativeModule {
         .replace('{platform}', this.rebuilder.platform)
         .replace('{arch}', this.rebuilder.arch)
         .replace('{version}', await this.packageJSONField('version') as string)
-        .replace('{libc}', detectLibc.family || 'unknown');
+        .replace('{libc}', await detectLibc.family() || 'unknown');
 
       for (const [replaceKey, replaceValue] of Object.entries(binary)) {
         value = value.replace(`{${replaceKey}}`, replaceValue);
