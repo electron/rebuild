@@ -35,6 +35,18 @@ describe('prebuild-install', () => {
       ])
     });
 
+    it('should pass --build-from-source to prebuild-install when forceBuildFromSource is true', async () => {
+      const rebuilder = new Rebuilder({
+        ...rebuilderArgs,
+        forceBuildFromSource: true,
+      });
+      const prebuildInstall = new PrebuildInstall(rebuilder, modulePath);
+      console.log(await prebuildInstall.getPrebuildInstallArgs('prebuild-install-path'))
+      expect(
+        await prebuildInstall.getPrebuildInstallArgs('prebuild-install-path')
+      ).to.include('--build-from-source');
+    });
+
     it('should not fail running prebuild-install', async () => {
       const rebuilder = new Rebuilder(rebuilderArgs);
       const prebuildInstall = new PrebuildInstall(rebuilder, modulePath);

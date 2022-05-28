@@ -25,6 +25,7 @@ export interface RebuildOptions {
   useElectronClang?: boolean;
   cachePath?: string;
   prebuildTagPrefix?: string;
+  forceBuildFromSource?: boolean;
   projectRootPath?: string;
   forceABI?: number;
   disablePreGypCopy?: boolean;
@@ -57,6 +58,7 @@ export class Rebuilder implements IRebuilder {
   public useCache: boolean;
   public cachePath: string;
   public prebuildTagPrefix: string;
+  public forceBuildFromSource: boolean;
   public msvsVersion?: string;
   public useElectronClang: boolean;
   public disablePreGypCopy: boolean;
@@ -74,6 +76,7 @@ export class Rebuilder implements IRebuilder {
     this.useElectronClang = options.useElectronClang || false;
     this.cachePath = options.cachePath || path.resolve(os.homedir(), '.electron-rebuild-cache');
     this.prebuildTagPrefix = options.prebuildTagPrefix || 'v';
+    this.forceBuildFromSource = options.forceBuildFromSource || false;
     this.msvsVersion = process.env.GYP_MSVS_VERSION;
     this.disablePreGypCopy = options.disablePreGypCopy || false;
 
