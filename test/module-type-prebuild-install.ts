@@ -41,7 +41,6 @@ describe('prebuild-install', () => {
         forceBuildFromSource: true,
       });
       const prebuildInstall = new PrebuildInstall(rebuilder, modulePath);
-      console.log(await prebuildInstall.getPrebuildInstallArgs('prebuild-install-path'))
       expect(
         await prebuildInstall.getPrebuildInstallArgs('prebuild-install-path')
       ).to.include('--build-from-source');
