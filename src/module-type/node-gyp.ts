@@ -41,7 +41,7 @@ export class NodeGyp extends NativeModule {
     // and --force-process-config must be passed to node-gyp >= 8.4.0 to
     // correctly build modules for them.
     // See also https://github.com/nodejs/node-gyp/pull/2497
-    if (!semver.satisfies(this.rebuilder.electronVersion, '^14.2.0 || ^15.3.0 || >= 16.0.0-alpha.1')) {
+    if (!semver.satisfies(this.rebuilder.electronVersion, '^14.2.0 || ^15.3.0') && semver.major(this.rebuilder.electronVersion) < 16) {
       args.push('--force-process-config');
     }
 
