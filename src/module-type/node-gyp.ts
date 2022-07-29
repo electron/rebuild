@@ -89,6 +89,10 @@ export class NodeGyp extends NativeModule {
     let env: Record<string, string | undefined>;
     const extraNodeGypArgs: string[] = [];
 
+    if (semver.major(this.rebuilder.electronVersion) >= 20) {
+      process.env.CXXFLAGS = '-std=c++17';
+    }
+
     if (this.rebuilder.useElectronClang) {
       env = { ...process.env };
       const { env: clangEnv, args: clangArgs } = await getClangEnvironmentVars(this.rebuilder.electronVersion, this.rebuilder.arch);
