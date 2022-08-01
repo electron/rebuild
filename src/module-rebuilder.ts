@@ -93,6 +93,7 @@ export class ModuleRebuilder {
     await this.nodeGyp.rebuildModule();
     d('built via node-gyp:', this.nodeGyp.moduleName);
     await this.writeMetadata();
+    await this.removeNodeGypBins();
     await this.replaceExistingNativeModule();
     await this.cacheModuleState(cacheKey);
     return true;
@@ -117,6 +118,16 @@ export class ModuleRebuilder {
         await fs.copyFile(nodePath, path.join(abiPath, `${this.nodeGyp.moduleName}.node`));
       }
     }
+  }
+
+  /**
+   * Removes symlinks created by node-gyp for external dependencies, such as Python.
+   * We do not want to include these in rebuilt packaged apps.
+   */
+  async removeNodeGypBins(): Promise<void> {
+    const nodeGypBinsLocation = path.resolve(this.modulePath, 'build', 'node_gyp_bins');
+    d('removing node_gyp_bins in ', nodeGypBinsLocation);
+    await fs.remove(nodeGypBinsLocation)
   }
 
   async writeMetadata(): Promise<void> {
