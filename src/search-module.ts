@@ -69,7 +69,7 @@ export async function searchForNodeModules(cwd: string, rootPath?: string): Prom
 
 /**
  * Determine the root directory of a given project, by looking for a directory with an
- * NPM or yarn lockfile.
+ * NPM or yarn lockfile or pnpm lockfile.
  *
  * @param cwd the initial directory to traverse
  */
