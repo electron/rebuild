@@ -78,7 +78,7 @@
     "eslint-plugin-mocha": "^9.0.0",
     "mocha": "^9.0.1",
     "nyc": "^15.1.0",
-    "semantic-release": "^17.1.1",
+    "semantic-release": "^19.0.4",
     "ts-node": "^10.0.0",
     "typescript": "^4.0.2"
   },
