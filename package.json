@@ -1,5 +1,5 @@
 {
-  "name": "electron-rebuild",
+  "name": "@electron/rebuild",
   "version": "0.0.0-development",
   "description": "Electron supporting package to rebuild native node modules against the currently installed electron",
   "main": "lib/src/main.js",
@@ -23,7 +23,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/electron/electron-rebuild"
+    "url": "https://github.com/electron/rebuild"
   },
   "keywords": [
     "electron"
@@ -31,9 +31,9 @@
   "author": "Paul Betts <paul@paulbetts.org>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/electron/electron-rebuild/issues"
+    "url": "https://github.com/electron/rebuild/issues"
   },
-  "homepage": "https://github.com/electron/electron-rebuild",
+  "homepage": "https://github.com/electron/rebuild",
   "engines": {
     "node": ">=12.13.0"
   },
@@ -54,7 +54,7 @@
     "yargs": "^17.0.1"
   },
   "devDependencies": {
-    "@continuous-auth/semantic-release-npm": "^2.0.0",
+    "@continuous-auth/semantic-release-npm": "^3.0.0",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/chai": "^4.2.12",
     "@types/chai-as-promised": "^7.1.3",
@@ -78,7 +78,6 @@
     "eslint-plugin-mocha": "^9.0.0",
     "mocha": "^9.0.1",
     "nyc": "^15.1.0",
-    "semantic-release": "^17.1.1",
     "ts-node": "^10.0.0",
     "typescript": "^4.0.2"
   },
