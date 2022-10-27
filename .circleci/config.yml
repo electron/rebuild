@@ -45,15 +45,15 @@ orbs:
 jobs:
   test-linux-12:
     docker:
-      - image: circleci/node:12-buster
+      - image: cimg/node:12.22
     <<: *steps-test
   test-linux-14:
     docker:
-      - image: circleci/node:14-buster
+      - image: cimg/node:14.20
     <<: *steps-test
   test-linux-16:
     docker:
-      - image: circleci/node:16-buster
+      - image: cimg/node:16.18
     <<: *steps-test
   test-mac:
     macos:
@@ -69,7 +69,7 @@ jobs:
 
   release:
     docker:
-      - image: circleci/node:16
+      - image: cimg/node:14.17
     steps:
       - checkout
       - *step-restore-cache
