@@ -22,7 +22,7 @@ export async function resetTestModule(testModulePath: string, installModules = t
     path.resolve(testModulePath, 'package.json')
   );
   if (installModules) {
-    await spawn('npm', ['install'], { cwd: testModulePath });
+    await spawn('yarn', ['install'], { cwd: testModulePath });
   }
   resetMSVSVersion();
 }

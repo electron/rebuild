@@ -39,7 +39,7 @@ steps-test: &steps-test
               nvm use 12.22.4
               ;;
           esac
-    - run: yarn install --frozen-lockfile
+    - run: yarn install --frozen-lockfile --ignore-engines
     - save_cache:
         paths:
           - node_modules
@@ -87,7 +87,7 @@ jobs:
     steps:
       - checkout
       - *step-restore-cache
-      - run: yarn install --frozen-lockfile
+      - run: yarn install --frozen-lockfile --ignore-engines
       - run: npx @continuous-auth/circleci-oidc-github-auth@1.0.4
       - run: npx semantic-release@17.4.5
 
