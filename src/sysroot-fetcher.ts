@@ -14,7 +14,7 @@ const sysrootArchAliases = {
   ia32: 'i386',
 }
 
-const SYSROOT_BASE_URL = 'https://s3.amazonaws.com/electronjs-sysroots/toolchain'
+const SYSROOT_BASE_URL = 'https://dev-cdn.electronjs.org/linux-sysroots'
 
 export async function downloadLinuxSysroot(electronVersion: string, targetArch: string): Promise<string> {
   d('fetching sysroot for Electron:', electronVersion);
