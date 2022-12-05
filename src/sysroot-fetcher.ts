@@ -25,7 +25,7 @@ export async function downloadLinuxSysroot(electronVersion: string, targetArch: 
   const linuxArch = sysrootArchAliases[targetArch] || targetArch;
   const electronSysroots = JSON.parse(await fetch(`https://raw.githubusercontent.com/electron/electron/v${electronVersion}/script/sysroots.json`, 'text'));
 
-  const { Sha1Sum: sha, Tarball: fileName } = electronSysroots[`sid_${linuxArch}`];
+  const { Sha1Sum: sha, Tarball: fileName } = electronSysroots[`sid_${linuxArch}`] || electronSysroots[`bullseye_${linuxArch}`];
   const sysrootURL = `${SYSROOT_BASE_URL}/${sha}/${fileName}`;
   let sysrootBuffer = await fetch(sysrootURL, 'buffer');
 
