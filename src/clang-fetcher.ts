@@ -61,7 +61,6 @@ export async function getClangEnvironmentVars(electronVersion: string, targetArc
     env: {
       CC: `"${path.resolve(clangDir, 'clang')}" ${clangArgs.join(' ')}`,
       CXX: `"${path.resolve(clangDir, 'clang++')}" ${clangArgs.join(' ')}`,
-      CFLAGS: `${cxxflags.join(' ')}`,
       CXXFLAGS: `${cxxflags.join(' ')}`
     },
     args: gypArgs,
