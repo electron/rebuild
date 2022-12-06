@@ -42,7 +42,7 @@
     "chalk": "^4.0.0",
     "debug": "^4.1.1",
     "detect-libc": "^2.0.1",
-    "fs-extra": "^10.0.0",
+    "fs-extra": "^11.1.0",
     "got": "^11.7.0",
     "lzma-native": "^8.0.5",
     "node-abi": "^3.0.0",
