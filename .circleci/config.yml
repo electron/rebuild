@@ -39,7 +39,7 @@ steps-test: &steps-test
               nvm use 12.22.4
               ;;
           esac
-    - run: yarn install --frozen-lockfile --ignore-engines
+    - run: yarn install --frozen-lockfile
     - save_cache:
         paths:
           - node_modules
@@ -52,10 +52,10 @@ steps-test: &steps-test
           DEBUG: electron-rebuild
     - run: yarn run codecov
 
-
 version: 2.1
 orbs:
-  win: circleci/windows@1.0.0
+  win: circleci/windows@5.0.0
+  cfa: continuousauth/npm@1.0.2
 jobs:
   test-linux-12:
     docker:
@@ -71,28 +71,17 @@ jobs:
     <<: *steps-test
   test-mac:
     macos:
-      xcode: "13.3.0"
+      xcode: '13.3.0'
     <<: *steps-test
   test-windows:
     executor:
-      name: win/vs2019
+      name: win/server-2019
       shell: bash.exe
     environment:
       GYP_MSVS_VERSION: '2019'
     <<: *steps-test
 
-  release:
-    docker:
-      - image: cimg/node:14.17
-    steps:
-      - checkout
-      - *step-restore-cache
-      - run: yarn install --frozen-lockfile --ignore-engines
-      - run: npx @continuous-auth/circleci-oidc-github-auth@1.0.4
-      - run: npx semantic-release@17.4.5
-
 workflows:
-  version: 2
   test_and_release:
     # Run the test jobs first, then the release only when all the test jobs are successful
     jobs:
@@ -101,7 +90,7 @@ workflows:
       - test-linux-14
       - test-mac
       - test-windows
-      - release:
+      - cfa/release:
           requires:
             - test-linux-16
             - test-linux-12
