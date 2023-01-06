@@ -29,14 +29,14 @@ steps-test: &steps-test
               curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
               export NVM_DIR="$HOME/.nvm"
               [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-              nvm install 12
-              nvm alias default 12
+              nvm install 18
+              nvm alias default 118
               echo 'export NVM_DIR=${HOME}/.nvm' >> $BASH_ENV
               echo "[ -s '${NVM_DIR}/nvm.sh' ] && . '${NVM_DIR}/nvm.sh'" >> $BASH_ENV
               ;;
             Windows*|CYGWIN*|MINGW*|MSYS*)
-              nvm install 12.22.4
-              nvm use 12.22.4
+              nvm install 18.13.0
+              nvm use 18.13.0
               ;;
           esac
     - run: yarn install --frozen-lockfile
