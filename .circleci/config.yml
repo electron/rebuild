@@ -30,7 +30,7 @@ steps-test: &steps-test
               export NVM_DIR="$HOME/.nvm"
               [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
               nvm install 18
-              nvm alias default 118
+              nvm alias default 18
               echo 'export NVM_DIR=${HOME}/.nvm' >> $BASH_ENV
               echo "[ -s '${NVM_DIR}/nvm.sh' ] && . '${NVM_DIR}/nvm.sh'" >> $BASH_ENV
               ;;
@@ -57,10 +57,6 @@ orbs:
   win: circleci/windows@5.0.0
   cfa: continuousauth/npm@1.0.2
 jobs:
-  test-linux-12:
-    docker:
-      - image: cimg/node:12.22
-    <<: *steps-test
   test-linux-14:
     docker:
       - image: cimg/node:14.20
@@ -86,14 +82,12 @@ workflows:
     # Run the test jobs first, then the release only when all the test jobs are successful
     jobs:
       - test-linux-16
-      - test-linux-12
       - test-linux-14
       - test-mac
       - test-windows
       - cfa/release:
           requires:
             - test-linux-16
-            - test-linux-12
             - test-linux-14
             - test-mac
             - test-windows
