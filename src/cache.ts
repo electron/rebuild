@@ -98,7 +98,7 @@ export const cacheModuleState = async (dir: string, cachePath: string, key: stri
   const snap = await takeSnapshot(dir);
 
   const moduleBuffer = Buffer.from(JSON.stringify(serialize(snap)));
-  const zipped = await new Promise(resolve => zlib.gzip(moduleBuffer, (_, result) => resolve(result)));
+  const zipped = await new Promise<Buffer>(resolve => zlib.gzip(moduleBuffer, (_, result) => resolve(result)));
   await fs.mkdirp(cachePath);
   await fs.writeFile(path.resolve(cachePath, key), zipped);
 };
