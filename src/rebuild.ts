@@ -14,6 +14,7 @@ export interface RebuildOptions {
   buildPath: string;
   electronVersion: string;
   arch?: string;
+  platform?: string;
   extraModules?: string[];
   onlyModules?: string[] | null;
   force?: boolean;
@@ -48,7 +49,7 @@ export class Rebuilder implements IRebuilder {
   public lifecycle: EventEmitter;
   public buildPath: string;
   public electronVersion: string;
-  public platform: string = process.platform;
+  public platform: string;
   public arch: string;
   public force: boolean;
   public headerURL: string;
@@ -65,6 +66,7 @@ export class Rebuilder implements IRebuilder {
     this.lifecycle = options.lifecycle;
     this.buildPath = options.buildPath;
     this.electronVersion = options.electronVersion;
+    this.platform = options.platform || process.platform;
     this.arch = options.arch || process.arch;
     this.force = options.force || false;
     this.headerURL = options.headerURL || 'https://www.electronjs.org/headers';
