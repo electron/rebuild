@@ -50,7 +50,7 @@ export class NodeGyp extends NativeModule {
 
   async buildArgsFromBinaryField(): Promise<string[]> {
     const binary = await this.packageJSONFieldWithDefault('binary', {}) as Record<string, string>;
-    let napi_build_version;
+    let napi_build_version: number = 0;
     if (binary.napi_versions) {
       napi_build_version = this.nodeAPI.getNapiVersion(binary.napi_versions)
     }
