@@ -50,7 +50,7 @@ export class NodeGyp extends NativeModule {
 
   async buildArgsFromBinaryField(): Promise<string[]> {
     const binary = await this.packageJSONFieldWithDefault('binary', {}) as Record<string, string>;
-    let napi_build_version: number = 0;
+    let napi_build_version: number | undefined = undefined
     if (binary.napi_versions) {
       napi_build_version = this.nodeAPI.getNapiVersion(binary.napi_versions)
     }
@@ -71,8 +71,8 @@ export class NodeGyp extends NativeModule {
         .replace('{arch}', this.rebuilder.arch)
         .replace('{version}', await this.packageJSONField('version') as string)
         .replace('{libc}', await detectLibc.family() || 'unknown');
-      if (napi_build_version) {
-        value = value.replace('{napi_build_version}', napi_build_version)
+      if (napi_build_version !== undefined) {
+        value = value.replace('{napi_build_version}', napi_build_version.toString())
       }
 
       for (const [replaceKey, replaceValue] of Object.entries(binary)) {
@@ -82,7 +82,7 @@ export class NodeGyp extends NativeModule {
       return `--${binaryKey}=${value}`;
     }))
 
-    return flags.filter(value => value) as string[];
+    return flags.filter(value => value !== undefined) as string[];
   }
 
   async rebuildModule(): Promise<void> {
