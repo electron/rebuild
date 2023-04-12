@@ -3,7 +3,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 
 import { cacheModuleState } from './cache';
-import { NodeGyp } from './module-type/node-gyp';
+import { NodeGyp } from './module-type/node-gyp/node-gyp';
 import { Prebuildify } from './module-type/prebuildify';
 import { PrebuildInstall } from './module-type/prebuild-install';
 import { IRebuilder } from './types';

@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import { getNodeArch, uname } from '../src/arch';
+import { getNodeArch, uname } from '../lib/arch';
 
 // Copied from @electron/get
 describe('uname()', () => {

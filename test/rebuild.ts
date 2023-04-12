@@ -6,7 +6,7 @@ import * as os from 'os';
 import { cleanupTestModule, MINUTES_IN_MILLISECONDS, resetMSVSVersion, resetTestModule, TIMEOUT_IN_MILLISECONDS } from './helpers/module-setup';
 import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild';
 import { getExactElectronVersionSync } from './helpers/electron-version';
-import { rebuild } from '../src/rebuild';
+import { rebuild } from '../lib/rebuild';
 
 const testElectronVersion = getExactElectronVersionSync();
 
@@ -19,7 +19,6 @@ describe('rebuilder', () => {
     before(async () => {
       await resetTestModule(testModulePath);
 
-      process.env.ELECTRON_REBUILD_TESTS = 'true';
       await rebuild({
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
@@ -59,7 +58,6 @@ describe('rebuilder', () => {
     });
 
     after(async () => {
-      delete process.env.ELECTRON_REBUILD_TESTS;
       await cleanupTestModule(testModulePath);
     });
   });

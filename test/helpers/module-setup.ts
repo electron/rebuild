@@ -1,4 +1,6 @@
+import crypto from 'crypto';
 import fs from 'fs-extra';
+import os from 'os';
 import path from 'path';
 import { spawn } from '@malept/cross-spawn-promise';
 
@@ -14,16 +16,22 @@ export function resetMSVSVersion(): void {
   }
 }
 
+const testModuleTmpPath = fs.mkdtempSync(path.resolve(os.tmpdir(), 'e-r-test-module-'));
+
 export async function resetTestModule(testModulePath: string, installModules = true): Promise<void> {
-  await fs.remove(testModulePath);
-  await fs.mkdir(testModulePath, { recursive: true });
-  await fs.copyFile(
-    path.resolve(__dirname, '../../test/fixture/native-app1/package.json'),
-    path.resolve(testModulePath, 'package.json')
-  );
-  if (installModules) {
-    await spawn('yarn', ['install'], { cwd: testModulePath });
+  const oneTimeModulePath = path.resolve(testModuleTmpPath, `${crypto.createHash('SHA1').update(testModulePath).digest('hex')}-${installModules}`);
+  if (!await fs.pathExists(oneTimeModulePath)) {
+    await fs.mkdir(oneTimeModulePath, { recursive: true });
+    await fs.copyFile(
+      path.resolve(__dirname, '../../test/fixture/native-app1/package.json'),
+      path.resolve(oneTimeModulePath, 'package.json')
+    );
+    if (installModules) {
+      await spawn('yarn', ['install'], { cwd: oneTimeModulePath });
+    }
   }
+  await fs.remove(testModulePath);
+  await fs.copy(oneTimeModulePath, testModulePath);
   resetMSVSVersion();
 }
 
@@ -31,3 +39,7 @@ export async function cleanupTestModule(testModulePath: string): Promise<void> {
   await fs.remove(testModulePath);
   resetMSVSVersion();
 }
+
+process.on('exit', () => {
+  fs.removeSync(testModuleTmpPath);
+});

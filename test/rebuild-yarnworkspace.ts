@@ -5,8 +5,8 @@ import { spawn } from '@malept/cross-spawn-promise';
 
 import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild';
 import { getExactElectronVersionSync } from './helpers/electron-version';
-import { getProjectRootPath } from '../src/search-module';
-import { rebuild } from '../src/rebuild';
+import { getProjectRootPath } from '../lib/search-module';
+import { rebuild } from '../lib/rebuild';
 
 const testElectronVersion = getExactElectronVersionSync();
 
