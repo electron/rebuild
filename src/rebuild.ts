@@ -36,7 +36,7 @@ export interface RebuilderOptions extends RebuildOptions {
 
 const d = debug('electron-rebuild');
 
-const defaultMode: RebuildMode = 'parallel';
+const defaultMode: RebuildMode = 'sequential';
 const defaultTypes: ModuleType[] = ['prod', 'optional'];
 
 export class Rebuilder implements IRebuilder {
