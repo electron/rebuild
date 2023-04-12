@@ -24,7 +24,7 @@ describe('rebuild with napi_build_versions in binary config', async function () 
   // https://github.com/electron/rebuild/issues/554
   const archs = ['x64', 'arm64']
   for (const arch of archs) {
-    it(`${ arch } arch should have rebuilt bianry with napi_build_versions array provided`, async () => {
+    it(`${ arch } arch should have rebuilt bianry with 'napi_build_versions' array and 'libc' provided`, async () => {
       const libc = await detectLibc.family() || 'unknown';
       const binaryPath = napiBuildVersionSpecificPath(arch, libc)
       if (await fs.pathExists(binaryPath)) {
@@ -40,12 +40,6 @@ describe('rebuild with napi_build_versions in binary config', async function () 
         arch
       });
       await expectNativeModuleToBeRebuilt(testModulePath, 'sqlite3');
-
-      const dirname = path.dirname(path.dirname(binaryPath))
-      console.log(dirname);
-      fs.readdirSync(dirname).forEach(file => {
-        console.log(file);
-      });
 
       expect(await fs.pathExists(binaryPath)).to.be.true;
       fs.removeSync(binaryPath);
