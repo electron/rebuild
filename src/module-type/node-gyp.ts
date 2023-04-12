@@ -52,7 +52,7 @@ export class NodeGyp extends NativeModule {
     const binary = await this.packageJSONFieldWithDefault('binary', {}) as Record<string, string>;
     let napiBuildVersion: number | undefined = undefined
     if (Array.isArray(binary.napi_versions)) {
-      napiBuildVersion = this.nodeAPI.getNapiVersion(binary.napi_versions as number[])
+      napiBuildVersion = this.nodeAPI.getNapiVersion(binary.napi_versions.map(str => Number(str)))
     }
     const flags = await Promise.all(Object.entries(binary).map(async ([binaryKey, binaryValue]) => {
       if (binaryKey === 'napi_versions') {
