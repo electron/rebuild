@@ -21,10 +21,6 @@ describe('prebuild-install', () => {
     lifecycle: new EventEmitter()
   };
 
-  before(() => {
-    process.env.ELECTRON_REBUILD_TESTS = 'true';
-  });
-
   describe('Node-API support', function() {
     this.timeout(TIMEOUT_IN_MILLISECONDS);
 
@@ -56,9 +52,5 @@ describe('prebuild-install', () => {
       const prebuildInstall = new PrebuildInstall(rebuilder, modulePath);
       expect(prebuildInstall.findPrebuiltModule()).to.eventually.be.rejectedWith("Native module 'farmhash' requires Node-API but Electron v2.0.0 does not support Node-API");
     });
-  });
-
-  after(() => {
-    delete process.env.ELECTRON_REBUILD_TESTS;
   });
 });

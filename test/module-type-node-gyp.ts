@@ -4,7 +4,7 @@ import os from 'os';
 import path from 'path';
 
 import { cleanupTestModule, resetTestModule } from './helpers/module-setup';
-import { NodeGyp } from '../src/module-type/node-gyp';
+import { NodeGyp } from '../src/module-type/node-gyp/node-gyp';
 import { Rebuilder } from '../src/rebuild';
 
 describe('node-gyp', () => {

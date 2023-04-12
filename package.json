@@ -2,8 +2,8 @@
   "name": "@electron/rebuild",
   "version": "0.0.0-development",
   "description": "Electron supporting package to rebuild native node modules against the currently installed electron",
-  "main": "lib/src/main.js",
-  "typings": "lib/src/main.d.ts",
+  "main": "lib/main.js",
+  "typings": "lib/main.d.ts",
   "scripts": {
     "codecov": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "compile": "tsc",

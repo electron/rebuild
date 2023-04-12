@@ -18,13 +18,10 @@ export class PrebuildInstall extends NativeModule {
   }
 
   async run(prebuildInstallPath: string): Promise<void> {
-    const shimExt = process.env.ELECTRON_REBUILD_TESTS ? 'ts' : 'js';
-    const executable = process.env.ELECTRON_REBUILD_TESTS ? path.resolve(__dirname, '..', '..', 'node_modules', '.bin', 'ts-node') : process.execPath;
-
     await spawn(
-      executable,
+      process.execPath,
       [
-        path.resolve(__dirname, '..', `prebuild-shim.${shimExt}`),
+        path.resolve(__dirname, '..', `prebuild-shim.js`),
         prebuildInstallPath,
         `--arch=${this.rebuilder.arch}`,
         `--platform=${this.rebuilder.platform}`,

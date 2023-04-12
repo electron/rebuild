@@ -2,7 +2,6 @@ import * as cp from 'child_process';
 import debug from 'debug';
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import semver from 'semver';
 import * as tar from 'tar';
 import * as zlib from 'zlib';
 import { ELECTRON_GYP_DIR } from './constants';
@@ -37,13 +36,9 @@ export async function getClangEnvironmentVars(electronVersion: string, targetArc
   const clangDownloadDir = await downloadClangVersion(electronVersion);
 
   const clangDir = path.resolve(clangDownloadDir, 'bin');
-  const cxxflags = [];
   const clangArgs: string[] = [];
   if (process.platform === 'darwin') {
     clangArgs.push('-isysroot', getSDKRoot());
-  }
-  if (semver.major(electronVersion) >= 20) {
-    cxxflags.push('-std=c++17');
   }
 
   const gypArgs = [];
@@ -61,7 +56,6 @@ export async function getClangEnvironmentVars(electronVersion: string, targetArc
     env: {
       CC: `"${path.resolve(clangDir, 'clang')}" ${clangArgs.join(' ')}`,
       CXX: `"${path.resolve(clangDir, 'clang++')}" ${clangArgs.join(' ')}`,
-      CXXFLAGS: `${cxxflags.join(' ')}`
     },
     args: gypArgs,
   }

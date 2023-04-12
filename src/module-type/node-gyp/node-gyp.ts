@@ -1,13 +1,12 @@
 import debug from 'debug';
 import detectLibc from 'detect-libc';
-import NodeGypRunner from 'node-gyp';
 import path from 'path';
-import { promisify } from 'util';
 import semver from 'semver';
 
-import { ELECTRON_GYP_DIR } from '../constants';
-import { getClangEnvironmentVars } from '../clang-fetcher';
-import { NativeModule } from '.';
+import { ELECTRON_GYP_DIR } from '../../constants';
+import { getClangEnvironmentVars } from '../../clang-fetcher';
+import { NativeModule } from '..';
+import { fork } from 'child_process';
 
 const d = debug('electron-rebuild');
 
@@ -86,76 +85,45 @@ export class NodeGyp extends NativeModule {
       // throw new Error(`node-gyp does not support building modules with spaces in their path, tried to build: ${modulePath}`);
     }
 
-    let env: Record<string, string | undefined>;
+    const env = {
+      ...process.env,
+    };
     const extraNodeGypArgs: string[] = [];
 
-    if (semver.major(this.rebuilder.electronVersion) >= 20) {
-      process.env.CXXFLAGS = '-std=c++17';
-    }
-
     if (this.rebuilder.useElectronClang) {
-      env = { ...process.env };
       const { env: clangEnv, args: clangArgs } = await getClangEnvironmentVars(this.rebuilder.electronVersion, this.rebuilder.arch);
-      Object.assign(process.env, clangEnv);
+      Object.assign(env, clangEnv);
       extraNodeGypArgs.push(...clangArgs);
     }
 
     const nodeGypArgs = await this.buildArgs(extraNodeGypArgs);
     d('rebuilding', this.moduleName, 'with args', nodeGypArgs);
 
-    const nodeGyp = NodeGypRunner();
-    nodeGyp.parseArgv(nodeGypArgs);
-    nodeGyp.devDir = ELECTRON_GYP_DIR;
-    let command = nodeGyp.todo.shift();
-    const originalWorkingDir = process.cwd();
-    try {
-      process.chdir(this.modulePath);
-      while (command) {
-        if (command.name === 'configure') {
-          command.args = command.args.filter((arg: string) => !extraNodeGypArgs.includes(arg));
-        } else if (command.name === 'build' && process.platform === 'win32') {
-          // This is disgusting but it prevents node-gyp from destroying our MSBuild arguments
-          command.args.map = (fn: (arg: string) => string) => {
-            return Array.prototype.map.call(command.args, (arg: string) => {
-              if (arg.startsWith('/p:')) return arg;
-              return fn(arg);
-            });
-          }
-        }
-        await promisify(nodeGyp.commands[command.name])(command.args);
-        command = nodeGyp.todo.shift();
-      }
-    } catch (err) {
-      const errorMessage = `node-gyp failed to rebuild '${this.modulePath}'.
-For more information, rerun with the DEBUG environment variable set to "electron-rebuild".
+    const forkedChild = fork(path.resolve(__dirname, 'worker.js'), {
+      env,
+      cwd: this.modulePath,
+      stdio: 'pipe',
+    });
+    const outputBuffers: Buffer[] = [];
+    forkedChild.stdout?.on('data', (chunk) => {
+      outputBuffers.push(chunk);
+    });
+    forkedChild.stderr?.on('data', (chunk) => {
+      outputBuffers.push(chunk);
+    });
+    forkedChild.send({
+      moduleName: this.moduleName,
+      nodeGypArgs,
+      extraNodeGypArgs,
+      devDir: ELECTRON_GYP_DIR,
+    });
 
-Error: ${err.message || err}\n\n`;
-      throw new Error(errorMessage);
-    } finally {
-      process.chdir(originalWorkingDir);
-    }
-
-    if (this.rebuilder.useElectronClang) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.restoreEnv(env!);
-    }
-  }
-
-  private restoreEnv(env: Record<string, string | undefined>): void {
-    const gotKeys = new Set<string>(Object.keys(process.env));
-    const expectedKeys = new Set<string>(Object.keys(env));
-
-    for (const key of Object.keys(process.env)) {
-      if (!expectedKeys.has(key)) {
-        delete process.env[key];
-      } else if (env[key] !== process.env[key]) {
-        process.env[key] = env[key];
-      }
-    }
-    for (const key of Object.keys(env)) {
-      if (!gotKeys.has(key)) {
-        process.env[key] = env[key];
-      }
-    }
+    await new Promise<void>((resolve, reject) => {
+      forkedChild.on('exit', (code) => {
+        if (code === 0) return resolve();
+        console.error(Buffer.concat(outputBuffers).toString());
+        reject(new Error(`node-gyp failed to rebuild '${this.modulePath}'`))
+      });
+    });
   }
 }
