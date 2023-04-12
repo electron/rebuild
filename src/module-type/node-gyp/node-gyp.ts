@@ -115,7 +115,7 @@ export class NodeGyp extends NativeModule {
       moduleName: this.moduleName,
       nodeGypArgs,
       extraNodeGypArgs,
-      devDir: ELECTRON_GYP_DIR,
+      devDir: this.rebuilder.mode === 'sequential' ? ELECTRON_GYP_DIR : path.resolve(ELECTRON_GYP_DIR, '_p', this.moduleName),
     });
 
     await new Promise<void>((resolve, reject) => {
