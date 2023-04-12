@@ -22,8 +22,7 @@
     "farmhash": "3.2.1",
     "level": "6.0.0",
     "native-hello-world": "2.0.0",
-    "ref-napi": "1.4.2",
-    "sqlite3": "5.1.6"
+    "ref-napi": "1.4.2"
   },
   "optionalDependencies": {
     "bcrypt": "3.0.6"

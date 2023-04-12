@@ -194,35 +194,4 @@ describe('rebuilder', () => {
       await expectNativeModuleToBeRebuilt(testModulePath, 'ffi-napi');
     });
   });
-
-  describe('rebuild with napi_build_versions in binary config', async function () {
-    this.timeout(10 * MINUTES_IN_MILLISECONDS);
-
-    before(async () => await resetTestModule(testModulePath));
-    after(async() => await cleanupTestModule(testModulePath));
-
-    // https://github.com/electron/rebuild/issues/554
-    const archs = ['x64', 'arm64']
-    for (const arch of archs) {
-      it(`${ arch } arch should have rebuilt bianry with napi_build_versions array provided`, async () => {
-        const napiBuildVersion = 6;
-        const binaryPath = path.resolve(testModulePath, `node_modules/sqlite3/lib/binding/napi-v${ napiBuildVersion }-${ process.platform }-unknown-${ arch }/node_sqlite3.node`);
-        if (await fs.pathExists(binaryPath)) {
-          fs.removeSync(binaryPath)
-        }
-        expect(await fs.pathExists(binaryPath)).to.be.false;
-
-        await rebuild({
-          buildPath: testModulePath,
-          electronVersion: testElectronVersion,
-          arch,
-          onlyModules: ['sqlite3'],
-        });
-        await expectNativeModuleToBeRebuilt(testModulePath, 'sqlite3');
-
-        expect(await fs.pathExists(binaryPath)).to.be.true;
-        fs.removeSync(binaryPath);
-      });
-    }
-  });
 });

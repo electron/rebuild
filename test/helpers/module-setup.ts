@@ -14,12 +14,12 @@ export function resetMSVSVersion(): void {
   }
 }
 
-export async function resetTestModule(testModulePath: string, installModules = true): Promise<void> {
+export async function resetTestModule(testModulePath: string, installModules = true, fixtureName = 'native-app1'): Promise<void> {
   await fs.remove(testModulePath);
   await fs.mkdir(testModulePath, { recursive: true });
-  await fs.copyFile(
-    path.resolve(__dirname, '../../test/fixture/native-app1/package.json'),
-    path.resolve(testModulePath, 'package.json')
+  await fs.copy(
+    path.resolve(__dirname, `../../test/fixture/${ fixtureName }`),
+    path.resolve(testModulePath)
   );
   if (installModules) {
     await spawn('yarn', ['install'], { cwd: testModulePath });
