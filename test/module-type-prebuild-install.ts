@@ -5,8 +5,8 @@ import os from 'os';
 import path from 'path';
 
 import { cleanupTestModule, resetTestModule, TIMEOUT_IN_MILLISECONDS } from './helpers/module-setup';
-import { PrebuildInstall } from '../src/module-type/prebuild-install';
-import { Rebuilder } from '../src/rebuild';
+import { PrebuildInstall } from '../lib/module-type/prebuild-install';
+import { Rebuilder } from '../lib/rebuild';
 
 chai.use(chaiAsPromised);
 
