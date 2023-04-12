@@ -36,7 +36,7 @@ describe('rebuild with napi_build_versions in binary config', async function () 
       });
       await expectNativeModuleToBeRebuilt(testModulePath, 'sqlite3');
 
-      const dirname = path.dirname(binaryPath)
+      const dirname = path.dirname(path.dirname(binaryPath))
       console.log(dirname);
       fs.readdirSync(dirname).forEach(file => {
         console.log(file);
