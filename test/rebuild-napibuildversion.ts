@@ -1,7 +1,6 @@
 import * as fs from 'fs-extra';
 import * as os from 'os';
 import * as path from 'path';
-import detectLibc from 'detect-libc';
 
 import { expect } from 'chai';
 import { rebuild } from '../lib/rebuild';
@@ -25,7 +24,9 @@ describe('rebuild with napi_build_versions in binary config', async function () 
   const archs = ['x64', 'arm64']
   for (const arch of archs) {
     it(`${ arch } arch should have rebuilt bianry with 'napi_build_versions' array and 'libc' provided`, async () => {
-      const libc = await detectLibc.family() || 'unknown';
+      // Should use detect-libc but for some reason it causes the test suite to not even run
+      const libc = process.platform === 'darwin' ? 'unknown' : 'glibc'
+      
       const binaryPath = napiBuildVersionSpecificPath(arch, libc)
       if (await fs.pathExists(binaryPath)) {
         fs.removeSync(binaryPath)

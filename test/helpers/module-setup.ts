@@ -22,7 +22,7 @@ export async function resetTestModule(testModulePath: string, installModules = t
   const oneTimeModulePath = path.resolve(testModuleTmpPath, `${crypto.createHash('SHA1').update(testModulePath).digest('hex')}-${installModules}`);
   if (!await fs.pathExists(oneTimeModulePath)) {
     await fs.mkdir(oneTimeModulePath, { recursive: true });
-    await fs.copy(path.resolve(__dirname, `../../test/fixture/${ fixtureName }`), oneTimeModulePath);
+    await fs.copy(path.resolve(__dirname, `../../test/fixture/${ fixtureName }`), path.resolve(oneTimeModulePath));
     if (installModules) {
       await spawn('yarn', ['install'], { cwd: oneTimeModulePath });
     }
