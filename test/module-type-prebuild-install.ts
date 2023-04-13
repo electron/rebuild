@@ -5,8 +5,8 @@ import os from 'os';
 import path from 'path';
 
 import { cleanupTestModule, resetTestModule, TIMEOUT_IN_MILLISECONDS } from './helpers/module-setup';
-import { PrebuildInstall } from '../src/module-type/prebuild-install';
-import { Rebuilder } from '../src/rebuild';
+import { PrebuildInstall } from '../lib/module-type/prebuild-install';
+import { Rebuilder } from '../lib/rebuild';
 
 chai.use(chaiAsPromised);
 
@@ -20,10 +20,6 @@ describe('prebuild-install', () => {
     arch: process.arch,
     lifecycle: new EventEmitter()
   };
-
-  before(() => {
-    process.env.ELECTRON_REBUILD_TESTS = 'true';
-  });
 
   describe('Node-API support', function() {
     this.timeout(TIMEOUT_IN_MILLISECONDS);
@@ -56,9 +52,5 @@ describe('prebuild-install', () => {
       const prebuildInstall = new PrebuildInstall(rebuilder, modulePath);
       expect(prebuildInstall.findPrebuiltModule()).to.eventually.be.rejectedWith("Native module 'farmhash' requires Node-API but Electron v2.0.0 does not support Node-API");
     });
-  });
-
-  after(() => {
-    delete process.env.ELECTRON_REBUILD_TESTS;
   });
 });

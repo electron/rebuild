@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 
-import { locateElectronModule } from '../src/electron-locator';
+import { locateElectronModule } from '../lib/electron-locator';
 
 const baseFixtureDir = path.resolve(__dirname, 'fixture', 'electron-locator')
 
