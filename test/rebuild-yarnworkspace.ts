@@ -1,12 +1,12 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as os from 'os';
-import { spawn } from '@malept/cross-spawn-promise';
 
 import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild';
 import { getExactElectronVersionSync } from './helpers/electron-version';
 import { getProjectRootPath } from '../lib/search-module';
 import { rebuild } from '../lib/rebuild';
+import { resetTestModule } from './helpers/module-setup';
 
 const testElectronVersion = getExactElectronVersionSync();
 
@@ -17,14 +17,7 @@ describe('rebuild for yarn workspace', function() {
 
   describe('core behavior', () => {
     before(async () => {
-      await fs.remove(testModulePath);
-      await fs.copy(path.resolve(__dirname, 'fixture/workspace-test'), testModulePath);
-
-      await spawn('yarn', [], { cwd: testModulePath });
-      if (msvs_version) {
-        process.env.GYP_MSVS_VERSION = msvs_version;
-      }
-
+      await resetTestModule(testModulePath, true, 'workspace-test')
       const projectRootPath = await getProjectRootPath(path.join(testModulePath, 'workspace-test', 'child-workspace'));
 
       await rebuild({

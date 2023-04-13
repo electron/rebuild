@@ -4,7 +4,7 @@ import * as path from 'path';
 import detectLibc from 'detect-libc';
 
 import { expect } from 'chai';
-import { rebuild } from '../src/rebuild';
+import { rebuild } from '../lib/rebuild';
 import { getExactElectronVersionSync } from './helpers/electron-version';
 import { TIMEOUT_IN_MILLISECONDS, cleanupTestModule, resetTestModule } from './helpers/module-setup';
 import { expectNativeModuleToBeRebuilt } from './helpers/rebuild';
