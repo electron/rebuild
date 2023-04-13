@@ -6,6 +6,7 @@ import { rebuild } from '../lib/rebuild';
 import { getExactElectronVersionSync } from './helpers/electron-version';
 import { TIMEOUT_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath, cleanupTestModule, resetTestModule } from './helpers/module-setup';
 import { expectNativeModuleToBeRebuilt } from './helpers/rebuild';
+import detectLibc from 'detect-libc';
 
 const testElectronVersion = getExactElectronVersionSync();
 
@@ -26,10 +27,9 @@ describe('rebuild with napi_build_versions in binary config', async function () 
   const archs = ['x64', 'arm64']
   for (const arch of archs) {
     it(`${ arch } arch should have rebuilt bianry with 'napi_build_versions' array and 'libc' provided`, async () => {
-      // Should use detect-libc but for some reason it causes the test suite to not even run
-      const libc = process.platform === 'darwin' ? 'unknown' : 'glibc'
-      
+      const libc = await detectLibc.family() || 'unknown'
       const binaryPath = napiBuildVersionSpecificPath(arch, libc)
+      
       if (await fs.pathExists(binaryPath)) {
         fs.removeSync(binaryPath)
       }
