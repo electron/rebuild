@@ -1,18 +1,16 @@
 import * as fs from 'fs-extra';
-import * as os from 'os';
 import * as path from 'path';
 
 import { expect } from 'chai';
 import { rebuild } from '../lib/rebuild';
 import { getExactElectronVersionSync } from './helpers/electron-version';
-import { TIMEOUT_IN_MILLISECONDS, cleanupTestModule, resetTestModule } from './helpers/module-setup';
+import { TIMEOUT_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath, cleanupTestModule, resetTestModule } from './helpers/module-setup';
 import { expectNativeModuleToBeRebuilt } from './helpers/rebuild';
 
 const testElectronVersion = getExactElectronVersionSync();
 
 describe('rebuild with napi_build_versions in binary config', async function () {
   this.timeout(TIMEOUT_IN_MILLISECONDS);
-  const testModulePath = path.resolve(os.tmpdir(), 'electron-rebuild-test');
 
   const napiBuildVersion = 6;
   const napiBuildVersionSpecificPath = (arch: string, libc: string) => path.resolve(testModulePath, `node_modules/sqlite3/lib/binding/napi-v${ napiBuildVersion }-${ process.platform }-${ libc }-${ arch }/node_sqlite3.node`);

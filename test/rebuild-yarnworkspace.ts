@@ -1,17 +1,15 @@
 import * as path from 'path';
-import * as os from 'os';
 
 import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild';
 import { getExactElectronVersionSync } from './helpers/electron-version';
 import { getProjectRootPath } from '../lib/search-module';
 import { rebuild } from '../lib/rebuild';
-import { cleanupTestModule, resetTestModule } from './helpers/module-setup';
+import { TIMEOUT_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath, cleanupTestModule, resetTestModule } from './helpers/module-setup';
 
 const testElectronVersion = getExactElectronVersionSync();
 
 describe('rebuild for yarn workspace', function() {
-  this.timeout(2 * 60 * 1000);
-  const testModulePath = path.resolve(os.tmpdir(), 'electron-rebuild-test');
+  this.timeout(TIMEOUT_IN_MILLISECONDS);
 
   describe('core behavior', () => {
     before(async () => {

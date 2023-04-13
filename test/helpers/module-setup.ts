@@ -10,6 +10,8 @@ const TIMEOUT_IN_MINUTES = process.platform === 'win32' ? 5 : 2;
 export const MINUTES_IN_MILLISECONDS = 60 * 1000;
 export const TIMEOUT_IN_MILLISECONDS = TIMEOUT_IN_MINUTES * MINUTES_IN_MILLISECONDS;
 
+export const TEST_MODULE_PATH = path.resolve(os.tmpdir(), 'electron-rebuild-test');
+
 export function resetMSVSVersion(): void {
   if (originalGypMSVSVersion) {
     process.env.GYP_MSVS_VERSION = originalGypMSVSVersion;
@@ -22,7 +24,7 @@ export async function resetTestModule(testModulePath: string, installModules = t
   const oneTimeModulePath = path.resolve(testModuleTmpPath, `${crypto.createHash('SHA1').update(testModulePath).digest('hex')}-${fixtureName}-${installModules}`);
   if (!await fs.pathExists(oneTimeModulePath)) {
     await fs.mkdir(oneTimeModulePath, { recursive: true });
-    await fs.copy(path.resolve(__dirname, `../../test/fixture/${ fixtureName }`), path.resolve(oneTimeModulePath));
+    await fs.copy(path.resolve(__dirname, `../../test/fixture/${ fixtureName }`), oneTimeModulePath);
     if (installModules) {
       await spawn('yarn', ['install'], { cwd: oneTimeModulePath });
     }

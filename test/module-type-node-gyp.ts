@@ -1,15 +1,12 @@
 import { EventEmitter } from 'events';
 import { expect } from 'chai';
-import os from 'os';
-import path from 'path';
 
-import { cleanupTestModule, resetTestModule } from './helpers/module-setup';
+import { cleanupTestModule, resetTestModule, TEST_MODULE_PATH as testModulePath } from './helpers/module-setup';
 import { NodeGyp } from '../lib/module-type/node-gyp/node-gyp';
 import { Rebuilder } from '../lib/rebuild';
 
 describe('node-gyp', () => {
   describe('buildArgs', () => {
-    const testModulePath = path.resolve(os.tmpdir(), 'electron-rebuild-test');
 
     before(async () => await resetTestModule(testModulePath, false));
     after(async () => await cleanupTestModule(testModulePath));
