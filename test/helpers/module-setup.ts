@@ -19,7 +19,7 @@ export function resetMSVSVersion(): void {
 const testModuleTmpPath = fs.mkdtempSync(path.resolve(os.tmpdir(), 'e-r-test-module-'));
 
 export async function resetTestModule(testModulePath: string, installModules = true, fixtureName = 'native-app1'): Promise<void> {
-  const oneTimeModulePath = path.resolve(testModuleTmpPath, `${crypto.createHash('SHA1').update(testModulePath).digest('hex')}-${installModules}`);
+  const oneTimeModulePath = path.resolve(testModuleTmpPath, `${crypto.createHash('SHA1').update(testModulePath).digest('hex')}-${fixtureName}-${installModules}`);
   if (!await fs.pathExists(oneTimeModulePath)) {
     await fs.mkdir(oneTimeModulePath, { recursive: true });
     await fs.copy(path.resolve(__dirname, `../../test/fixture/${ fixtureName }`), path.resolve(oneTimeModulePath));
