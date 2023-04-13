@@ -17,7 +17,11 @@ describe('rebuild with napi_build_versions in binary config', async function () 
   const napiBuildVersion = 6;
   const napiBuildVersionSpecificPath = (arch: string, libc: string) => path.resolve(testModulePath, `node_modules/sqlite3/lib/binding/napi-v${ napiBuildVersion }-${ process.platform }-${ libc }-${ arch }/node_sqlite3.node`);
 
-  before(() => resetTestModule(testModulePath, true, 'napi-build-version'));
+  before(async () => {
+    await resetTestModule(testModulePath, true, 'napi-build-version')
+    // Forcing `msvs_version` needed in order for `arm64` `win32` binary to be built
+    process.env.GYP_MSVS_VERSION = "2019"
+  });
   after(() => cleanupTestModule(testModulePath));
 
   // https://github.com/electron/rebuild/issues/554
@@ -33,17 +37,14 @@ describe('rebuild with napi_build_versions in binary config', async function () 
       }
       expect(await fs.pathExists(binaryPath)).to.be.false;
 
-      // Forcing `msvs_version` needed in order for `arm64` `win32` binary to be built
-      process.env.GYP_MSVS_VERSION = "2019"
       await rebuild({
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch
       });
+      
       await expectNativeModuleToBeRebuilt(testModulePath, 'sqlite3');
-
       expect(await fs.pathExists(binaryPath)).to.be.true;
-      fs.removeSync(binaryPath);
     });
   }
 
