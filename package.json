@@ -16,7 +16,7 @@
     "test": "npm run lint && npm run spec"
   },
   "bin": {
-    "electron-rebuild": "lib/src/cli.js"
+    "electron-rebuild": "lib/cli.js"
   },
   "files": [
     "lib"
