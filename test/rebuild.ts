@@ -1,9 +1,8 @@
 import { expect } from 'chai';
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import * as os from 'os';
 
-import { cleanupTestModule, MINUTES_IN_MILLISECONDS, resetMSVSVersion, resetTestModule, TIMEOUT_IN_MILLISECONDS } from './helpers/module-setup';
+import { cleanupTestModule, MINUTES_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath, resetMSVSVersion, resetTestModule, TIMEOUT_IN_MILLISECONDS } from './helpers/module-setup';
 import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild';
 import { getExactElectronVersionSync } from './helpers/electron-version';
 import { rebuild } from '../lib/rebuild';
@@ -11,7 +10,6 @@ import { rebuild } from '../lib/rebuild';
 const testElectronVersion = getExactElectronVersionSync();
 
 describe('rebuilder', () => {
-  const testModulePath = path.resolve(os.tmpdir(), 'electron-rebuild-test');
 
   describe('core behavior', function() {
     this.timeout(TIMEOUT_IN_MILLISECONDS);

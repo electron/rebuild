@@ -1,16 +1,13 @@
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { EventEmitter } from 'events';
-import os from 'os';
 import path from 'path';
 
-import { cleanupTestModule, resetTestModule, TIMEOUT_IN_MILLISECONDS } from './helpers/module-setup';
+import { cleanupTestModule, resetTestModule, TIMEOUT_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath } from './helpers/module-setup';
 import { PrebuildInstall } from '../lib/module-type/prebuild-install';
 import { Rebuilder } from '../lib/rebuild';
 
 chai.use(chaiAsPromised);
-
-const testModulePath = path.resolve(os.tmpdir(), 'electron-rebuild-test');
 
 describe('prebuild-install', () => {
   const modulePath = path.join(testModulePath, 'node_modules', 'farmhash');
