@@ -8,20 +8,6 @@ steps-test: &steps-test
     - checkout
     - *step-restore-cache
     - run:
-        name: Install python2 on macos
-        command: |
-          if [ "`uname`" == "Darwin" ]; then
-            if [ ! -f "python-downloads/python-2.7.18-macosx10.9.pkg" ]; then
-              mkdir python-downloads
-              echo 'Downloading Python 2.7.18'
-              curl -O https://dev-cdn.electronjs.org/python/python-2.7.18-macosx10.9.pkg
-              mv python-2.7.18-macosx10.9.pkg python-downloads
-            else
-              echo 'Using Python install from cache'
-            fi
-            sudo installer -pkg python-downloads/python-2.7.18-macosx10.9.pkg -target /
-          fi
-    - run:
         name: Install Node
         command: |
           case "$(uname -s)" in
@@ -29,16 +15,17 @@ steps-test: &steps-test
               curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
               export NVM_DIR="$HOME/.nvm"
               [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-              nvm install 12
-              nvm alias default 12
+              nvm install 20
+              nvm alias default 20
               echo 'export NVM_DIR=${HOME}/.nvm' >> $BASH_ENV
               echo "[ -s '${NVM_DIR}/nvm.sh' ] && . '${NVM_DIR}/nvm.sh'" >> $BASH_ENV
               ;;
             Windows*|CYGWIN*|MINGW*|MSYS*)
-              nvm install 12.22.4
-              nvm use 12.22.4
+              nvm install 20
+              nvm use 20
               ;;
           esac
+    - run: node --version
     - run: yarn install --frozen-lockfile --ignore-engines
     - save_cache:
         paths:
@@ -57,21 +44,21 @@ version: 2.1
 orbs:
   win: circleci/windows@1.0.0
 jobs:
-  test-linux-12:
-    docker:
-      - image: cimg/node:12.22
-    <<: *steps-test
-  test-linux-14:
-    docker:
-      - image: cimg/node:14.20
-    <<: *steps-test
   test-linux-16:
     docker:
-      - image: cimg/node:16.18
+      - image: cimg/node:16.19
+    <<: *steps-test
+  test-linux-18:
+    docker:
+      - image: cimg/node:18.16
+    <<: *steps-test
+  test-linux-20:
+    docker:
+      - image: cimg/node:20.3
     <<: *steps-test
   test-mac:
     macos:
-      xcode: "13.3.0"
+      xcode: "14.2.0"
     <<: *steps-test
   test-windows:
     executor:
@@ -83,7 +70,7 @@ jobs:
 
   release:
     docker:
-      - image: cimg/node:14.17
+      - image: cimg/node:20.3
     steps:
       - checkout
       - *step-restore-cache
@@ -97,15 +84,15 @@ workflows:
     # Run the test jobs first, then the release only when all the test jobs are successful
     jobs:
       - test-linux-16
-      - test-linux-12
-      - test-linux-14
+      - test-linux-18
+      - test-linux-20
       - test-mac
       - test-windows
       - release:
           requires:
             - test-linux-16
-            - test-linux-12
-            - test-linux-14
+            - test-linux-18
+            - test-linux-20
             - test-mac
             - test-windows
           filters:
