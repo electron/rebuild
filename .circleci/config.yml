@@ -8,20 +8,6 @@ steps-test: &steps-test
     - checkout
     - *step-restore-cache
     - run:
-        name: Install python2 on macos
-        command: |
-          if [ "`uname`" == "Darwin" ]; then
-            if [ ! -f "python-downloads/python-2.7.18-macosx10.9.pkg" ]; then
-              mkdir python-downloads
-              echo 'Downloading Python 2.7.18'
-              curl -O https://dev-cdn.electronjs.org/python/python-2.7.18-macosx10.9.pkg
-              mv python-2.7.18-macosx10.9.pkg python-downloads
-            else
-              echo 'Using Python install from cache'
-            fi
-            sudo installer -pkg python-downloads/python-2.7.18-macosx10.9.pkg -target /
-          fi
-    - run:
         name: Install Node
         command: |
           case "$(uname -s)" in
