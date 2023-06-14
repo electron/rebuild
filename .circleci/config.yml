@@ -54,7 +54,7 @@ jobs:
     <<: *steps-test
   test-linux-20:
     docker:
-      - image: cimg/node:20.3
+      - image: cimg/node:20.2  # See #1085 discussion of node v20.3
     <<: *steps-test
   test-mac:
     macos:
