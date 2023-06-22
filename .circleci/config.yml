@@ -1,99 +1,132 @@
-step-restore-cache: &step-restore-cache
-  restore_cache:
-    keys:
-      - v1-dependencies-{{ arch }}-{{ checksum "yarn.lock" }}
-
-steps-test: &steps-test
-  steps:
-    - checkout
-    - *step-restore-cache
-    - run:
-        name: Install Node
-        command: |
-          case "$(uname -s)" in
-            Darwin)
-              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
-              export NVM_DIR="$HOME/.nvm"
-              [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-              nvm install 12
-              nvm alias default 12
-              echo 'export NVM_DIR=${HOME}/.nvm' >> $BASH_ENV
-              echo "[ -s '${NVM_DIR}/nvm.sh' ] && . '${NVM_DIR}/nvm.sh'" >> $BASH_ENV
-              ;;
-            Windows*|CYGWIN*|MINGW*|MSYS*)
-              nvm install 12.22.4
-              nvm use 12.22.4
-              ;;
-          esac
-    - run: yarn install --frozen-lockfile --ignore-engines
-    - save_cache:
-        paths:
-          - node_modules
-        key: v1-dependencies-{{ arch }}-{{ checksum "yarn.lock" }}
-    - run: yarn run lint
-    - run:
-        name: Tests with code coverage
-        command: yarn run coverage
-        environment:
-          DEBUG: electron-rebuild
-    - run: yarn run codecov
-
-
 version: 2.1
+
 orbs:
-  win: circleci/windows@1.0.0
+  cfa: continuousauth/npm@1.0.2
+  node: circleci/node@5.1.0
+  win: circleci/windows@5.0.0
+
+commands:
+  install:
+    parameters:
+      node-version:
+        description: Node.js version to install
+        type: string
+    steps:
+      - run: git config --global core.autocrlf input
+      - node/install:
+          node-version: << parameters.node-version >>
+      - run: nvm use << parameters.node-version >>
+      # Can't get yarn installed on Windows with the circleci/node orb, so use npx yarn for commands
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ arch }}-{{ checksum "yarn.lock" }}
+            - v1-dependencies-{{ arch }}
+      - run: npx yarn install --frozen-lockfile --ignore-engines
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ arch }}-{{ checksum "yarn.lock" }}
+  test:
+    steps:
+      - run: npx yarn run lint
+      - run:
+          name: Tests with code coverage
+          command: npx yarn run coverage
+          environment:
+            DEBUG: electron-rebuild
+      - run: npx yarn run codecov
+
 jobs:
-  test-linux-12:
+  test-linux:
     docker:
-      - image: cimg/node:12.22
-    <<: *steps-test
-  test-linux-14:
-    docker:
-      - image: cimg/node:14.20
-    <<: *steps-test
-  test-linux-16:
-    docker:
-      - image: cimg/node:16.18
-    <<: *steps-test
+      - image: cimg/base:stable
+    parameters:
+      node-version:
+        description: Node.js version to install
+        type: string
+    steps:
+      - install:
+          node-version: << parameters.node-version >>
+      - test
   test-mac:
     macos:
       xcode: "13.3.0"
-    <<: *steps-test
+    resource_class: macos.x86.medium.gen2
+    parameters:
+      node-version:
+        description: Node.js version to install
+        type: string
+    steps:
+      - install:
+          node-version: << parameters.node-version >>
+      - test
   test-windows:
     executor:
-      name: win/vs2019
+      name: win/server-2022
       shell: bash.exe
     environment:
-      GYP_MSVS_VERSION: '2019'
-    <<: *steps-test
-
-  release:
-    docker:
-      - image: cimg/node:14.17
+      GYP_MSVS_VERSION: '2022'
+    parameters:
+      node-version:
+        description: Node.js version to install
+        type: string
     steps:
-      - checkout
-      - *step-restore-cache
-      - run: yarn install --frozen-lockfile --ignore-engines
-      - run: npx @continuous-auth/circleci-oidc-github-auth@1.0.4
-      - run: npx semantic-release@17.4.5
+      - run:
+          command: New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
+          shell: powershell.exe
+      - install:
+          node-version: << parameters.node-version >>
+      - test
 
 workflows:
-  version: 2
   test_and_release:
     # Run the test jobs first, then the release only when all the test jobs are successful
     jobs:
-      - test-linux-16
-      - test-linux-12
-      - test-linux-14
-      - test-mac
-      - test-windows
-      - release:
+      - test-linux:
+          matrix:
+            parameters:
+              node-version:
+                - 20.2.0
+                - 18.16.0
+                - 16.20.0
+                - 14.21.3
+                - 12.22.12
+      - test-mac:
+          matrix:
+            parameters:
+              node-version:
+                - 20.2.0
+                - 18.16.0
+                - 16.20.0
+                - 14.21.3
+                - 12.22.12
+      - test-windows:
+          matrix:
+            parameters:
+              node-version:
+                - 20.2.0
+                - 18.16.0
+                - 16.20.0
+                - 14.21.3
+                - 12.22.12
+      - cfa/release:
           requires:
-            - test-linux-16
-            - test-linux-12
-            - test-linux-14
-            - test-mac
-            - test-windows
+            - test-linux-20.2.0
+            - test-linux-18.16.0
+            - test-linux-16.20.0
+            - test-linux-14.21.3
+            - test-linux-12.22.12
+            - test-mac-20.2.0
+            - test-mac-18.16.0
+            - test-mac-16.20.0
+            - test-mac-14.21.3
+            - test-mac-12.22.12
+            - test-windows-20.2.0
+            - test-windows-18.16.0
+            - test-windows-16.20.0
+            - test-windows-14.21.3
+            - test-windows-12.22.12
           filters:
             branches:
               only:

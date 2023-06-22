@@ -19,7 +19,7 @@ describe('rebuild with napi_build_versions in binary config', async function () 
   before(async () => {
     await resetTestModule(testModulePath, true, 'napi-build-version')
     // Forcing `msvs_version` needed in order for `arm64` `win32` binary to be built
-    process.env.GYP_MSVS_VERSION = "2019"
+    process.env.GYP_MSVS_VERSION = process.env.GYP_MSVS_VERSION ?? "2019"
   });
   after(() => cleanupTestModule(testModulePath));
 
