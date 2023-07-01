@@ -51,7 +51,7 @@ jobs:
       - test
   test-mac:
     macos:
-      xcode: "13.3.0"
+      xcode: "14.0.0"
     resource_class: macos.x86.medium.gen2
     parameters:
       node-version:
