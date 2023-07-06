@@ -2,108 +2,49 @@ version: 2.1
 
 orbs:
   cfa: continuousauth/npm@1.0.2
-  node: circleci/node@5.1.0
-  win: circleci/windows@5.0.0
+  node: electronjs/node@1.0.0
 
-commands:
-  install:
-    parameters:
-      node-version:
-        description: Node.js version to install
-        type: string
-    steps:
-      - run: git config --global core.autocrlf input
-      - node/install:
-          node-version: << parameters.node-version >>
-      - run: nvm use << parameters.node-version >>
-      # Can't get yarn installed on Windows with the circleci/node orb, so use npx yarn for commands
-      - checkout
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ arch }}-{{ checksum "yarn.lock" }}
-            - v1-dependencies-{{ arch }}
-      - run: npx yarn install --frozen-lockfile --ignore-engines
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ arch }}-{{ checksum "yarn.lock" }}
-  test:
-    steps:
-      - run: npx yarn run lint
-      - run:
-          name: Tests with code coverage
-          command: npx yarn run coverage
-          environment:
-            DEBUG: electron-rebuild
-      - run: npx yarn run codecov
-
-jobs:
-  test-linux:
-    docker:
-      - image: cimg/base:stable
-    parameters:
-      node-version:
-        description: Node.js version to install
-        type: string
-    steps:
-      - install:
-          node-version: << parameters.node-version >>
-      - test
-  test-mac:
-    macos:
-      xcode: "14.3.0"
-    resource_class: macos.x86.medium.gen2
-    parameters:
-      node-version:
-        description: Node.js version to install
-        type: string
-    steps:
-      - install:
-          node-version: << parameters.node-version >>
-      - test
-  test-windows:
-    executor:
-      name: win/server-2022
-      shell: bash.exe
+executors:
+  windows:
     environment:
       GYP_MSVS_VERSION: '2022'
-    parameters:
-      node-version:
-        description: Node.js version to install
-        type: string
-    steps:
-      - run:
-          command: New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
-          shell: powershell.exe
-      - install:
-          node-version: << parameters.node-version >>
-      - test
+    machine:
+      image: windows-server-2022-gui:stable
+      resource_class: windows.medium
+      shell: bash.exe
 
 workflows:
   test_and_release:
     # Run the test jobs first, then the release only when all the test jobs are successful
     jobs:
-      - test-linux:
+      - node/test:
+          name: test-<< matrix.executor >>-<< matrix.node-version >>
+          override-ci-command: yarn install --frozen-lockfile --ignore-engines
+          pre-steps:
+            - run: git config --global core.autocrlf input
+            - when:
+                condition:
+                  equal: [ windows, << matrix.executor >> ]
+                steps:
+                  - run:
+                      name: Enable Long Paths
+                      command: New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
+                      shell: powershell.exe
+          test-steps:
+            - run: yarn run lint
+            - run:
+                name: Tests with code coverage
+                command: yarn run coverage
+                environment:
+                  DEBUG: electron-rebuild
+            - run: yarn run codecov
           matrix:
+            alias: test
             parameters:
-              node-version:
-                - 20.2.0
-                - 18.16.0
-                - 16.20.0
-                - 14.21.3
-                - 12.22.12
-      - test-mac:
-          matrix:
-            parameters:
-              node-version:
-                - 20.2.0
-                - 18.16.0
-                - 16.20.0
-                - 14.21.3
-                - 12.22.12
-      - test-windows:
-          matrix:
-            parameters:
+              executor:
+                - node/linux
+                - node/macos
+                - windows
               node-version:
                 - 20.2.0
                 - 18.16.0
@@ -112,21 +53,7 @@ workflows:
                 - 12.22.12
       - cfa/release:
           requires:
-            - test-linux-20.2.0
-            - test-linux-18.16.0
-            - test-linux-16.20.0
-            - test-linux-14.21.3
-            - test-linux-12.22.12
-            - test-mac-20.2.0
-            - test-mac-18.16.0
-            - test-mac-16.20.0
-            - test-mac-14.21.3
-            - test-mac-12.22.12
-            - test-windows-20.2.0
-            - test-windows-18.16.0
-            - test-windows-16.20.0
-            - test-windows-14.21.3
-            - test-windows-12.22.12
+            - test
           filters:
             branches:
               only:
