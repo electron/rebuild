@@ -23,12 +23,10 @@ export class NodePreGyp extends NativeModule {
       nodePreGypPath,
       [
         'reinstall',
+        '--fallback-to-build',
         `--arch=${this.rebuilder.arch}`,
         `--platform=${this.rebuilder.platform}`,
-        '--runtime=electron',
-        `--target=${this.rebuilder.electronVersion}`,
-        `--dist-url=${this.rebuilder.headerURL}`,
-        '--fallback-to-build',
+        ...await this.getNodePreGypRuntimeArgs(),
       ],
       {
         cwd: this.modulePath,
@@ -62,5 +60,18 @@ export class NodePreGyp extends NativeModule {
    */
   async prebuiltModuleExists(): Promise<boolean> {
     return fs.pathExists(path.resolve(this.modulePath, 'prebuilds', `${this.rebuilder.platform}-${this.rebuilder.arch}`, `electron-${this.rebuilder.ABI}.node`))
+  }
+
+  async getNodePreGypRuntimeArgs(): Promise<string[]> {
+    const moduleNapiVersions = await this.getSupportedNapiVersions();
+    if (moduleNapiVersions) {
+      return []
+    } else {
+      return [
+        '--runtime=electron',
+        `--target=${this.rebuilder.electronVersion}`,
+        `--dist-url=${this.rebuilder.headerURL}`,
+      ]
+    }
   }
 }
