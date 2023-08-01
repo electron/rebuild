@@ -15,18 +15,20 @@ export class NodePreGyp extends NativeModule {
 
   async locateBinary(): Promise<string | null> {
     const cmd = `node-pre-gyp${process.platform === 'win32' ? '.cmd' : ''}`;
-    return locateBinary(this.modulePath, `node_modules/@mapbox/node-pre-gyp/${cmd}`);
+    return locateBinary(this.modulePath, `node_modules/@mapbox/node-pre-gyp/bin/${cmd}`);
   }
 
   async run(nodePreGypPath: string): Promise<void> {
     await spawn(
       nodePreGypPath,
       [
-        '--fallback-to-build',
+        'reinstall',
         `--arch=${this.rebuilder.arch}`,
         `--platform=${this.rebuilder.platform}`,
         '--runtime=electron',
         `--target=${this.rebuilder.electronVersion}`,
+        `--dist-url=${this.rebuilder.headerURL}`,
+        '--fallback-to-build',
       ],
       {
         cwd: this.modulePath,
