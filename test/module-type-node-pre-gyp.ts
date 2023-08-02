@@ -44,7 +44,7 @@ describe('node-pre-gyp', () => {
         electronVersion: '2.0.0',
       });
       const nodePreGyp = new NodePreGyp(rebuilder, modulePath);
-      expect(nodePreGyp.findPrebuiltModule()).to.eventually.be.rejectedWith("Native module 'farmhash' requires Node-API but Electron v2.0.0 does not support Node-API");
+      expect(nodePreGyp.findPrebuiltModule()).to.eventually.be.rejectedWith("Native module 'sqlite3' requires Node-API but Electron v2.0.0 does not support Node-API");
     });
   });
 });
