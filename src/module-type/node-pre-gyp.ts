@@ -12,14 +12,14 @@ export class NodePreGyp extends NativeModule {
   }
 
   async locateBinary(): Promise<string | null> {
-    const cmd = `node-pre-gyp${process.platform === 'win32' ? '.cmd' : ''}`;
-    return locateBinary(this.modulePath, `node_modules/@mapbox/node-pre-gyp/bin/${cmd}`);
+    return locateBinary(this.modulePath, 'node_modules/@mapbox/node-pre-gyp/bin/node-pre-gyp');
   }
 
   async run(nodePreGypPath: string): Promise<void> {
     await spawn(
-      nodePreGypPath,
+      process.execPath,
       [
+        nodePreGypPath,
         'reinstall',
         '--fallback-to-build',
         `--arch=${this.rebuilder.arch}`,
