@@ -142,9 +142,15 @@ export class ModuleRebuilder {
   }
 
   async rebuild(cacheKey: string): Promise<boolean> {
-    return (await this.findPrebuildifyModule(cacheKey)) ||
-      (await this.findPrebuildInstallModule(cacheKey)) ||
-      (await this.findNodePreGypInstallModule(cacheKey)) ||
-      (await this.rebuildNodeGypModule(cacheKey));
+    if (
+      !this.rebuilder.skipPrebuilds && (
+        (await this.findPrebuildifyModule(cacheKey)) ||
+        (await this.findPrebuildInstallModule(cacheKey)) ||
+        (await this.findNodePreGypInstallModule(cacheKey)))
+    ) {
+      return true;
+    }
+
+    return await this.rebuildNodeGypModule(cacheKey);
   }
 }
