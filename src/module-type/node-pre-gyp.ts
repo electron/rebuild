@@ -1,6 +1,4 @@
 import debug from 'debug';
-import fs from 'fs-extra';
-import path from 'path';
 import { spawn } from '@malept/cross-spawn-promise';
 
 import { locateBinary, NativeModule } from '.';
@@ -55,23 +53,16 @@ export class NodePreGyp extends NativeModule {
     return false;
   }
 
-  /**
-   * Whether a prebuild-install-based native module exists.
-   */
-  async prebuiltModuleExists(): Promise<boolean> {
-    return fs.pathExists(path.resolve(this.modulePath, 'prebuilds', `${this.rebuilder.platform}-${this.rebuilder.arch}`, `electron-${this.rebuilder.ABI}.node`))
-  }
-
   async getNodePreGypRuntimeArgs(): Promise<string[]> {
     const moduleNapiVersions = await this.getSupportedNapiVersions();
     if (moduleNapiVersions) {
-      return []
+      return [];
     } else {
       return [
         '--runtime=electron',
         `--target=${this.rebuilder.electronVersion}`,
         `--dist-url=${this.rebuilder.headerURL}`,
-      ]
+      ];
     }
   }
 }
