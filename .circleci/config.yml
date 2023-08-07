@@ -18,15 +18,15 @@ commands:
       - run: nvm use << parameters.node-version >>
       # Can't get yarn installed on Windows with the circleci/node orb, so use npx yarn for commands
       - checkout
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ arch }}-{{ checksum "yarn.lock" }}
-            - v1-dependencies-{{ arch }}
+      # - restore_cache:
+      #     keys:
+      #       - v1-dependencies-{{ arch }}-{{ checksum "yarn.lock" }}
+      #       - v1-dependencies-{{ arch }}
       - run: npx yarn install --frozen-lockfile --ignore-engines
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ arch }}-{{ checksum "yarn.lock" }}
+      # - save_cache:
+      #     paths:
+      #       - node_modules
+      #     key: v1-dependencies-{{ arch }}-{{ checksum "yarn.lock" }}
   test:
     steps:
       - run: npx yarn run lint
