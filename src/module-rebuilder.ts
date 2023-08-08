@@ -143,7 +143,7 @@ export class ModuleRebuilder {
 
   async rebuild(cacheKey: string): Promise<boolean> {
     if (
-      !this.rebuilder.skipPrebuilds && (
+      !this.rebuilder.buildFromSource && (
         (await this.findPrebuildifyModule(cacheKey)) ||
         (await this.findPrebuildInstallModule(cacheKey)) ||
         (await this.findNodePreGypInstallModule(cacheKey)))

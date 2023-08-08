@@ -28,7 +28,7 @@ export interface RebuildOptions {
   projectRootPath?: string;
   forceABI?: number;
   disablePreGypCopy?: boolean;
-  skipPrebuilds?: boolean;
+  buildFromSource?: boolean;
 }
 
 export interface RebuilderOptions extends RebuildOptions {
@@ -61,7 +61,7 @@ export class Rebuilder implements IRebuilder {
   public msvsVersion?: string;
   public useElectronClang: boolean;
   public disablePreGypCopy: boolean;
-  public skipPrebuilds: boolean;
+  public buildFromSource: boolean;
 
   constructor(options: RebuilderOptions) {
     this.lifecycle = options.lifecycle;
@@ -78,7 +78,7 @@ export class Rebuilder implements IRebuilder {
     this.prebuildTagPrefix = options.prebuildTagPrefix || 'v';
     this.msvsVersion = process.env.GYP_MSVS_VERSION;
     this.disablePreGypCopy = options.disablePreGypCopy || false;
-    this.skipPrebuilds = options.skipPrebuilds || false;
+    this.buildFromSource = options.buildFromSource || false;
 
     if (this.useCache && this.force) {
       console.warn('[WARNING]: Electron Rebuild has force enabled and cache enabled, force take precedence and the cache will not be used.');

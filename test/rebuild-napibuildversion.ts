@@ -39,7 +39,7 @@ describe('rebuild with napi_build_versions in binary config', async function () 
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch,
-        skipPrebuilds: true, // need to skip node-pre-gyp prebuilt binary
+        buildFromSource: true, // need to skip node-pre-gyp prebuilt binary
       });
       
       await expectNativeModuleToBeRebuilt(testModulePath, 'sqlite3');

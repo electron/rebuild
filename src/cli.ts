@@ -128,7 +128,7 @@ process.on('unhandledRejection', handler);
     useElectronClang: !!argv.useElectronClang,
     disablePreGypCopy: !!argv.disablePreGypCopy,
     projectRootPath,
-    skipPrebuilds: !!argv.skipPrebuilds,
+    buildFromSource: !!argv.buildFromSource,
   });
 
   const lifecycle = rebuilder.lifecycle;

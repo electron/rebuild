@@ -23,7 +23,7 @@ export interface IRebuilder {
   msvsVersion?: string;
   platform: string;
   prebuildTagPrefix: string;
-  skipPrebuilds: boolean;
+  buildFromSource: boolean;
   useCache: boolean;
   useElectronClang: boolean;
 }
