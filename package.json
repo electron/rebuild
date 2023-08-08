@@ -7,13 +7,14 @@
   "scripts": {
     "codecov": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "compile": "tsc",
-    "coverage": "nyc npm run spec",
+    "coverage": "npm run prewarm-headers && nyc npm run spec",
     "watch": "tsc -w",
     "prepare": "npm run compile",
     "mocha": "cross-env TS_NODE_FILES=true mocha",
     "lint": "eslint --ext .ts .",
     "spec": "tsc && npm run mocha -- test/*.ts",
-    "test": "npm run lint && npm run spec"
+    "test": "npm run prewarm-headers && npm run lint && npm run spec",
+    "prewarm-headers": "node-gyp install --ensure"
   },
   "bin": {
     "electron-rebuild": "lib/cli.js"
