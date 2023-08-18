@@ -79,6 +79,8 @@ Options:
   -b, --debug                  Build debug version of modules
   --prebuild-tag-prefix        GitHub tag prefix passed to prebuild-install.
                                Default is "v"
+  --force-build-from-source    Skip prebuild download and rebuild module from
+                               source. Default is false
 
 Copyright 2016
 ```

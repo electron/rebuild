@@ -20,18 +20,23 @@ export class PrebuildInstall extends NativeModule {
   async run(prebuildInstallPath: string): Promise<void> {
     await spawn(
       process.execPath,
-      [
-        path.resolve(__dirname, '..', `prebuild-shim.js`),
-        prebuildInstallPath,
-        `--arch=${this.rebuilder.arch}`,
-        `--platform=${this.rebuilder.platform}`,
-        `--tag-prefix=${this.rebuilder.prebuildTagPrefix}`,
-        ...await this.getPrebuildInstallRuntimeArgs(),
-      ],
+      await this.getPrebuildInstallArgs(prebuildInstallPath),
       {
         cwd: this.modulePath,
       }
     );
+  }
+
+  async getPrebuildInstallArgs(prebuildInstallPath: string): Promise<string[]> {
+    return [
+      path.resolve(__dirname, '..', `prebuild-shim.js`),
+      prebuildInstallPath,
+      `--arch=${this.rebuilder.arch}`,
+      `--platform=${this.rebuilder.platform}`,
+      `--tag-prefix=${this.rebuilder.prebuildTagPrefix}`,
+      this.rebuilder.forceBuildFromSource ? `--build-from-source` : '',
+      ...(await this.getPrebuildInstallRuntimeArgs()),
+    ].filter(Boolean);
   }
 
   async findPrebuiltModule(): Promise<boolean> {
