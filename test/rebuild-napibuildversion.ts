@@ -26,7 +26,7 @@ describe('rebuild with napi_build_versions in binary config', async function () 
   // https://github.com/electron/rebuild/issues/554
   const archs = ['x64', 'arm64']
   for (const arch of archs) {
-    it(`${ arch } arch should have rebuilt bianry with 'napi_build_versions' array and 'libc' provided`, async () => {
+    it(`${ arch } arch should have rebuilt binary with 'napi_build_versions' array and 'libc' provided`, async () => {
       const libc = await detectLibc.family() || 'unknown'
       const binaryPath = napiBuildVersionSpecificPath(arch, libc)
       
@@ -38,7 +38,8 @@ describe('rebuild with napi_build_versions in binary config', async function () 
       await rebuild({
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
-        arch
+        arch,
+        buildFromSource: true, // need to skip node-pre-gyp prebuilt binary
       });
       
       await expectNativeModuleToBeRebuilt(testModulePath, 'sqlite3');

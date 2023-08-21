@@ -81,7 +81,7 @@ describe('rebuilder', () => {
         skipped++;
       });
       await rebuilder;
-      expect(skipped).to.equal(7);
+      expect(skipped).to.equal(8);
     });
 
     it('should rebuild all modules again when disabled but the electron ABI changed', async () => {

@@ -45,7 +45,7 @@
     "detect-libc": "^2.0.1",
     "fs-extra": "^10.0.0",
     "got": "^11.7.0",
-    "node-abi": "^3.0.0",
+    "node-abi": "^3.45.0",
     "node-api-version": "^0.1.4",
     "node-gyp": "^9.0.0",
     "ora": "^5.1.0",
