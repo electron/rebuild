@@ -6,7 +6,6 @@ import { cacheModuleState } from './cache';
 import { NodeGyp } from './module-type/node-gyp/node-gyp';
 import { Prebuildify } from './module-type/prebuildify';
 import { PrebuildInstall } from './module-type/prebuild-install';
-import { NodePreGyp } from './module-type/node-pre-gyp';
 import { IRebuilder } from './types';
 
 const d = debug('electron-rebuild');
@@ -17,7 +16,6 @@ export class ModuleRebuilder {
   private rebuilder: IRebuilder;
   private prebuildify: Prebuildify;
   private prebuildInstall: PrebuildInstall;
-  private nodePreGyp: NodePreGyp;
 
   constructor(rebuilder: IRebuilder, modulePath: string) {
     this.modulePath = modulePath;
@@ -26,7 +24,6 @@ export class ModuleRebuilder {
     this.nodeGyp = new NodeGyp(rebuilder, modulePath);
     this.prebuildify = new Prebuildify(rebuilder, modulePath);
     this.prebuildInstall = new PrebuildInstall(rebuilder, modulePath);
-    this.nodePreGyp = new NodePreGyp(rebuilder, modulePath);
   }
 
   get metaPath(): string {
@@ -92,21 +89,6 @@ export class ModuleRebuilder {
     return false;
   }
 
-  async findNodePreGypInstallModule(cacheKey: string): Promise<boolean> {
-    if (await this.nodePreGyp.usesTool()) {
-      d(`assuming is node-pre-gyp powered: ${this.nodePreGyp.moduleName}`);
-
-      if (await this.nodePreGyp.findPrebuiltModule()) {
-        d('installed prebuilt module:', this.nodePreGyp.moduleName);
-        await this.writeMetadata();
-        await this.cacheModuleState(cacheKey);
-        return true;
-      }
-    }
-
-    return false;
-  }
-
   async rebuildNodeGypModule(cacheKey: string): Promise<boolean> {
     await this.nodeGyp.rebuildModule();
     d('built via node-gyp:', this.nodeGyp.moduleName);
@@ -142,15 +124,8 @@ export class ModuleRebuilder {
   }
 
   async rebuild(cacheKey: string): Promise<boolean> {
-    if (
-      !this.rebuilder.buildFromSource && (
-        (await this.findPrebuildifyModule(cacheKey)) ||
-        (await this.findPrebuildInstallModule(cacheKey)) ||
-        (await this.findNodePreGypInstallModule(cacheKey)))
-    ) {
-      return true;
-    }
-
-    return await this.rebuildNodeGypModule(cacheKey);
+    return (await this.findPrebuildifyModule(cacheKey)) ||
+      (await this.findPrebuildInstallModule(cacheKey)) ||
+      (await this.rebuildNodeGypModule(cacheKey));
   }
 }

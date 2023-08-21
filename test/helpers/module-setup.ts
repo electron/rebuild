@@ -35,7 +35,7 @@ export async function resetTestModule(testModulePath: string, installModules = t
 }
 
 export async function cleanupTestModule(testModulePath: string): Promise<void> {
-  await fs.rmdir(testModulePath, { recursive: true, maxRetries: 10 });
+  await fs.remove(testModulePath);
   resetMSVSVersion();
 }
 

@@ -35,10 +35,7 @@ describe('prebuild-install', () => {
       ])
     });
 
-    it('should not fail running prebuild-install', async function () {
-      if (process.platform === 'darwin' && process.arch === 'arm64') {
-        this.skip(); // farmhash module has no prebuilt binaries for ARM64
-      }
+    it('should not fail running prebuild-install', async () => {
       const rebuilder = new Rebuilder(rebuilderArgs);
       const prebuildInstall = new PrebuildInstall(rebuilder, modulePath);
       expect(await prebuildInstall.findPrebuiltModule()).to.equal(true);
