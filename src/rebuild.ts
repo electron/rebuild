@@ -20,6 +20,7 @@ export interface RebuildOptions {
   headerURL?: string;
   types?: ModuleType[];
   mode?: RebuildMode;
+  jobs?: string;
   debug?: boolean;
   useCache?: boolean;
   useElectronClang?: boolean;
@@ -54,6 +55,7 @@ export class Rebuilder implements IRebuilder {
   public force: boolean;
   public headerURL: string;
   public mode: RebuildMode;
+  public jobs: string;
   public debug: boolean;
   public useCache: boolean;
   public cachePath: string;
@@ -71,6 +73,7 @@ export class Rebuilder implements IRebuilder {
     this.force = options.force || false;
     this.headerURL = options.headerURL || 'https://www.electronjs.org/headers';
     this.mode = options.mode || defaultMode;
+    this.jobs = options.jobs || '1';
     this.debug = options.debug || false;
     this.useCache = options.useCache || false;
     this.useElectronClang = options.useElectronClang || false;
