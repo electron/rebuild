@@ -6,8 +6,8 @@ import {
   determineNativePrebuildArch,
   determineNativePrebuildExtension,
   Prebuildify
-} from '../src/module-type/prebuildify';
-import { Rebuilder, RebuilderOptions } from '../src/rebuild';
+} from '../lib/module-type/prebuildify';
+import { Rebuilder, RebuilderOptions } from '../lib/rebuild';
 
 describe('determineNativePrebuildArch', () => {
   it('returns arm if passed in armv7l', () => {

@@ -1,13 +1,13 @@
 import { expect } from 'chai';
 
-import { getNodeArch, uname } from '../src/arch';
+import { getNodeArch, uname } from '../lib/arch';
 
 // Copied from @electron/get
 describe('uname()', () => {
   if (process.platform !== 'win32') {
     it('should return the correct arch for your system', () => {
       // assumes that the tests will always be run on an x64 system 😬
-      expect(uname()).to.equal('x86_64');
+      expect(uname()).to.equal(process.arch === 'arm64' ? 'arm64' : 'x86_64');
     });
   }
 });

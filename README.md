@@ -1,8 +1,8 @@
 ## Electron Rebuild
 
-[![CircleCI](https://circleci.com/gh/electron/electron-rebuild.svg?style=svg)](https://circleci.com/gh/electron/electron-rebuild)
-[![NPM](https://img.shields.io/npm/v/electron-rebuild.svg?style=flat)](https://npm.im/electron-rebuild)
-[![Coverage Status](https://codecov.io/gh/electron/electron-rebuild/branch/master/graph/badge.svg)](https://codecov.io/gh/electron/electron-rebuild)
+[![CircleCI](https://circleci.com/gh/electron/rebuild.svg?style=svg)](https://circleci.com/gh/electron/rebuild)
+[![NPM](https://img.shields.io/npm/v/@electron/rebuild.svg?style=flat)](https://npm.im/@electron/rebuild)
+[![Coverage Status](https://codecov.io/gh/electron/rebuild/branch/main/graph/badge.svg)](https://codecov.io/gh/electron/rebuild)
 
 This executable rebuilds native Node.js modules against the version of Node.js
 that your Electron project is using. This allows you to use native Node.js
@@ -14,7 +14,7 @@ modules in Electron apps without your system version of Node.js matching exactly
 Install the package with `--save-dev`:
 
 ```sh
-npm install --save-dev electron-rebuild
+npm install --save-dev @electron/rebuild
 ```
 
 Then, whenever you install a new npm package, rerun electron-rebuild:
@@ -83,7 +83,7 @@ Options:
 Copyright 2016
 ```
 
-### How can I use this with [Electron Forge](https://github.com/electron-userland/electron-forge)?
+### How can I use this with [Electron Forge](https://github.com/electron/forge)?
 
 This package is automatically used with Electron Forge when packaging an Electron app.
 
@@ -94,7 +94,7 @@ for Electron Packager. For example:
 
 ```javascript
 import packager from 'electron-packager';
-import rebuild from 'electron-rebuild';
+import rebuild from '@electron/rebuild';
 
 packager({
   // … other options
@@ -120,7 +120,7 @@ electron-rebuild is also a library that you can require into your app or
 build process. It has a very simple API:
 
 ```javascript
-import rebuild from 'electron-rebuild';
+import rebuild from '@electron/rebuild';
 
 // Public: Rebuilds a node_modules directory with the given Electron version.
 //
@@ -156,7 +156,3 @@ const pathToElectron = require('electron');
       console.error(e);
     });
 ```
-
-### Alternatives
-
-- [require-rebuild](https://github.com/juliangruber/require-rebuild) patches `require()` to rebuild native node modules on the fly

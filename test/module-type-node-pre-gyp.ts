@@ -4,13 +4,13 @@ import { EventEmitter } from 'events';
 import path from 'path';
 
 import { cleanupTestModule, resetTestModule, TIMEOUT_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath } from './helpers/module-setup';
-import { PrebuildInstall } from '../lib/module-type/prebuild-install';
+import { NodePreGyp } from '../lib/module-type/node-pre-gyp';
 import { Rebuilder } from '../lib/rebuild';
 
 chai.use(chaiAsPromised);
 
-describe('prebuild-install', () => {
-  const modulePath = path.join(testModulePath, 'node_modules', 'farmhash');
+describe('node-pre-gyp', () => {
+  const modulePath = path.join(testModulePath, 'node_modules', 'sqlite3');
   const rebuilderArgs = {
     buildPath: testModulePath,
     electronVersion: '8.0.0',
@@ -26,22 +26,16 @@ describe('prebuild-install', () => {
 
     it('should find correct napi version and select napi args', async () => {
       const rebuilder = new Rebuilder(rebuilderArgs);
-      const prebuildInstall = new PrebuildInstall(rebuilder, modulePath);
+      const nodePreGyp = new NodePreGyp(rebuilder, modulePath);
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      expect(prebuildInstall.nodeAPI.getNapiVersion((await prebuildInstall.getSupportedNapiVersions())!)).to.equal(3);
-      expect(await prebuildInstall.getPrebuildInstallRuntimeArgs()).to.deep.equal([
-        '--runtime=napi',
-        `--target=3`,
-      ])
+      expect(nodePreGyp.nodeAPI.getNapiVersion((await nodePreGyp.getSupportedNapiVersions())!)).to.equal(3);
+      expect(await nodePreGyp.getNodePreGypRuntimeArgs()).to.deep.equal([])
     });
 
-    it('should not fail running prebuild-install', async function () {
-      if (process.platform === 'darwin' && process.arch === 'arm64') {
-        this.skip(); // farmhash module has no prebuilt binaries for ARM64
-      }
+    it('should not fail running node-pre-gyp', async () => {
       const rebuilder = new Rebuilder(rebuilderArgs);
-      const prebuildInstall = new PrebuildInstall(rebuilder, modulePath);
-      expect(await prebuildInstall.findPrebuiltModule()).to.equal(true);
+      const nodePreGyp = new NodePreGyp(rebuilder, modulePath);
+      expect(await nodePreGyp.findPrebuiltModule()).to.equal(true);
     });
 
     it('should throw error with unsupported Electron version', async () => {
@@ -49,8 +43,8 @@ describe('prebuild-install', () => {
         ...rebuilderArgs,
         electronVersion: '2.0.0',
       });
-      const prebuildInstall = new PrebuildInstall(rebuilder, modulePath);
-      expect(prebuildInstall.findPrebuiltModule()).to.eventually.be.rejectedWith("Native module 'farmhash' requires Node-API but Electron v2.0.0 does not support Node-API");
+      const nodePreGyp = new NodePreGyp(rebuilder, modulePath);
+      expect(nodePreGyp.findPrebuiltModule()).to.eventually.be.rejectedWith("Native module 'sqlite3' requires Node-API but Electron v2.0.0 does not support Node-API");
     });
   });
 });
