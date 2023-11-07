@@ -26,7 +26,7 @@ const argv = yargs(process.argv.slice(2)).version(false).options({
   types: { alias: 't', type: 'string', description: 'The types of dependencies to rebuild.  Comma separated list of "prod", "dev" and "optional".  Default is "prod,optional"' },
   parallel: { alias: 'p', type: 'boolean', description: 'Rebuild in parallel, this is enabled by default on macOS and Linux' },
   sequential: { alias: 's', type: 'boolean', description: 'Rebuild modules sequentially, this is enabled by default on Windows' },
-  jobs: {alias: 'j', type: 'string', description: 'Run make in parallel. The value max will use all available CPU cores'},
+  jobs: {alias: 'j', type: 'string', description: 'Run make in parallel. The value max will use all available CPU cores. Defaults to 1.'},
   debug: { alias: 'b', type: 'boolean', description: 'Build debug version of modules' },
   'prebuild-tag-prefix': { type: 'string', description: 'GitHub tag prefix passed to prebuild-install. Default is "v"' },
   'force-abi': { type: 'number', description: 'Override the ABI version for the version of Electron you are targeting.  Only use when targeting Nightly releases.' },
