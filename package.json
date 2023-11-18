@@ -54,7 +54,6 @@
     "yargs": "^17.0.1"
   },
   "devDependencies": {
-    "@continuous-auth/semantic-release-npm": "^3.0.0",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/chai": "^4.2.12",
     "@types/chai-as-promised": "^7.1.3",
