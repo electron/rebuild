@@ -22,8 +22,8 @@ export class NodePreGyp extends NativeModule {
         nodePreGypPath,
         'reinstall',
         '--fallback-to-build',
-        `--arch=${this.rebuilder.arch}`,
-        `--platform=${this.rebuilder.platform}`,
+        `--target_arch=${this.rebuilder.arch}`,
+        `--target_platform=${this.rebuilder.platform}`,
         ...await this.getNodePreGypRuntimeArgs(),
       ],
       {
