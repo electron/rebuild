@@ -9,7 +9,9 @@ import { Rebuilder } from '../lib/rebuild';
 
 chai.use(chaiAsPromised);
 
-describe('node-pre-gyp', () => {
+describe('node-pre-gyp', function () {
+  this.timeout(TIMEOUT_IN_MILLISECONDS);
+
   const modulePath = path.join(testModulePath, 'node_modules', 'sqlite3');
   const rebuilderArgs = {
     buildPath: testModulePath,
@@ -18,12 +20,10 @@ describe('node-pre-gyp', () => {
     lifecycle: new EventEmitter()
   };
 
+  before(async () => await resetTestModule(testModulePath));
+  after(async () => await cleanupTestModule(testModulePath));
+
   describe('Node-API support', function() {
-    this.timeout(TIMEOUT_IN_MILLISECONDS);
-
-    before(async () => await resetTestModule(testModulePath));
-    after(async () => await cleanupTestModule(testModulePath));
-
     it('should find correct napi version and select napi args', async () => {
       const rebuilder = new Rebuilder(rebuilderArgs);
       const nodePreGyp = new NodePreGyp(rebuilder, modulePath);
@@ -46,5 +46,16 @@ describe('node-pre-gyp', () => {
       const nodePreGyp = new NodePreGyp(rebuilder, modulePath);
       expect(nodePreGyp.findPrebuiltModule()).to.eventually.be.rejectedWith("Native module 'sqlite3' requires Node-API but Electron v2.0.0 does not support Node-API");
     });
+  });
+
+  it('should redownload the module if the architecture changes', async () => {
+    let rebuilder = new Rebuilder(rebuilderArgs);
+    let nodePreGyp = new NodePreGyp(rebuilder, modulePath);
+    expect(await nodePreGyp.findPrebuiltModule()).to.equal(true);
+
+    const arch = rebuilderArgs.arch === 'arm64' ? 'x64' : 'arm64';
+    rebuilder = new Rebuilder({ ...rebuilderArgs, arch });
+    nodePreGyp = new NodePreGyp(rebuilder, modulePath);
+    expect(await nodePreGyp.findPrebuiltModule()).to.equal(true);
   });
 });
