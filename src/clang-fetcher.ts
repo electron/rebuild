@@ -12,18 +12,22 @@ const d = debug('electron-rebuild');
 
 const CDS_URL = 'https://commondatastorage.googleapis.com/chromium-browser-clang';
 
-function getPlatformUrlPrefix(hostOS: string) {
+function getPlatformUrlPrefix(hostOS: string, hostArch: string) {
   const prefixMap = {
       'linux': 'Linux_x64',
       'darwin': 'Mac',
       'win32': 'Win',
+  };
+  let prefix = prefixMap[hostOS];
+  if (prefix === 'Mac' && hostArch === 'arm64') {
+    prefix = 'Mac_arm64';
   }
-  return CDS_URL + '/' + prefixMap[hostOS] + '/'
+  return CDS_URL + '/' + prefix + '/';
 }
 
-function getClangDownloadURL(packageFile: string, packageVersion: string, hostOS: string) {
+function getClangDownloadURL(packageFile: string, packageVersion: string, hostOS: string, hostArch: string) {
   const cdsFile = `${packageFile}-${packageVersion}.tgz`;
-  return getPlatformUrlPrefix(hostOS) + cdsFile;
+  return getPlatformUrlPrefix(hostOS, hostArch) + cdsFile;
 }
 
 function getSDKRoot(): string {
@@ -97,7 +101,7 @@ async function downloadClangVersion(electronVersion: string) {
   if (!clangVersionString) throw new Error('Failed to determine Clang revision from Electron version');
   d('fetching clang:', clangVersionString);
 
-  const clangDownloadURL = getClangDownloadURL('clang', clangVersionString, process.platform);
+  const clangDownloadURL = getClangDownloadURL('clang', clangVersionString, process.platform, process.arch);
   
   const contents = await fetch(clangDownloadURL, 'buffer');
   d('deflating clang');
