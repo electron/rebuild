@@ -2,14 +2,14 @@ version: 2.1
 
 orbs:
   cfa: continuousauth/npm@2.1.0
-  node: electronjs/node@1.2.0
+  node: electronjs/node@2.1.0
 
 executors:
   windows:
     environment:
       GYP_MSVS_VERSION: '2022'
     machine:
-      image: windows-server-2022-gui:stable
+      image: windows-server-2022-gui:current
       resource_class: windows.medium
       shell: bash.exe
 
@@ -23,6 +23,17 @@ workflows:
             - run: git config --global core.autocrlf input
             - when:
                 condition:
+                  or:
+                    - and:
+                        - equal: [ node/macos, << matrix.executor >> ]
+                        - equal: [ '14.16', << matrix.node-version >> ]
+                    - and:
+                        - equal: [ node/macos, << matrix.executor >> ]
+                        - equal: [ '12.22', << matrix.node-version >> ]
+                steps:
+                  - node/install-rosetta
+            - when:
+                condition:
                   equal: [ windows, << matrix.executor >> ]
                 steps:
                   - run:
@@ -33,8 +44,8 @@ workflows:
             - when:
                 condition:
                   or:
-                    - equal: [ 14.21.3, << matrix.node-version >> ]
-                    - equal: [ 12.22.12, << matrix.node-version >> ]
+                    - equal: [ '14.16', << matrix.node-version >> ]
+                    - equal: [ '12.22', << matrix.node-version >> ]
                 steps:
                   # Update npm so it works with latest Python 3
                   - run: npm install -g npm@8
@@ -54,16 +65,17 @@ workflows:
                 - node/macos
                 - windows
               node-version:
-                - 20.2.0
-                - 18.16.0
-                - 16.20.0
-                - 14.21.3
-                - 12.22.12
+                - '20.9'
+                - '18.17'
+                - '16.20'
+                # Stay below 14.17.0 or nvm tries to download arm64 artifacts which don't exist
+                - '14.16'
+                - '12.22'
             exclude:
               - executor: windows
-                node-version: 14.21.3
+                node-version: '14.16'
               - executor: windows
-                node-version: 12.22.12
+                node-version: '12.22'
       - cfa/release:
           requires:
             - test
