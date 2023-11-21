@@ -9,7 +9,7 @@ executors:
     environment:
       GYP_MSVS_VERSION: '2022'
     machine:
-      image: windows-server-2022-gui:stable
+      image: windows-server-2022-gui:current
       resource_class: windows.medium
       shell: bash.exe
 
@@ -23,9 +23,13 @@ workflows:
             - run: git config --global core.autocrlf input
             - when:
                 condition:
-                  and:
-                    - equal: [ node/macos, << matrix.executor >> ]
-                    - equal: [ '14.16', << matrix.node-version >> ]
+                  or:
+                    - and:
+                        - equal: [ node/macos, << matrix.executor >> ]
+                        - equal: [ '14.16', << matrix.node-version >> ]
+                    - and:
+                        - equal: [ node/macos, << matrix.executor >> ]
+                        - equal: [ '12.22', << matrix.node-version >> ]
                 steps:
                   - node/install-rosetta
             - when:
@@ -40,8 +44,8 @@ workflows:
             - when:
                 condition:
                   or:
-                    - equal: [ 14.21.3, << matrix.node-version >> ]
-                    - equal: [ 12.22.12, << matrix.node-version >> ]
+                    - equal: [ '14.16', << matrix.node-version >> ]
+                    - equal: [ '12.22', << matrix.node-version >> ]
                 steps:
                   # Update npm so it works with latest Python 3
                   - run: npm install -g npm@8
