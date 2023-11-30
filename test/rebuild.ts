@@ -112,6 +112,33 @@ describe('rebuilder', () => {
     });
   });
 
+  describe('ignore rebuild', function() {
+    this.timeout(2 * MINUTES_IN_MILLISECONDS);
+
+    before(async () => await resetTestModule(testModulePath));
+    after(async () => await cleanupTestModule(testModulePath));
+    afterEach(resetMSVSVersion);
+
+    const buildPath = testModulePath;
+    const electronVersion = testElectronVersion;
+    const arch = process.arch;
+
+    it('should rebuild all modules again when enabled', async function() {
+      if (process.platform === 'darwin') {
+        this.timeout(5 * MINUTES_IN_MILLISECONDS);
+      }
+      await rebuild({ buildPath, electronVersion, arch });
+      resetMSVSVersion();
+      const rebuilder = rebuild({ buildPath, electronVersion, arch, ignoreModules: ['native-hello-world'], force: true });
+      let skipped = 0;
+      rebuilder.lifecycle.on('module-skip', () => {
+        skipped++;
+      });
+      await rebuilder;
+      expect(skipped).to.equal(1);
+    });
+  });
+
   describe('only rebuild', function() {
     this.timeout(2 * MINUTES_IN_MILLISECONDS);
 
