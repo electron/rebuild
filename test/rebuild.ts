@@ -124,7 +124,7 @@ describe('rebuilder', () => {
     const arch = process.arch;
 
     it('should rebuild all modules again when enabled', async function() {
-      if (process.platform === 'darwin') {
+      if (process.platform === 'win32') {
         this.timeout(5 * MINUTES_IN_MILLISECONDS);
       }
       await rebuild({ buildPath, electronVersion, arch });
