@@ -2780,10 +2780,10 @@ randombytes@^2.1.0:
   dependencies:
     safe-buffer "^5.1.0"
 
-read-binary-file-arch@^1.0.5:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/read-binary-file-arch/-/read-binary-file-arch-1.0.5.tgz#9fc347a1017a4894021eea1e6d375422f6be2077"
-  integrity sha512-Tcz+mwwDBsZ7H6e3tq/8knMhhwHOXcRxm+CSw43b6vyDiyb9My1pzdV1qSf+NmDyp0xXkHyRmmNHeH2MNd3tZQ==
+read-binary-file-arch@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/read-binary-file-arch/-/read-binary-file-arch-1.0.6.tgz#959c4637daa932280a9b911b1a6766a7e44288fc"
+  integrity sha512-BNg9EN3DD3GsDXX7Aa8O4p92sryjkmzYYgmgTAc6CA4uGLEDzFfxOxugu21akOxpcXHiEgsYkC6nPsQvLLLmEg==
   dependencies:
     debug "^4.3.4"
 
