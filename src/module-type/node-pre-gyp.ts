@@ -1,5 +1,6 @@
 import debug from 'debug';
 import { spawn } from '@malept/cross-spawn-promise';
+import { readBinaryFileArch } from 'read-binary-file-arch';
 
 import { locateBinary, NativeModule } from '.';
 const d = debug('electron-rebuild');
@@ -16,14 +17,18 @@ export class NodePreGyp extends NativeModule {
   }
 
   async run(nodePreGypPath: string): Promise<void> {
+    const redownloadBinary = await this.shouldUpdateBinary(nodePreGypPath);
+
     await spawn(
       process.execPath,
       [
         nodePreGypPath,
         'reinstall',
         '--fallback-to-build',
-        `--arch=${this.rebuilder.arch}`,
-        `--platform=${this.rebuilder.platform}`,
+        ...(redownloadBinary ? ['--update-binary'] : []),
+        `--arch=${this.rebuilder.arch}`, // fallback build arch
+        `--target_arch=${this.rebuilder.arch}`, // prebuild arch
+        `--target_platform=${this.rebuilder.platform}`,
         ...await this.getNodePreGypRuntimeArgs(),
       ],
       {
@@ -64,5 +69,54 @@ export class NodePreGyp extends NativeModule {
         `--dist-url=${this.rebuilder.headerURL}`,
       ];
     }
+  }
+
+  private async shouldUpdateBinary(nodePreGypPath: string) {
+    let shouldUpdate = false;
+
+    // Redownload binary only if the existing module arch differs from the
+    // target arch.
+    try {
+      const modulePaths = await this.getModulePaths(nodePreGypPath);
+      d('module paths:', modulePaths);
+      for (const modulePath of modulePaths) {
+        let moduleArch;
+        try {
+          moduleArch = await readBinaryFileArch(modulePath);
+          d('module arch:', moduleArch);
+        } catch (error) {
+          d('failed to read module arch:', error.message);
+          continue;
+        }
+
+        if (moduleArch && moduleArch !== this.rebuilder.arch) {
+          shouldUpdate = true;
+          d('module architecture differs:', `${moduleArch} !== ${this.rebuilder.arch}`);
+          break;
+        }
+      }
+    } catch (error) {
+      d('failed to get existing binary arch:', error.message);
+
+      // Assume architecture differs
+      shouldUpdate = true;
+    }
+
+    return shouldUpdate;
+  }
+
+  private async getModulePaths(nodePreGypPath: string): Promise<string[]> {
+    const results = await spawn(process.execPath, [
+      nodePreGypPath,
+      'reveal',
+      'module', // pick property with module path
+      `--target_arch=${this.rebuilder.arch}`,
+      `--target_platform=${this.rebuilder.platform}`,
+    ], {
+      cwd: this.modulePath,
+    });
+
+    // Packages with multiple binaries will output one per line
+    return results.split('\n').filter(Boolean);
   }
 }
