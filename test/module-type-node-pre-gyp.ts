@@ -53,8 +53,14 @@ describe('node-pre-gyp', function () {
     let nodePreGyp = new NodePreGyp(rebuilder, modulePath);
     expect(await nodePreGyp.findPrebuiltModule()).to.equal(true);
 
-    const arch = rebuilderArgs.arch === 'arm64' ? 'x64' : 'arm64';
-    rebuilder = new Rebuilder({ ...rebuilderArgs, arch });
+    let alternativeArch: string;
+    if (process.platform === 'win32') {
+      alternativeArch = rebuilderArgs.arch === 'x64' ? 'ia32' : 'x64';
+    } else {
+      alternativeArch = rebuilderArgs.arch === 'arm64' ? 'x64' : 'arm64'
+    }
+
+    rebuilder = new Rebuilder({ ...rebuilderArgs, arch: alternativeArch });
     nodePreGyp = new NodePreGyp(rebuilder, modulePath);
     expect(await nodePreGyp.findPrebuiltModule()).to.equal(true);
   });
