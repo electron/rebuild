@@ -2,9 +2,9 @@
 
 :+1::tada: First off, thanks for taking the time to contribute! :tada::+1:
 
-This project adheres to the Contributor Covenant [code of conduct](CODE_OF_CONDUCT.md).
-By participating, you are expected to uphold this code. Please report unacceptable
-behavior to electron@github.com.
+This project adheres to the Contributor Covenant
+[code of conduct](https://github.com/electron/electron/blob/main/CODE_OF_CONDUCT.md).
+By participating, you are expected to uphold this code.
 
 The following is a set of guidelines for contributing to @electron/rebuild.
 These are just guidelines, not rules, use your best judgment and feel free to
