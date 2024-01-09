@@ -2451,10 +2451,10 @@ node-abi@^3.45.0:
   dependencies:
     semver "^7.3.5"
 
-node-api-version@^0.1.4:
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/node-api-version/-/node-api-version-0.1.4.tgz#1ed46a485e462d55d66b5aa1fe2821720dedf080"
-  integrity sha512-KGXihXdUChwJAOHO53bv9/vXcLmdUsZ6jIptbvYvkpKfth+r7jw44JkVxQFA3kX5nQjzjmGu1uAu/xNNLNlI5g==
+node-api-version@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/node-api-version/-/node-api-version-0.2.0.tgz#5177441da2b1046a4d4547ab9e0972eed7b1ac1d"
+  integrity sha512-fthTTsi8CxaBXMaBAD7ST2uylwvsnYxh2PfaScwpMhos6KlSFajXQPcM4ogNE1q2s3Lbz9GCGqeIHC+C6OZnKg==
   dependencies:
     semver "^7.3.5"
 
