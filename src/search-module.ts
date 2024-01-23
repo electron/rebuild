@@ -69,12 +69,12 @@ export async function searchForNodeModules(cwd: string, rootPath?: string): Prom
 
 /**
  * Determine the root directory of a given project, by looking for a directory with an
- * NPM or yarn lockfile.
+ * NPM or yarn lockfile or pnpm lockfile.
  *
  * @param cwd the initial directory to traverse
  */
 export async function getProjectRootPath(cwd: string): Promise<string> {
-  for (const lockFilename of ['yarn.lock', 'package-lock.json']) {
+  for (const lockFilename of ['yarn.lock', 'package-lock.json', 'pnpm-lock.yaml']) {
     const pathGenerator: PathGeneratorFunction = (traversedPath) => path.join(traversedPath, lockFilename);
     const lockPaths = await traverseAncestorDirectories(cwd, pathGenerator, undefined, 1)
     if (lockPaths.length > 0) {

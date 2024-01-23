@@ -18,7 +18,7 @@ async function removeTempDir(): Promise<void> {
 describe('search-module', () => {
   describe('getProjectRootPath', () => {
     describe('multi-level workspace', () => {
-      for (const lockFile of ['yarn.lock', 'package-lock.json']) {
+      for (const lockFile of ['yarn.lock', 'package-lock.json', 'pnpm-lock.yaml']) {
         describe(lockFile, () => {
           before(async () => {
             await createTempDir();
