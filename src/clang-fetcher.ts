@@ -2,7 +2,6 @@ import * as cp from 'child_process';
 import debug from 'debug';
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import semver from 'semver';
 import * as tar from 'tar';
 import * as zlib from 'zlib';
 import { ELECTRON_GYP_DIR } from './constants';
@@ -13,18 +12,22 @@ const d = debug('electron-rebuild');
 
 const CDS_URL = 'https://commondatastorage.googleapis.com/chromium-browser-clang';
 
-function getPlatformUrlPrefix(hostOS: string) {
+function getPlatformUrlPrefix(hostOS: string, hostArch: string) {
   const prefixMap = {
       'linux': 'Linux_x64',
       'darwin': 'Mac',
       'win32': 'Win',
+  };
+  let prefix = prefixMap[hostOS];
+  if (prefix === 'Mac' && hostArch === 'arm64') {
+    prefix = 'Mac_arm64';
   }
-  return CDS_URL + '/' + prefixMap[hostOS] + '/'
+  return CDS_URL + '/' + prefix + '/';
 }
 
-function getClangDownloadURL(packageFile: string, packageVersion: string, hostOS: string) {
+function getClangDownloadURL(packageFile: string, packageVersion: string, hostOS: string, hostArch: string) {
   const cdsFile = `${packageFile}-${packageVersion}.tgz`;
-  return getPlatformUrlPrefix(hostOS) + cdsFile;
+  return getPlatformUrlPrefix(hostOS, hostArch) + cdsFile;
 }
 
 function getSDKRoot(): string {
@@ -37,13 +40,9 @@ export async function getClangEnvironmentVars(electronVersion: string, targetArc
   const clangDownloadDir = await downloadClangVersion(electronVersion);
 
   const clangDir = path.resolve(clangDownloadDir, 'bin');
-  const cxxflags = [];
   const clangArgs: string[] = [];
   if (process.platform === 'darwin') {
     clangArgs.push('-isysroot', getSDKRoot());
-  }
-  if (semver.major(electronVersion) >= 20) {
-    cxxflags.push('-std=c++17');
   }
 
   const gypArgs = [];
@@ -61,8 +60,6 @@ export async function getClangEnvironmentVars(electronVersion: string, targetArc
     env: {
       CC: `"${path.resolve(clangDir, 'clang')}" ${clangArgs.join(' ')}`,
       CXX: `"${path.resolve(clangDir, 'clang++')}" ${clangArgs.join(' ')}`,
-      CFLAGS: `${cxxflags.join(' ')}`,
-      CXXFLAGS: `${cxxflags.join(' ')}`
     },
     args: gypArgs,
   }
@@ -104,7 +101,7 @@ async function downloadClangVersion(electronVersion: string) {
   if (!clangVersionString) throw new Error('Failed to determine Clang revision from Electron version');
   d('fetching clang:', clangVersionString);
 
-  const clangDownloadURL = getClangDownloadURL('clang', clangVersionString, process.platform);
+  const clangDownloadURL = getClangDownloadURL('clang', clangVersionString, process.platform, process.arch);
   
   const contents = await fetch(clangDownloadURL, 'buffer');
   d('deflating clang');

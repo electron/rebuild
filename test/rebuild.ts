@@ -1,17 +1,15 @@
 import { expect } from 'chai';
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import * as os from 'os';
 
-import { cleanupTestModule, MINUTES_IN_MILLISECONDS, resetMSVSVersion, resetTestModule, TIMEOUT_IN_MILLISECONDS } from './helpers/module-setup';
+import { cleanupTestModule, MINUTES_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath, resetMSVSVersion, resetTestModule, TIMEOUT_IN_MILLISECONDS } from './helpers/module-setup';
 import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild';
 import { getExactElectronVersionSync } from './helpers/electron-version';
-import { rebuild } from '../src/rebuild';
+import { rebuild } from '../lib/rebuild';
 
 const testElectronVersion = getExactElectronVersionSync();
 
 describe('rebuilder', () => {
-  const testModulePath = path.resolve(os.tmpdir(), 'electron-rebuild-test');
 
   describe('core behavior', function() {
     this.timeout(TIMEOUT_IN_MILLISECONDS);
@@ -19,7 +17,6 @@ describe('rebuilder', () => {
     before(async () => {
       await resetTestModule(testModulePath);
 
-      process.env.ELECTRON_REBUILD_TESTS = 'true';
       await rebuild({
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
@@ -59,7 +56,6 @@ describe('rebuilder', () => {
     });
 
     after(async () => {
-      delete process.env.ELECTRON_REBUILD_TESTS;
       await cleanupTestModule(testModulePath);
     });
   });
@@ -85,7 +81,7 @@ describe('rebuilder', () => {
         skipped++;
       });
       await rebuilder;
-      expect(skipped).to.equal(6);
+      expect(skipped).to.equal(8);
     });
 
     it('should rebuild all modules again when disabled but the electron ABI changed', async () => {
@@ -113,6 +109,33 @@ describe('rebuilder', () => {
       });
       await rebuilder;
       expect(skipped).to.equal(0);
+    });
+  });
+
+  describe('ignore rebuild', function() {
+    this.timeout(2 * MINUTES_IN_MILLISECONDS);
+
+    before(async () => await resetTestModule(testModulePath));
+    after(async () => await cleanupTestModule(testModulePath));
+    afterEach(resetMSVSVersion);
+
+    const buildPath = testModulePath;
+    const electronVersion = testElectronVersion;
+    const arch = process.arch;
+
+    it('should rebuild all modules again when enabled', async function() {
+      if (process.platform === 'win32') {
+        this.timeout(5 * MINUTES_IN_MILLISECONDS);
+      }
+      await rebuild({ buildPath, electronVersion, arch });
+      resetMSVSVersion();
+      const rebuilder = rebuild({ buildPath, electronVersion, arch, ignoreModules: ['native-hello-world'], force: true });
+      let skipped = 0;
+      rebuilder.lifecycle.on('module-skip', () => {
+        skipped++;
+      });
+      await rebuilder;
+      expect(skipped).to.equal(1);
     });
   });
 
@@ -152,7 +175,7 @@ describe('rebuilder', () => {
       let built = 0;
       rebuilder.lifecycle.on('module-done', () => built++);
       await rebuilder;
-      expect(built).to.equal(2);
+      expect(built).to.equal(3);
     });
   });
 

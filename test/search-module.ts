@@ -3,7 +3,7 @@ import * as fs from 'fs-extra';
 import * as os from 'os';
 import * as path from 'path';
 
-import { getProjectRootPath } from '../src/search-module';
+import { getProjectRootPath } from '../lib/search-module';
 
 let baseDir: string;
 

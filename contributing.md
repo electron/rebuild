@@ -1,28 +1,28 @@
-# Contributing to electron-rebuild
+# Contributing to @electron/rebuild
 
 :+1::tada: First off, thanks for taking the time to contribute! :tada::+1:
 
-This project adheres to the Contributor Covenant [code of conduct](CODE_OF_CONDUCT.md).
-By participating, you are expected to uphold this code. Please report unacceptable
-behavior to electron@github.com.
+This project adheres to the Contributor Covenant
+[code of conduct](https://github.com/electron/electron/blob/main/CODE_OF_CONDUCT.md).
+By participating, you are expected to uphold this code.
 
-The following is a set of guidelines for contributing to electron-rebuild.
+The following is a set of guidelines for contributing to @electron/rebuild.
 These are just guidelines, not rules, use your best judgment and feel free to
 propose changes to this document in a pull request.
 
 ## Submitting Issues
 
-* You can create an issue [here](https://github.com/electron/electron-rebuild/issues/new),
+* You can create an issue [here](https://github.com/electron/rebuild/issues/new),
 but before doing that please read the notes below and include as many details as
 possible with your report. If you can, please include:
-  * The version of electron and electron-rebuild you are using
+  * The version of electron and @electron/rebuild you are using
   * The operating system you are using
   * If applicable, what you were doing when the issue arose and what you
   expected to happen
 * Other things that will help resolve your issue:
   * Screenshots and animated GIFs
   * Error output that appears in your terminal, dev tools or as an alert
-  * Perform a [cursory search](https://github.com/electron/electron-rebuild/issues?utf8=✓&q=is%3Aissue+)
+  * Perform a [cursory search](https://github.com/electron/rebuild/issues?utf8=✓&q=is%3Aissue+)
   to see if a similar issue has already been submitted
 
 ## Submitting Pull Requests

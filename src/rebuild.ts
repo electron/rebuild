@@ -28,6 +28,8 @@ export interface RebuildOptions {
   projectRootPath?: string;
   forceABI?: number;
   disablePreGypCopy?: boolean;
+  buildFromSource?: boolean;
+  ignoreModules?: string[];
 }
 
 export interface RebuilderOptions extends RebuildOptions {
@@ -60,6 +62,8 @@ export class Rebuilder implements IRebuilder {
   public msvsVersion?: string;
   public useElectronClang: boolean;
   public disablePreGypCopy: boolean;
+  public buildFromSource: boolean;
+  public ignoreModules: string[];
 
   constructor(options: RebuilderOptions) {
     this.lifecycle = options.lifecycle;
@@ -76,6 +80,9 @@ export class Rebuilder implements IRebuilder {
     this.prebuildTagPrefix = options.prebuildTagPrefix || 'v';
     this.msvsVersion = process.env.GYP_MSVS_VERSION;
     this.disablePreGypCopy = options.disablePreGypCopy || false;
+    this.buildFromSource = options.buildFromSource || false;
+    this.ignoreModules = options.ignoreModules || [];
+    d('ignoreModules', this.ignoreModules);
 
     if (this.useCache && this.force) {
       console.warn('[WARNING]: Electron Rebuild has force enabled and cache enabled, force take precedence and the cache will not be used.');
@@ -167,17 +174,31 @@ export class Rebuilder implements IRebuilder {
 
     const moduleRebuilder = new ModuleRebuilder(this, modulePath);
 
-    this.lifecycle.emit('module-found', path.basename(modulePath));
+    let moduleName = path.basename(modulePath);
+    const parentName = path.basename(path.dirname(modulePath));
+    if (parentName !== 'node_modules') {
+      moduleName = `${parentName}/${moduleName}`;
+    }
+
+    this.lifecycle.emit('module-found', moduleName);
 
     if (!this.force && await moduleRebuilder.alreadyBuiltByRebuild()) {
-      d(`skipping: ${path.basename(modulePath)} as it is already built`);
-      this.lifecycle.emit('module-done');
-      this.lifecycle.emit('module-skip');
+      d(`skipping: ${moduleName} as it is already built`);
+      this.lifecycle.emit('module-done', moduleName);
+      this.lifecycle.emit('module-skip', moduleName);
+      return;
+    }
+
+    d('checking', moduleName, 'against', this.ignoreModules);
+    if (this.ignoreModules.includes(moduleName)) {
+      d(`skipping: ${moduleName} as it is in the ignoreModules array`);
+      this.lifecycle.emit('module-done', moduleName);
+      this.lifecycle.emit('module-skip', moduleName);
       return;
     }
 
     if (await moduleRebuilder.prebuildInstallNativeModuleExists()) {
-      d(`skipping: ${path.basename(modulePath)} as it was prebuilt`);
+      d(`skipping: ${moduleName} as it was prebuilt`);
       return;
     }
 
@@ -195,13 +216,13 @@ export class Rebuilder implements IRebuilder {
       const applyDiffFn = await lookupModuleState(this.cachePath, cacheKey);
       if (typeof applyDiffFn === 'function') {
         await applyDiffFn(modulePath);
-        this.lifecycle.emit('module-done');
+        this.lifecycle.emit('module-done', moduleName);
         return;
       }
     }
 
     if (await moduleRebuilder.rebuild(cacheKey)) {
-      this.lifecycle.emit('module-done');
+      this.lifecycle.emit('module-done', moduleName);
     }
   }
 }
