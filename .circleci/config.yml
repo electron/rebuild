@@ -9,7 +9,7 @@ executors:
     environment:
       GYP_MSVS_VERSION: '2022'
     machine:
-      image: windows-server-2022-gui:current
+      image: windows-server-2022-gui:2023.11.1
       resource_class: windows.medium
       shell: bash.exe
 
