@@ -2,14 +2,14 @@ version: 2.1
 
 orbs:
   cfa: continuousauth/npm@2.1.0
-  node: electronjs/node@2.2.0
+  node: electronjs/node@2.2.1
 
 executors:
   windows:
     environment:
       GYP_MSVS_VERSION: '2022'
     machine:
-      image: windows-server-2022-gui:current
+      image: windows-server-2022-gui:2023.11.1
       resource_class: windows.medium
       shell: bash.exe
 
