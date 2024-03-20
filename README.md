@@ -72,6 +72,7 @@ Options:
                                Default is "prod,optional"
   -p, --parallel               Rebuild in parallel, this is enabled by default
                                on macOS and Linux
+  -j, --jobs                   Run make in parallel. The value max will use all available CPU cores. Defaults to 1.
   -s, --sequential             Rebuild modules sequentially, this is enabled by
                                default on Windows
   -o, --only                   Only build specified module, or comma separated

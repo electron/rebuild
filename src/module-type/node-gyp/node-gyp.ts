@@ -21,7 +21,8 @@ export class NodeGyp extends NativeModule {
       `--target=${this.rebuilder.electronVersion}`,
       `--arch=${this.rebuilder.arch}`,
       `--dist-url=${this.rebuilder.headerURL}`,
-      '--build-from-source'
+      '--build-from-source',
+      `--jobs=${this.rebuilder.jobs}`,
     ];
 
     args.push(d.enabled ? '--verbose' : '--silent');
