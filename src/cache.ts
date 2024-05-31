@@ -98,7 +98,7 @@ export const cacheModuleState = async (dir: string, cachePath: string, key: stri
   const snap = await takeSnapshot(dir);
 
   const moduleBuffer = Buffer.from(JSON.stringify(serialize(snap)));
-  const zipped = await new Promise(resolve => zlib.gzip(moduleBuffer, (_, result) => resolve(result)));
+  const zipped = await new Promise<Buffer>(resolve => zlib.gzip(moduleBuffer, (_, result) => resolve(result)));
   await fs.mkdirp(cachePath);
   await fs.writeFile(path.resolve(cachePath, key), zipped);
 };
@@ -109,7 +109,7 @@ export const lookupModuleState = async (cachePath: string, key: string): Promise
   if (await fs.pathExists(path.resolve(cachePath, key))) {
     return async function applyDiff(dir: string): Promise<void> {
       const zipped = await fs.readFile(path.resolve(cachePath, key));
-      const unzipped: Buffer = await new Promise(resolve => { zlib.gunzip(zipped, (_, result) => resolve(result)); });
+      const unzipped = await new Promise<Buffer>(resolve => { zlib.gunzip(zipped, (_, result) => resolve(result)); });
       const diff = unserialize(JSON.parse(unzipped.toString()));
       await writeSnapshot(diff, dir);
     };
