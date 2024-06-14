@@ -45,7 +45,7 @@ describe('rebuilder', () => {
     });
 
     it('should not have rebuilt top level devDependencies', async () => {
-      await expectNativeModuleToNotBeRebuilt(testModulePath, 'ffi-napi');
+      await expectNativeModuleToNotBeRebuilt(testModulePath, 'ref-napi');
     });
 
     it('should not download files in the module directory', async () => {
@@ -169,7 +169,7 @@ describe('rebuilder', () => {
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch: process.arch,
-        onlyModules: ['ffi-napi', 'ref-napi'], // TODO: check to see if there's a bug with scoped modules
+        onlyModules: ['farmhash', 'ref-napi'], // TODO: check to see if there's a bug with scoped modules
         force: true
       });
       let built = 0;
@@ -185,17 +185,19 @@ describe('rebuilder', () => {
     before(async () => await resetTestModule(testModulePath));
     after(async() => await cleanupTestModule(testModulePath));
 
-    it('should have rebuilt ffi-napi module in Debug mode', async () => {
+    it("should have rebuilt farmhash module in Debug mode", async () => {
       await rebuild({
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch: process.arch,
-        onlyModules: ['ffi-napi'],
+        onlyModules: ["farmhash"],
         force: true,
-        debug: true
+        debug: true,
       });
-      await expectNativeModuleToBeRebuilt(testModulePath, 'ffi-napi', { buildType: 'Debug' });
-      await expectNativeModuleToNotBeRebuilt(testModulePath, 'ffi-napi');
+      await expectNativeModuleToBeRebuilt(testModulePath, "farmhash", {
+        buildType: "Debug",
+      });
+      await expectNativeModuleToNotBeRebuilt(testModulePath, "farmhash");
     });
   });
 
@@ -205,16 +207,16 @@ describe('rebuilder', () => {
     before(async () => await resetTestModule(testModulePath));
     after(async() => await cleanupTestModule(testModulePath));
 
-    it('should have rebuilt ffi-napi module using clang mode', async () => {
+    it('should have rebuilt farmhash module using clang mode', async () => {
       await rebuild({
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch: process.arch,
-        onlyModules: ['ffi-napi'],
+        onlyModules: ['farmhash'],
         force: true,
         useElectronClang: true
       });
-      await expectNativeModuleToBeRebuilt(testModulePath, 'ffi-napi');
+      await expectNativeModuleToBeRebuilt(testModulePath, 'farmhash');
     });
   });
 });
