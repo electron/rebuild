@@ -20,6 +20,7 @@ export interface IRebuilder {
   headerURL: string;
   lifecycle: EventEmitter;
   mode: RebuildMode;
+  jobs: string;
   msvsVersion?: string;
   platform: string;
   prebuildTagPrefix: string;
