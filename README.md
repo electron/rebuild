@@ -54,44 +54,39 @@ installation/runtime requirements.
 Usage: electron-rebuild --version [version] --module-dir [path]
 
 Options:
-  -v, --version                  The version of Electron to build against
+  -v, --version                The version of Electron to build against [string]
+  -f, --force                  Force rebuilding modules, even if we would skip
+                               it otherwise                            [boolean]
+  -a, --arch                   Override the target architecture to something
+                               other than your system's                 [string]
+  -m, --module-dir             The path to the node_modules directory to rebuild
                                                                         [string]
-  -f, --force                    Force rebuilding modules, even if we would skip
-                                 it otherwise                          [boolean]
-  -a, --arch                     Override the target architecture to something
-                                 other than your system's               [string]
-  -m, --module-dir               The path to the node_modules directory to
-                                 rebuild                                [string]
-  -w, --which-module             A specific module to build, or comma separated
-                                 list of modules. Modules will only be rebuilt
-                                 if they also match the types of dependencies
-                                 being rebuilt (see --types).           [string]
-  -o, --only                     Only build specified module, or comma separated
-                                 list of modules. All others are ignored.
-                                                                        [string]
-  -e, --electron-prebuilt-dir    The path to the prebuilt electron module
-                                                                        [string]
-  -d, --dist-url                 Custom header tarball URL              [string]
-  -t, --types                    The types of dependencies to rebuild.  Comma
-                                 separated list of "prod", "dev" and "optional".
-                                 Default is "prod,optional"             [string]
-  -p, --parallel                 Rebuild in parallel, this is enabled by default
-                                 on macOS and Linux                    [boolean]
-  -s, --sequential               Rebuild modules sequentially, this is enabled
-                                 by default on Windows                 [boolean]
-  -b, --debug                    Build debug version of modules        [boolean]
-      --prebuild-tag-prefix      GitHub tag prefix passed to prebuild-install.
-                                 Default is "v"                         [string]
-      --force-build-from-source  Skip prebuild download and rebuild module from
-                                 source. Default is false              [boolean]
-      --force-abi                Override the ABI version for the version of
-                                 Electron you are targeting.  Only use when
-                                 targeting Nightly releases.            [number]
-      --use-electron-clang       Use the clang executable that Electron used
-                                 when building its binary. This will guarantee
-                                 compiler compatibility                [boolean]
-      --disable-pre-gyp-copy     Disables the pre-gyp copy step        [boolean]
-  -h, --help                     Show help                             [boolean]
+  -w, --which-module           A specific module to build, or comma separated
+                               list of modules. Modules will only be rebuilt if
+                               they also match the types of dependencies being
+                               rebuilt (see --types).                   [string]
+  -o, --only                   Only build specified module, or comma separated
+                               list of modules. All others are ignored. [string]
+  -e, --electron-prebuilt-dir  The path to the prebuilt electron module [string]
+  -d, --dist-url               Custom header tarball URL                [string]
+  -t, --types                  The types of dependencies to rebuild.  Comma
+                               separated list of "prod", "dev" and "optional".
+                               Default is "prod,optional"               [string]
+  -p, --parallel               Rebuild in parallel, this is enabled by default
+                               on macOS and Linux                      [boolean]
+  -s, --sequential             Rebuild modules sequentially, this is enabled by
+                               default on Windows                      [boolean]
+  -b, --debug                  Build debug version of modules          [boolean]
+      --prebuild-tag-prefix    GitHub tag prefix passed to prebuild-install.
+                               Default is "v"                           [string]
+      --force-abi              Override the ABI version for the version of
+                               Electron you are targeting.  Only use when
+                               targeting Nightly releases.              [number]
+      --use-electron-clang     Use the clang executable that Electron used when
+                               building its binary. This will guarantee compiler
+                               compatibility                           [boolean]
+      --disable-pre-gyp-copy   Disables the pre-gyp copy step          [boolean]
+  -h, --help                   Show help                               [boolean]
 ```
 
 ### How can I use this with [Electron Forge](https://github.com/electron/forge)?
