@@ -86,6 +86,8 @@ Options:
                                building its binary. This will guarantee compiler
                                compatibility                           [boolean]
       --disable-pre-gyp-copy   Disables the pre-gyp copy step          [boolean]
+      --build-from-source      Skips prebuild download and rebuilds module from
+                               source.                                 [boolean]
   -h, --help                   Show help                               [boolean]
 ```
 

@@ -31,6 +31,7 @@ const argv = yargs(process.argv.slice(2)).version(false).options({
   'force-abi': { type: 'number', description: 'Override the ABI version for the version of Electron you are targeting.  Only use when targeting Nightly releases.' },
   'use-electron-clang': { type: 'boolean', description: 'Use the clang executable that Electron used when building its binary. This will guarantee compiler compatibility' },
   'disable-pre-gyp-copy': { type: 'boolean', description: 'Disables the pre-gyp copy step' },
+  'build-from-source': { type: 'boolean', description: 'Skips prebuild download and rebuilds module from source.'},
 }).usage('Usage: $0 --version [version] --module-dir [path]')
   .help()
   .alias('help', 'h')
