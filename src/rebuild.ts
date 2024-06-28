@@ -11,24 +11,106 @@ import { ModuleRebuilder } from './module-rebuilder';
 import { ModuleType, ModuleWalker } from './module-walker';
 
 export interface RebuildOptions {
+  /**
+   * The path to the `node_modules` directory to rebuild.
+   */
   buildPath: string;
+  /**
+   * The version of Electron to build against.
+   */
   electronVersion: string;
+  /**
+   * Override the target rebuild architecture to something other than the host system architecture.
+   * 
+   * @defaultValue The system {@link https://nodejs.org/api/process.html#processarch | `process.arch`} value
+   */
   arch?: string;
+  /**
+   * An array of module names to rebuild in addition to detected modules
+   * @default []
+   */
   extraModules?: string[];
+  /**
+   * An array of module names to rebuild. **Only** these modules will be rebuilt.
+   */
   onlyModules?: string[] | null;
+  /**
+   * Force a rebuild of modules regardless of their current build state.
+   */
   force?: boolean;
+  /**
+   * URL to download Electron header files from.
+   * @defaultValue `https://www.electronjs.org/headers`
+   */
   headerURL?: string;
+  /**
+   * Array of types of dependencies to rebuild. Possible values are `prod`, `dev`, and `optional`.
+   * 
+   * @defaultValue `['prod', 'optional']`
+   */
   types?: ModuleType[];
+  /**
+   * Whether to rebuild modules sequentially or in parallel.
+   * 
+   * @defaultValue `sequential`
+   */
   mode?: RebuildMode;
+  /**
+   * Rebuilds a Debug build of target modules. If this is `false`, a Release build will be generated instead.
+   * 
+   * @defaultValue false
+   */
   debug?: boolean;
+  /**
+   * Enables hash-based caching to speed up local rebuilds.
+   * 
+   * @experimental
+   * @defaultValue false
+   */
   useCache?: boolean;
+  /**
+   * Whether to use the `clang` executable that Electron uses when building.
+   * This will guarantee compiler compatibility.
+   *
+   * @defaultValue false
+   */
   useElectronClang?: boolean;
+  /**
+   * Sets a custom cache path for the {@link useCache} option.
+   * @experimental
+   * @defaultValue a `.electron-rebuild-cache` folder in the `os.homedir()` directory
+   */
   cachePath?: string;
+  /**
+   * GitHub tag prefix passed to {@link https://www.npmjs.com/package/prebuild-install | `prebuild-install`}.
+   * @defaultValue `v`
+   */
   prebuildTagPrefix?: string;
+  /**
+   * Path to the root of the project if using npm or yarn workspaces.
+   */
   projectRootPath?: string;
+  /**
+   * Override the Application Binary Interface (ABI) version for the version of Electron you are targeting.
+   * Only use when targeting nightly releases.
+   * 
+   * @see the {@link https://github.com/electron/node-abi | electron/node-abi} repository for a list of Electron and Node.js ABIs
+   */
   forceABI?: number;
+  /**
+   * Disables the copying of `.node` files if not needed.
+   * @defaultValue false
+   */
   disablePreGypCopy?: boolean;
+  /**
+   * Skip prebuild download and rebuild module from source.
+   *
+   * @defaultValue false
+   */
   buildFromSource?: boolean;
+  /**
+   * Array of module names to ignore during the rebuild process.
+   */
   ignoreModules?: string[];
 }
 
