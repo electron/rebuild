@@ -3,8 +3,9 @@
 import chalk from 'chalk';
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import ora = require('ora');
 import yargs from 'yargs/yargs';
+
+import { createSpinner } from 'nanospinner';
 
 import { getProjectRootPath } from './search-module';
 import { locateElectronModule } from './electron-locator';
@@ -100,16 +101,20 @@ process.on('unhandledRejection', handler);
 
   let modulesDone = 0;
   let moduleTotal = 0;
-  const rebuildSpinner = ora('Searching dependency tree').start();
+  const rebuildSpinner = createSpinner('Searching dependency tree').start();
   let lastModuleName: string;
 
   const redraw = (moduleName?: string): void => {
     if (moduleName) lastModuleName = moduleName;
 
     if (argv.p) {
-      rebuildSpinner.text = `Building modules: ${modulesDone}/${moduleTotal}`;
+      rebuildSpinner.update({
+        text: `Building modules: ${modulesDone}/${moduleTotal}`,
+      });
     } else {
-      rebuildSpinner.text = `Building module: ${lastModuleName}, Completed: ${modulesDone}`;
+      rebuildSpinner.update({
+        text: `Building module: ${lastModuleName}, Completed: ${modulesDone}`,
+      });
     }
   };
 
@@ -147,11 +152,9 @@ process.on('unhandledRejection', handler);
   try {
     await rebuilder;
   } catch (err) {
-    rebuildSpinner.text = 'Rebuild Failed';
-    rebuildSpinner.fail();
+    rebuildSpinner.error({ text: 'Rebuild Failed' });
     throw err;
   }
 
-  rebuildSpinner.text = 'Rebuild Complete';
-  rebuildSpinner.succeed();
+  rebuildSpinner.success({ text: 'Rebuild Complete' });
 })();
