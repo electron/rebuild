@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import chalk from 'chalk';
+import color from 'picocolors';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import yargs from 'yargs/yargs';
@@ -51,8 +51,8 @@ if (process.argv.length === 3 && process.argv[2] === '--version') {
 }
 
 const handler = (err: Error): void => {
-  console.error(chalk.red('\nAn unhandled error occurred inside electron-rebuild'));
-  console.error(chalk.red(`${err.message}\n\n${err.stack}`));
+  console.error(color.red('\nAn unhandled error occurred inside electron-rebuild'));
+  console.error(color.red(`${err.message}\n\n${err.stack}`));
   process.exit(-1);
 };
 
