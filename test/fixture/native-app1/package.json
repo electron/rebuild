@@ -26,7 +26,7 @@
     "sqlite3": "5.1.6"
   },
   "optionalDependencies": {
-    "bcrypt": "3.0.6"
+    "bcrypt": "5.0.0"
   },
   "resolutions": {
     "bcrypt/nan": "2.17.0"
