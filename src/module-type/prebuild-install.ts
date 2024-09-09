@@ -9,7 +9,7 @@ const d = debug('electron-rebuild');
 export class PrebuildInstall extends NativeModule {
   async usesTool(): Promise<boolean> {
     const dependencies = await this.packageJSONFieldWithDefault('dependencies', {});
-    // eslint-disable-next-line no-prototype-builtins
+     
     return dependencies.hasOwnProperty('prebuild-install')
   }
 

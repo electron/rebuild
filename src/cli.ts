@@ -3,7 +3,7 @@
 import chalk from 'chalk';
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import ora = require('ora');
+import ora from 'ora';
 import yargs from 'yargs/yargs';
 
 import { getProjectRootPath } from './search-module';
@@ -39,13 +39,11 @@ const argv = yargs(process.argv.slice(2)).version(false).options({
   .parseSync();
 
 if (process.argv.length === 3 && process.argv[2] === '--version') {
-  /* eslint-disable @typescript-eslint/no-var-requires */
   try {
     console.log('Electron Rebuild Version:', require(path.resolve(__dirname, '../../package.json')).version);
-  } catch (err) {
+  } catch (_err) {
     console.log('Electron Rebuild Version:', require(path.resolve(__dirname, '../package.json')).version);
   }
-  /* eslint-enable @typescript-eslint/no-var-requires */
   process.exit(0);
 }
 
@@ -67,11 +65,10 @@ process.on('unhandledRejection', handler);
   if (!electronModuleVersion) {
     try {
       if (!electronModulePath) throw new Error('Prebuilt electron module not found');
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const pkgJson = require(path.join(electronModulePath, 'package.json'));
 
       electronModuleVersion = pkgJson.version;
-    } catch (e) {
+    } catch (_err) {
       throw new Error(`Unable to find electron's version number, either install it or specify an explicit version`);
     }
   }

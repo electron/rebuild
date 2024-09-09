@@ -23,7 +23,6 @@ export type ConfigVariables = {
  */
 export function getNodeArch(arch: string, configVariables: ConfigVariables): string {
   if (arch === 'arm') {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     switch (configVariables.arm_version) {
       case '6':
         return uname();

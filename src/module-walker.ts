@@ -13,7 +13,7 @@ export class ModuleWalker {
   buildPath: string;
   modulesToRebuild: string[];
   onlyModules: string[] | null;
-  prodDeps: Set<string>;
+  prodDeps: { [key: string]: boolean };
   projectRootPath?: string;
   realModulePaths: Set<string>;
   realNodeModulesPaths: Set<string>;
@@ -24,7 +24,7 @@ export class ModuleWalker {
     this.modulesToRebuild = [];
     this.projectRootPath = projectRootPath;
     this.types = types;
-    this.prodDeps = prodDeps;
+    this.prodDeps = prodDeps as unknown as { [key: string]: boolean };
     this.onlyModules = onlyModules;
     this.realModulePaths = new Set();
     this.realNodeModulesPaths = new Set();
@@ -90,7 +90,7 @@ export class ModuleWalker {
     let childPackageJson;
     try {
       childPackageJson = await readPackageJson(modulePath, true);
-    } catch (err) {
+    } catch (_err) {
       return;
     }
     const moduleWait: Promise<void[]>[] = [];

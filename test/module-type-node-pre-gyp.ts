@@ -20,25 +20,26 @@ describe('node-pre-gyp', function () {
     lifecycle: new EventEmitter()
   };
 
-  before(async () => await resetTestModule(testModulePath));
-  after(async () => await cleanupTestModule(testModulePath));
+  before(async function() { return await resetTestModule(testModulePath); });
 
-  describe('Node-API support', function() {
-    it('should find correct napi version and select napi args', async () => {
+  after(async function() { return await cleanupTestModule(testModulePath); });
+
+  context('Node-API support', function() {
+    it('should find correct napi version and select napi args', async function() {
       const rebuilder = new Rebuilder(rebuilderArgs);
       const nodePreGyp = new NodePreGyp(rebuilder, modulePath);
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+       
       expect(nodePreGyp.nodeAPI.getNapiVersion((await nodePreGyp.getSupportedNapiVersions())!)).to.equal(3);
       expect(await nodePreGyp.getNodePreGypRuntimeArgs()).to.deep.equal([])
     });
 
-    it('should not fail running node-pre-gyp', async () => {
+    it('should not fail running node-pre-gyp', async function() {
       const rebuilder = new Rebuilder(rebuilderArgs);
       const nodePreGyp = new NodePreGyp(rebuilder, modulePath);
       expect(await nodePreGyp.findPrebuiltModule()).to.equal(true);
     });
 
-    it('should throw error with unsupported Electron version', async () => {
+    it('should throw error with unsupported Electron version', async function() {
       const rebuilder = new Rebuilder({
         ...rebuilderArgs,
         electronVersion: '2.0.0',
@@ -48,7 +49,7 @@ describe('node-pre-gyp', function () {
     });
   });
 
-  it('should redownload the module if the architecture changes', async () => {
+  it('should redownload the module if the architecture changes', async function() {
     let rebuilder = new Rebuilder(rebuilderArgs);
     let nodePreGyp = new NodePreGyp(rebuilder, modulePath);
     expect(await nodePreGyp.findPrebuiltModule()).to.equal(true);

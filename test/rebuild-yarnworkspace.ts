@@ -11,8 +11,8 @@ const testElectronVersion = getExactElectronVersionSync();
 describe('rebuild for yarn workspace', function() {
   this.timeout(TIMEOUT_IN_MILLISECONDS);
 
-  describe('core behavior', () => {
-    before(async () => {
+  describe('core behavior', function() {
+    before(async function() {
       await resetTestModule(testModulePath, true, 'workspace-test')
       const projectRootPath = await getProjectRootPath(path.join(testModulePath, 'workspace-test', 'child-workspace'));
 
@@ -23,13 +23,14 @@ describe('rebuild for yarn workspace', function() {
         projectRootPath
       });
     });
-    after(() => cleanupTestModule(testModulePath));
 
-    it('should have rebuilt top level prod dependencies', async () => {
+    after(function() { return cleanupTestModule(testModulePath); });
+
+    it('should have rebuilt top level prod dependencies', async function() {
       await expectNativeModuleToBeRebuilt(testModulePath, 'snappy');
     });
 
-    it('should not have rebuilt top level devDependencies', async () => {
+    it('should not have rebuilt top level devDependencies', async function() {
       await expectNativeModuleToNotBeRebuilt(testModulePath, 'sleep');
     });
   });

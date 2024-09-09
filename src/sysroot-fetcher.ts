@@ -22,7 +22,7 @@ export async function downloadLinuxSysroot(electronVersion: string, targetArch: 
   if (await fs.pathExists(path.resolve(sysrootDir, 'lib'))) return sysrootDir;
   if (!await fs.pathExists(sysrootDir)) await fs.mkdirp(sysrootDir);
 
-  const linuxArch = sysrootArchAliases[targetArch] || targetArch;
+  const linuxArch = sysrootArchAliases[targetArch as 'x64' | 'ia32'] || targetArch;
   const electronSysroots = JSON.parse(await fetch(`https://raw.githubusercontent.com/electron/electron/v${electronVersion}/script/sysroots.json`, 'text'));
 
   const { Sha1Sum: sha, Tarball: fileName } = electronSysroots[`sid_${linuxArch}`] || electronSysroots[`bullseye_${linuxArch}`];

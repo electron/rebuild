@@ -10,23 +10,24 @@ import detectLibc from 'detect-libc';
 
 const testElectronVersion = getExactElectronVersionSync();
 
-describe('rebuild with napi_build_versions in binary config', async function () {
+describe('rebuild with napi_build_versions in binary config', function () {
   this.timeout(TIMEOUT_IN_MILLISECONDS);
 
   const napiBuildVersion = 6;
   const napiBuildVersionSpecificPath = (arch: string, libc: string) => path.resolve(testModulePath, `node_modules/sqlite3/lib/binding/napi-v${ napiBuildVersion }-${ process.platform }-${ libc }-${ arch }/node_sqlite3.node`);
 
-  before(async () => {
+  before(async function() {
     await resetTestModule(testModulePath, true, 'napi-build-version')
     // Forcing `msvs_version` needed in order for `arm64` `win32` binary to be built
     process.env.GYP_MSVS_VERSION = process.env.GYP_MSVS_VERSION ?? "2019"
   });
-  after(() => cleanupTestModule(testModulePath));
+
+  after(function() { return cleanupTestModule(testModulePath); });
 
   // https://github.com/electron/rebuild/issues/554
   const archs = ['x64', 'arm64']
   for (const arch of archs) {
-    it(`${ arch } arch should have rebuilt binary with 'napi_build_versions' array and 'libc' provided`, async () => {
+    it(`${ arch } arch should have rebuilt binary with 'napi_build_versions' array and 'libc' provided`, async function() {
       const libc = await detectLibc.family() || 'unknown'
       const binaryPath = napiBuildVersionSpecificPath(arch, libc)
       

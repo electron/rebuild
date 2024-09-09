@@ -9,7 +9,7 @@ import { Rebuilder } from '../lib/rebuild';
 
 chai.use(chaiAsPromised);
 
-describe('prebuild-install', () => {
+describe('prebuild-install', function() {
   const modulePath = path.join(testModulePath, 'node_modules', 'farmhash');
   const rebuilderArgs = {
     buildPath: testModulePath,
@@ -21,13 +21,14 @@ describe('prebuild-install', () => {
   describe('Node-API support', function() {
     this.timeout(TIMEOUT_IN_MILLISECONDS);
 
-    before(async () => await resetTestModule(testModulePath));
-    after(async () => await cleanupTestModule(testModulePath));
+    before(async function() { return await resetTestModule(testModulePath); });
 
-    it('should find correct napi version and select napi args', async () => {
+    after(async function() { return await cleanupTestModule(testModulePath); });
+
+    it('should find correct napi version and select napi args', async function() {
       const rebuilder = new Rebuilder(rebuilderArgs);
       const prebuildInstall = new PrebuildInstall(rebuilder, modulePath);
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+       
       expect(prebuildInstall.nodeAPI.getNapiVersion((await prebuildInstall.getSupportedNapiVersions())!)).to.equal(3);
       expect(await prebuildInstall.getPrebuildInstallRuntimeArgs()).to.deep.equal([
         '--runtime=napi',
@@ -44,7 +45,7 @@ describe('prebuild-install', () => {
       expect(await prebuildInstall.findPrebuiltModule()).to.equal(true);
     });
 
-    it('should throw error with unsupported Electron version', async () => {
+    it('should throw error with unsupported Electron version', async function() {
       const rebuilder = new Rebuilder({
         ...rebuilderArgs,
         electronVersion: '2.0.0',

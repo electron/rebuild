@@ -33,7 +33,7 @@ export function determineNativePrebuildExtension(arch: string): string {
 export class Prebuildify extends NativeModule {
   async usesTool(): Promise<boolean> {
     const devDependencies = await this.packageJSONFieldWithDefault('devDependencies', {});
-    // eslint-disable-next-line no-prototype-builtins
+     
     return devDependencies.hasOwnProperty('prebuildify');
   }
 

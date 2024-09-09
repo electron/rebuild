@@ -59,9 +59,7 @@ const writeSnapshot = async (diff: Snapshot, dir: string): Promise<void> => {
   }
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const serialize = (snap: Snapshot): any => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const jsonReady: any = {};
   for (const key in snap) {
     if (snap[key] instanceof Snap) {
@@ -78,7 +76,6 @@ const serialize = (snap: Snapshot): any => {
   return jsonReady;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const unserialize = (jsonReady: any): Snapshot => {
   const snap: Snapshot = {};
   for (const key in jsonReady) {
@@ -100,7 +97,7 @@ export const cacheModuleState = async (dir: string, cachePath: string, key: stri
   const moduleBuffer = Buffer.from(JSON.stringify(serialize(snap)));
   const zipped = await new Promise(resolve => zlib.gzip(moduleBuffer, (_, result) => resolve(result)));
   await fs.mkdirp(cachePath);
-  await fs.writeFile(path.resolve(cachePath, key), zipped);
+  await fs.writeFile(path.resolve(cachePath, key), zipped as string);
 };
 
 type ApplyDiffFunction = (dir: string) => Promise<void>;
@@ -140,7 +137,7 @@ async function hashDirectory(dir: string, relativeTo?: string): Promise<HashTree
     if (child === 'node_modules') return;
 
     const childPath = path.resolve(dir, child);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+     
     const relative = path.relative(relativeTo!, childPath);
     if ((await fs.stat(childPath)).isDirectory()) {
       dirTree[relative] = await hashDirectory(childPath, relativeTo);

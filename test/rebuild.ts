@@ -9,12 +9,12 @@ import { rebuild } from '../lib/rebuild';
 
 const testElectronVersion = getExactElectronVersionSync();
 
-describe('rebuilder', () => {
+describe('rebuilder', function() {
 
   describe('core behavior', function() {
     this.timeout(TIMEOUT_IN_MILLISECONDS);
 
-    before(async () => {
+    before(async function() {
       await resetTestModule(testModulePath);
 
       await rebuild({
@@ -24,38 +24,38 @@ describe('rebuilder', () => {
       });
     });
 
-    it('should have rebuilt top level prod dependencies', async () => {
+    it('should have rebuilt top level prod dependencies', async function() {
       await expectNativeModuleToBeRebuilt(testModulePath, 'ref-napi');
     });
 
-    it('should have rebuilt top level prod dependencies that are using prebuild', async () => {
+    it('should have rebuilt top level prod dependencies that are using prebuild', async function() {
       await expectNativeModuleToBeRebuilt(testModulePath, 'farmhash');
     });
 
-    it('should have rebuilt children of top level prod dependencies', async () => {
+    it('should have rebuilt children of top level prod dependencies', async function() {
       await expectNativeModuleToBeRebuilt(testModulePath, 'leveldown');
     });
 
-    it('should have rebuilt children of scoped top level prod dependencies', async () => {
+    it('should have rebuilt children of scoped top level prod dependencies', async function() {
       await expectNativeModuleToBeRebuilt(testModulePath, '@newrelic/native-metrics');
     });
 
-    it('should have rebuilt top level optional dependencies', async () => {
+    it('should have rebuilt top level optional dependencies', async function() {
       await expectNativeModuleToBeRebuilt(testModulePath, 'bcrypt');
     });
 
-    it('should not have rebuilt top level devDependencies', async () => {
+    it('should not have rebuilt top level devDependencies', async function() {
       await expectNativeModuleToNotBeRebuilt(testModulePath, 'ffi-napi');
     });
 
-    it('should not download files in the module directory', async () => {
+    it('should not download files in the module directory', async function() {
       const modulePath = path.resolve(testModulePath, 'node_modules/ref-napi');
       const fileNames = await fs.readdir(modulePath);
 
       expect(fileNames).to.not.contain(testElectronVersion);
     });
 
-    after(async () => {
+    after(async function() {
       await cleanupTestModule(testModulePath);
     });
   });
@@ -63,8 +63,10 @@ describe('rebuilder', () => {
   describe('force rebuild', function() {
     this.timeout(TIMEOUT_IN_MILLISECONDS);
 
-    before(async () => await resetTestModule(testModulePath));
-    after(async () => await cleanupTestModule(testModulePath));
+    before(async function() { return await resetTestModule(testModulePath); });
+
+    after(async function() { return await cleanupTestModule(testModulePath); });
+
     afterEach(resetMSVSVersion);
 
     const buildPath = testModulePath;
@@ -72,7 +74,7 @@ describe('rebuilder', () => {
     const arch = process.arch;
     const extraModules: string[] = [];
 
-    it('should skip the rebuild step when disabled', async () => {
+    it('should skip the rebuild step when disabled', async function() {
       await rebuild({ buildPath, electronVersion, arch });
       resetMSVSVersion();
       const rebuilder = rebuild({ buildPath, electronVersion, arch, extraModules, force: false });
@@ -84,7 +86,7 @@ describe('rebuilder', () => {
       expect(skipped).to.equal(8);
     });
 
-    it('should rebuild all modules again when disabled but the electron ABI changed', async () => {
+    it('should rebuild all modules again when disabled but the electron ABI changed', async function() {
       await rebuild({ buildPath, electronVersion, arch });
       resetMSVSVersion();
       const rebuilder = rebuild({ buildPath, electronVersion: '3.0.0', arch, extraModules, force: false });
@@ -115,8 +117,10 @@ describe('rebuilder', () => {
   describe('ignore rebuild', function() {
     this.timeout(2 * MINUTES_IN_MILLISECONDS);
 
-    before(async () => await resetTestModule(testModulePath));
-    after(async () => await cleanupTestModule(testModulePath));
+    before(async function() { return await resetTestModule(testModulePath); });
+
+    after(async function() { return await cleanupTestModule(testModulePath); });
+
     afterEach(resetMSVSVersion);
 
     const buildPath = testModulePath;
@@ -142,10 +146,11 @@ describe('rebuilder', () => {
   describe('only rebuild', function() {
     this.timeout(2 * MINUTES_IN_MILLISECONDS);
 
-    beforeEach(async () => await resetTestModule(testModulePath));
-    afterEach(async() => await cleanupTestModule(testModulePath));
+    beforeEach(async function() { return await resetTestModule(testModulePath); });
 
-    it('should rebuild only specified modules', async () => {
+    afterEach(async function() { return await cleanupTestModule(testModulePath); });
+
+    it('should rebuild only specified modules', async function() {
       const nativeModuleBinary = path.join(testModulePath, 'node_modules', 'native-hello-world', 'build', 'Release', 'hello_world.node');
       expect(await fs.pathExists(nativeModuleBinary)).to.be.true;
       await fs.remove(nativeModuleBinary);
@@ -164,7 +169,7 @@ describe('rebuilder', () => {
       expect(await fs.pathExists(nativeModuleBinary)).to.be.true;
     });
 
-    it('should rebuild multiple specified modules via --only option', async () => {
+    it('should rebuild multiple specified modules via --only option', async function() {
       const rebuilder = rebuild({
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
@@ -182,10 +187,11 @@ describe('rebuilder', () => {
   describe('debug rebuild', function() {
     this.timeout(10 * MINUTES_IN_MILLISECONDS);
 
-    before(async () => await resetTestModule(testModulePath));
-    after(async() => await cleanupTestModule(testModulePath));
+    before(async function() { return await resetTestModule(testModulePath); });
 
-    it('should have rebuilt ffi-napi module in Debug mode', async () => {
+    after(async function() { return await cleanupTestModule(testModulePath); });
+
+    it('should have rebuilt ffi-napi module in Debug mode', async function() {
       await rebuild({
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
@@ -202,10 +208,11 @@ describe('rebuilder', () => {
   describe('useElectronClang rebuild', function() {
     this.timeout(10 * MINUTES_IN_MILLISECONDS);
 
-    before(async () => await resetTestModule(testModulePath));
-    after(async() => await cleanupTestModule(testModulePath));
+    before(async function() { return await resetTestModule(testModulePath); });
 
-    it('should have rebuilt ffi-napi module using clang mode', async () => {
+    after(async function() { return await cleanupTestModule(testModulePath); });
+
+    it('should have rebuilt ffi-napi module using clang mode', async function() {
       await rebuild({
         buildPath: testModulePath,
         electronVersion: testElectronVersion,

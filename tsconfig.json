@@ -6,7 +6,6 @@
     "declaration": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
-    "suppressImplicitAnyIndexErrors": true,
     "strictNullChecks": true,
     "noUnusedLocals": true,
     "noImplicitThis": true,
@@ -22,9 +21,5 @@
     "indentSize": 2,
     "tabSize": 2
   },
-  "exclude": [
-    "node_modules",
-    "lib",
-    "test"
-  ]
+  "exclude": ["node_modules", "lib"]
 }

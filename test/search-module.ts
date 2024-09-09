@@ -15,18 +15,18 @@ async function removeTempDir(): Promise<void> {
   await fs.remove(baseDir);
 }
 
-describe('search-module', () => {
-  describe('getProjectRootPath', () => {
-    describe('multi-level workspace', () => {
+describe('search-module', function() {
+  describe('getProjectRootPath', function() {
+    describe('multi-level workspace', function() {
       for (const lockFile of ['yarn.lock', 'package-lock.json', 'pnpm-lock.yaml']) {
-        describe(lockFile, () => {
-          before(async () => {
+        describe(lockFile, function() {
+          before(async function() {
             await createTempDir();
             await fs.copy(path.resolve(__dirname, 'fixture', 'multi-level-workspace'), baseDir);
             await fs.ensureFile(path.join(baseDir, lockFile));
           });
 
-          it('finds the folder with the lockfile', async () => {
+          it('finds the folder with the lockfile', async function() {
             const packageDir = path.join(baseDir, 'packages', 'bar');
             expect(await getProjectRootPath(packageDir)).to.equal(baseDir);
           });
@@ -36,10 +36,10 @@ describe('search-module', () => {
       }
     });
 
-    describe('no workspace', () => {
+    describe('no workspace', function() {
       before(createTempDir);
 
-      it('returns the input directory if a lockfile cannot be found', async () => {
+      it('returns the input directory if a lockfile cannot be found', async function() {
         expect(await getProjectRootPath(baseDir)).to.equal(baseDir);
       });
 

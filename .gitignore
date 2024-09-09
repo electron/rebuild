@@ -29,3 +29,4 @@ node_modules
 
 lib
 test-dist
+coverage.lcov

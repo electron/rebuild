@@ -18,7 +18,7 @@ function getPlatformUrlPrefix(hostOS: string, hostArch: string) {
       'darwin': 'Mac',
       'win32': 'Win',
   };
-  let prefix = prefixMap[hostOS];
+  let prefix = prefixMap[hostOS as 'darwin' | 'linux' | 'win32'];
   if (prefix === 'Mac' && hostArch === 'arm64') {
     prefix = 'Mac_arm64';
   }
