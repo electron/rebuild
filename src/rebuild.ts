@@ -213,7 +213,6 @@ export class Rebuilder implements IRebuilder {
       this.ABIVersion = nodeAbi.getAbi(this.electronVersion, 'electron');
     }
 
-     
     return this.ABIVersion!;
   }
 
@@ -312,7 +311,7 @@ export class Rebuilder implements IRebuilder {
 export type RebuildResult = Promise<void> & { lifecycle: EventEmitter };
 
 export function rebuild(options: RebuildOptions): RebuildResult {
-   
+  // eslint-disable-next-line prefer-rest-params
   d('rebuilding with args:', arguments);
   const lifecycle = new EventEmitter();
   const rebuilderOptions: RebuilderOptions = { ...options, lifecycle };

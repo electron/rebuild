@@ -28,7 +28,6 @@ describe('node-pre-gyp', function () {
     it('should find correct napi version and select napi args', async function() {
       const rebuilder = new Rebuilder(rebuilderArgs);
       const nodePreGyp = new NodePreGyp(rebuilder, modulePath);
-       
       expect(nodePreGyp.nodeAPI.getNapiVersion((await nodePreGyp.getSupportedNapiVersions())!)).to.equal(3);
       expect(await nodePreGyp.getNodePreGypRuntimeArgs()).to.deep.equal([])
     });

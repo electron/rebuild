@@ -40,8 +40,10 @@ const argv = yargs(process.argv.slice(2)).version(false).options({
 
 if (process.argv.length === 3 && process.argv[2] === '--version') {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     console.log('Electron Rebuild Version:', require(path.resolve(__dirname, '../../package.json')).version);
   } catch (_err) {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     console.log('Electron Rebuild Version:', require(path.resolve(__dirname, '../package.json')).version);
   }
   process.exit(0);
@@ -65,6 +67,7 @@ process.on('unhandledRejection', handler);
   if (!electronModuleVersion) {
     try {
       if (!electronModulePath) throw new Error('Prebuilt electron module not found');
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const pkgJson = require(path.join(electronModulePath, 'package.json'));
 
       electronModuleVersion = pkgJson.version;

@@ -9,6 +9,7 @@ export class NodePreGyp extends NativeModule {
   async usesTool(): Promise<boolean> {
     const dependencies = await this.packageJSONFieldWithDefault('dependencies', {});
      
+    // eslint-disable-next-line no-prototype-builtins
     return dependencies.hasOwnProperty('@mapbox/node-pre-gyp');
   }
 

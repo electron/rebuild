@@ -11,7 +11,7 @@
     "watch": "tsc -w",
     "prepare": "npm run compile",
     "mocha": "cross-env TS_NODE_FILES=true mocha",
-    "lint": "eslint .",
+    "lint": "eslint --ext .ts .",
     "spec": "tsc && npm run mocha -- test/*.ts",
     "test": "npm run prewarm-headers && npm run lint && npm run spec",
     "prewarm-headers": "node-gyp install --ensure"
@@ -66,20 +66,57 @@
     "@types/semver": "^7.5.8",
     "@types/tar": "^6.1.13",
     "@types/yargs": "^17.0.33",
-    "@typescript-eslint/eslint-plugin": "^8.4.0",
-    "@typescript-eslint/parser": "^8.4.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "codecov": "^3.8.3",
     "cross-env": "^7.0.3",
     "electron": "^32.0.2",
-    "eslint": "^9.9.1",
+    "eslint": "^8.57.0",
     "eslint-plugin-mocha": "^10.5.0",
     "mocha": "^9.0.2",
-    "nyc": "^17.0.0",
+    "nyc": "^15.1.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.5.4"
+    "typescript": "^5.3.3"
   },
+  "eslintConfig": {
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "ecmaVersion": 2019,
+      "sourceType": "module"
+    },
+    "plugins": [
+      "mocha",
+      "@typescript-eslint"
+    ],
+    "env": {
+      "es6": true,
+      "mocha": true,
+      "node": true
+    },
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended"
+    ],
+    "rules": {
+      "mocha/no-exclusive-tests": "error",
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          "args": "after-used",
+          "argsIgnorePattern": "^_",
+          "ignoreRestSiblings": true,
+          "vars": "all"
+        }
+      ]
+    }
+  },
+  "eslintIgnore": [
+    "*.d.ts",
+    "node_modules"
+  ],
   "mocha": {
     "extensions": [
       "ts"

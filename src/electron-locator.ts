@@ -11,8 +11,7 @@ async function locateModuleByRequire(): Promise<string | null> {
       if (await fs.pathExists(path.join(modulePath, 'package.json'))) {
         return modulePath;
       }
-    } catch {  
-    }
+    } catch { /* empty */ }
   }
 
   return null

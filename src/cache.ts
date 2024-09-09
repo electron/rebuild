@@ -59,7 +59,9 @@ const writeSnapshot = async (diff: Snapshot, dir: string): Promise<void> => {
   }
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const serialize = (snap: Snapshot): any => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const jsonReady: any = {};
   for (const key in snap) {
     if (snap[key] instanceof Snap) {
@@ -76,6 +78,7 @@ const serialize = (snap: Snapshot): any => {
   return jsonReady;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const unserialize = (jsonReady: any): Snapshot => {
   const snap: Snapshot = {};
   for (const key in jsonReady) {
