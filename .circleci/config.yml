@@ -46,9 +46,9 @@ workflows:
                 - node/macos
                 - windows
               node-version:
-                - '20.9'
-                - '18.17'
-                - '16.20'
+                - '22.8'
+                - '20.17'
+                - '18.20'
       - cfa/release:
           requires:
             - test
