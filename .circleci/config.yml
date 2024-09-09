@@ -23,17 +23,6 @@ workflows:
             - run: git config --global core.autocrlf input
             - when:
                 condition:
-                  or:
-                    - and:
-                        - equal: [ node/macos, << matrix.executor >> ]
-                        - equal: [ '14.16', << matrix.node-version >> ]
-                    - and:
-                        - equal: [ node/macos, << matrix.executor >> ]
-                        - equal: [ '12.22', << matrix.node-version >> ]
-                steps:
-                  - node/install-rosetta
-            - when:
-                condition:
                   equal: [ windows, << matrix.executor >> ]
                 steps:
                   - run:
@@ -41,14 +30,6 @@ workflows:
                       command: New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
                       shell: powershell.exe
           test-steps:
-            - when:
-                condition:
-                  or:
-                    - equal: [ '14.16', << matrix.node-version >> ]
-                    - equal: [ '12.22', << matrix.node-version >> ]
-                steps:
-                  # Update npm so it works with latest Python 3
-                  - run: npm install -g npm@8
             - run: yarn run lint
             - run:
                 name: Tests with code coverage
@@ -68,14 +49,6 @@ workflows:
                 - '20.9'
                 - '18.17'
                 - '16.20'
-                # Stay below 14.17.0 or nvm tries to download arm64 artifacts which don't exist
-                - '14.16'
-                - '12.22'
-            exclude:
-              - executor: windows
-                node-version: '14.16'
-              - executor: windows
-                node-version: '12.22'
       - cfa/release:
           requires:
             - test
