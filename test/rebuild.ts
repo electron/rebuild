@@ -24,10 +24,6 @@ describe('rebuilder', () => {
       });
     });
 
-    it('should have rebuilt top level prod dependencies', async () => {
-      await expectNativeModuleToBeRebuilt(testModulePath, 'ref-napi');
-    });
-
     it('should have rebuilt top level prod dependencies that are using prebuild', async () => {
       await expectNativeModuleToBeRebuilt(testModulePath, 'farmhash');
     });
@@ -45,14 +41,7 @@ describe('rebuilder', () => {
     });
 
     it('should not have rebuilt top level devDependencies', async () => {
-      await expectNativeModuleToNotBeRebuilt(testModulePath, 'ffi-napi');
-    });
-
-    it('should not download files in the module directory', async () => {
-      const modulePath = path.resolve(testModulePath, 'node_modules/ref-napi');
-      const fileNames = await fs.readdir(modulePath);
-
-      expect(fileNames).to.not.contain(testElectronVersion);
+      await expectNativeModuleToNotBeRebuilt(testModulePath, 'koffi');
     });
 
     after(async () => {
@@ -129,7 +118,7 @@ describe('rebuilder', () => {
       }
       await rebuild({ buildPath, electronVersion, arch });
       resetMSVSVersion();
-      const rebuilder = rebuild({ buildPath, electronVersion, arch, ignoreModules: ['native-hello-world'], force: true });
+      const rebuilder = rebuild({ buildPath, electronVersion, arch, ignoreModules: ['farmhash'], force: true });
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
         skipped++;
@@ -146,7 +135,7 @@ describe('rebuilder', () => {
     afterEach(async() => await cleanupTestModule(testModulePath));
 
     it('should rebuild only specified modules', async () => {
-      const nativeModuleBinary = path.join(testModulePath, 'node_modules', 'native-hello-world', 'build', 'Release', 'hello_world.node');
+      const nativeModuleBinary = path.join(testModulePath, 'node_modules', 'farmhash', 'build', 'farmhash.node');
       expect(await fs.pathExists(nativeModuleBinary)).to.be.true;
       await fs.remove(nativeModuleBinary);
       expect(await fs.pathExists(nativeModuleBinary)).to.be.false;
@@ -154,7 +143,7 @@ describe('rebuilder', () => {
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch: process.arch,
-        onlyModules: ['native-hello-world'],
+        onlyModules: ['farmhash'],
         force: true
       });
       let built = 0;
@@ -169,13 +158,13 @@ describe('rebuilder', () => {
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch: process.arch,
-        onlyModules: ['ffi-napi', 'ref-napi'], // TODO: check to see if there's a bug with scoped modules
+        onlyModules: ['koffi'], // TODO: check to see if there's a bug with scoped modules
         force: true
       });
       let built = 0;
       rebuilder.lifecycle.on('module-done', () => built++);
       await rebuilder;
-      expect(built).to.equal(3);
+      expect(built).to.equal(2);
     });
   });
 
@@ -185,17 +174,17 @@ describe('rebuilder', () => {
     before(async () => await resetTestModule(testModulePath));
     after(async() => await cleanupTestModule(testModulePath));
 
-    it('should have rebuilt ffi-napi module in Debug mode', async () => {
+    it('should have rebuilt koffi module in Debug mode', async () => {
       await rebuild({
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch: process.arch,
-        onlyModules: ['ffi-napi'],
+        onlyModules: ['koffi'],
         force: true,
         debug: true
       });
-      await expectNativeModuleToBeRebuilt(testModulePath, 'ffi-napi', { buildType: 'Debug' });
-      await expectNativeModuleToNotBeRebuilt(testModulePath, 'ffi-napi');
+      await expectNativeModuleToBeRebuilt(testModulePath, 'koffi', { buildType: 'Debug' });
+      await expectNativeModuleToNotBeRebuilt(testModulePath, 'koffi');
     });
   });
 
@@ -205,16 +194,16 @@ describe('rebuilder', () => {
     before(async () => await resetTestModule(testModulePath));
     after(async() => await cleanupTestModule(testModulePath));
 
-    it('should have rebuilt ffi-napi module using clang mode', async () => {
+    it('should have rebuilt koffi module using clang mode', async () => {
       await rebuild({
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch: process.arch,
-        onlyModules: ['ffi-napi'],
+        onlyModules: ['koffi'],
         force: true,
         useElectronClang: true
       });
-      await expectNativeModuleToBeRebuilt(testModulePath, 'ffi-napi');
+      await expectNativeModuleToBeRebuilt(testModulePath, 'koffi');
     });
   });
 });
