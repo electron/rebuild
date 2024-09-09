@@ -9,7 +9,6 @@ describe('node-gyp', function() {
   describe('buildArgs', function() {
 
     before(async function() { return await resetTestModule(testModulePath, false); });
-
     after(async function() { return await cleanupTestModule(testModulePath); });
 
     function nodeGypArgsForElectronVersion(electronVersion: string): Promise<string[]> {

@@ -140,7 +140,6 @@ async function hashDirectory(dir: string, relativeTo?: string): Promise<HashTree
     if (child === 'node_modules') return;
 
     const childPath = path.resolve(dir, child);
-     
     const relative = path.relative(relativeTo!, childPath);
     if ((await fs.stat(childPath)).isDirectory()) {
       dirTree[relative] = await hashDirectory(childPath, relativeTo);
