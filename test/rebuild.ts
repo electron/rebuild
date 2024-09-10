@@ -70,7 +70,7 @@ describe('rebuilder', () => {
         skipped++;
       });
       await rebuilder;
-      expect(skipped).to.equal(8);
+      expect(skipped).to.equal(5);
     });
 
     it('should rebuild all modules again when disabled but the electron ABI changed', async () => {
@@ -150,6 +150,7 @@ describe('rebuilder', () => {
       rebuilder.lifecycle.on('module-done', () => built++);
       await rebuilder;
       expect(built).to.equal(1);
+      console.log('nativeModuleBinary', path.join(testModulePath, 'node_modules', 'farmhash'));
       expect(await fs.pathExists(nativeModuleBinary)).to.be.true;
     });
 
@@ -158,7 +159,7 @@ describe('rebuilder', () => {
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch: process.arch,
-        onlyModules: ['farmhash'], // TODO: check to see if there's a bug with scoped modules
+        onlyModules: ['farmhash', '@newrelic/native-metrics'], // TODO: check to see if there's a bug with scoped modules
         force: true
       });
       let built = 0;

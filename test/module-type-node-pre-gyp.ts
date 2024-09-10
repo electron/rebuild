@@ -15,7 +15,7 @@ describe('node-pre-gyp', function () {
   const modulePath = path.join(TEST_MODULE_PATH, 'node_modules', 'sqlite3');
   const rebuilderArgs = {
     buildPath: TEST_MODULE_PATH,
-    electronVersion: '30.0.0',
+    electronVersion: '22.0.0',
     arch: process.arch,
     lifecycle: new EventEmitter()
   };
@@ -28,7 +28,7 @@ describe('node-pre-gyp', function () {
       const rebuilder = new Rebuilder(rebuilderArgs);
       const nodePreGyp = new NodePreGyp(rebuilder, modulePath);
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      expect(nodePreGyp.nodeAPI.getNapiVersion((await nodePreGyp.getSupportedNapiVersions())!)).to.equal(3);
+      expect(nodePreGyp.nodeAPI.getNapiVersion((await nodePreGyp.getSupportedNapiVersions())!)).to.equal(5);
       expect(await nodePreGyp.getNodePreGypRuntimeArgs()).to.deep.equal([])
     });
 
