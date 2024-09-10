@@ -163,7 +163,7 @@ describe('rebuilder', () => {
       let built = 0;
       rebuilder.lifecycle.on('module-done', () => built++);
       await rebuilder;
-      expect(built).to.equal(2);
+      expect(built).to.equal(3);
     });
   });
 
