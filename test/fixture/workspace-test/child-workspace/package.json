@@ -11,6 +11,6 @@
     "sleep": "6.3.0"
   },
   "dependencies": {
-    "snappy": "6.3.4"
+    "snappy": "7.2.2"
   }
 }
