@@ -158,7 +158,7 @@ describe('rebuilder', () => {
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch: process.arch,
-        onlyModules: ['koffi'], // TODO: check to see if there's a bug with scoped modules
+        onlyModules: ['farmhash'], // TODO: check to see if there's a bug with scoped modules
         force: true
       });
       let built = 0;
@@ -174,17 +174,17 @@ describe('rebuilder', () => {
     before(async () => await resetTestModule(testModulePath));
     after(async() => await cleanupTestModule(testModulePath));
 
-    it('should have rebuilt koffi module in Debug mode', async () => {
+    it('should have rebuilt farmhash module in Debug mode', async () => {
       await rebuild({
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch: process.arch,
-        onlyModules: ['koffi'],
+        onlyModules: ['farmhash'],
         force: true,
         debug: true
       });
-      await expectNativeModuleToBeRebuilt(testModulePath, 'koffi', { buildType: 'Debug' });
-      await expectNativeModuleToNotBeRebuilt(testModulePath, 'koffi');
+      await expectNativeModuleToBeRebuilt(testModulePath, 'farmhash', { buildType: 'Debug' });
+      await expectNativeModuleToNotBeRebuilt(testModulePath, 'farmhash');
     });
   });
 
@@ -194,16 +194,16 @@ describe('rebuilder', () => {
     before(async () => await resetTestModule(testModulePath));
     after(async() => await cleanupTestModule(testModulePath));
 
-    it('should have rebuilt koffi module using clang mode', async () => {
+    it('should have rebuilt farmhash module using clang mode', async () => {
       await rebuild({
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch: process.arch,
-        onlyModules: ['koffi'],
+        onlyModules: ['farmhash'],
         force: true,
         useElectronClang: true
       });
-      await expectNativeModuleToBeRebuilt(testModulePath, 'koffi');
+      await expectNativeModuleToBeRebuilt(testModulePath, 'farmhash');
     });
   });
 });

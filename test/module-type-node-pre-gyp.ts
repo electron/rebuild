@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 import { EventEmitter } from 'events';
 import path from 'path';
 
-import { cleanupTestModule, resetTestModule, TIMEOUT_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath } from './helpers/module-setup';
+import { cleanupTestModule, resetTestModule, TIMEOUT_IN_MILLISECONDS, TEST_MODULE_PATH } from './helpers/module-setup';
 import { NodePreGyp } from '../lib/module-type/node-pre-gyp';
 import { Rebuilder } from '../lib/rebuild';
 
@@ -12,16 +12,16 @@ chai.use(chaiAsPromised);
 describe('node-pre-gyp', function () {
   this.timeout(TIMEOUT_IN_MILLISECONDS);
 
-  const modulePath = path.join(testModulePath, 'node_modules', 'sqlite3');
+  const modulePath = path.join(TEST_MODULE_PATH, 'node_modules', 'sqlite3');
   const rebuilderArgs = {
-    buildPath: testModulePath,
-    electronVersion: '8.0.0',
+    buildPath: TEST_MODULE_PATH,
+    electronVersion: '30.0.0',
     arch: process.arch,
     lifecycle: new EventEmitter()
   };
 
-  before(async () => await resetTestModule(testModulePath));
-  after(async () => await cleanupTestModule(testModulePath));
+  before(async () => await resetTestModule(TEST_MODULE_PATH));
+  after(async () => await cleanupTestModule(TEST_MODULE_PATH));
 
   describe('Node-API support', function() {
     it('should find correct napi version and select napi args', async () => {
