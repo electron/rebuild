@@ -28,7 +28,7 @@ describe('node-pre-gyp', function () {
       const rebuilder = new Rebuilder(rebuilderArgs);
       const nodePreGyp = new NodePreGyp(rebuilder, modulePath);
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      expect(nodePreGyp.nodeAPI.getNapiVersion((await nodePreGyp.getSupportedNapiVersions())!)).to.equal(5);
+      expect(nodePreGyp.nodeAPI.getNapiVersion((await nodePreGyp.getSupportedNapiVersions())!)).to.equal(6);
       expect(await nodePreGyp.getNodePreGypRuntimeArgs()).to.deep.equal([])
     });
 
