@@ -70,13 +70,13 @@ describe('rebuilder', () => {
         skipped++;
       });
       await rebuilder;
-      expect(skipped).to.equal(5);
+      expect(skipped).to.equal(6);
     });
 
     it('should rebuild all modules again when disabled but the electron ABI changed', async () => {
       await rebuild({ buildPath, electronVersion, arch });
       resetMSVSVersion();
-      const rebuilder = rebuild({ buildPath, electronVersion: '28.0.0', arch, extraModules, force: false });
+      const rebuilder = rebuild({ buildPath, electronVersion: '19.0.0', arch, extraModules, force: false });
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
         skipped++;
@@ -135,10 +135,9 @@ describe('rebuilder', () => {
     afterEach(async() => await cleanupTestModule(testModulePath));
 
     it('should rebuild only specified modules', async () => {
-      const nativeModuleBinary = path.join(testModulePath, 'node_modules', 'farmhash', 'build', 'farmhash.node');
-      // expect(await fs.pathExists(nativeModuleBinary)).to.be.true;
-      await fs.remove(nativeModuleBinary);
-      expect(await fs.pathExists(nativeModuleBinary)).to.be.false;
+      const nativeModulePrebuiltFolder = path.join(testModulePath, 'node_modules', 'farmhash', 'bin');
+      await fs.remove(nativeModulePrebuiltFolder);
+      expect(await fs.pathExists(nativeModulePrebuiltFolder)).to.be.false;
       const rebuilder = rebuild({
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
@@ -150,7 +149,7 @@ describe('rebuilder', () => {
       rebuilder.lifecycle.on('module-done', () => built++);
       await rebuilder;
       expect(built).to.equal(1);
-      expect(await fs.pathExists(nativeModuleBinary)).to.be.true;
+      expect(await fs.pathExists(nativeModulePrebuiltFolder)).to.be.true;
     });
 
     it('should rebuild multiple specified modules via --only option', async () => {
@@ -158,7 +157,7 @@ describe('rebuilder', () => {
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch: process.arch,
-        onlyModules: ['farmhash', 'leveldown:'], // TODO: check to see if there's a bug with scoped modules
+        onlyModules: ['farmhash', 'leveldown'], // TODO: check to see if there's a bug with scoped modules
         force: true
       });
       let built = 0;
