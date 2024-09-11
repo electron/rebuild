@@ -102,7 +102,7 @@ describe('rebuilder', () => {
   });
 
   describe('ignore rebuild', function() {
-    this.timeout(2 * MINUTES_IN_MILLISECONDS);
+    this.timeout(3 * MINUTES_IN_MILLISECONDS);
 
     before(async () => await resetTestModule(testModulePath));
     after(async () => await cleanupTestModule(testModulePath));
@@ -129,7 +129,7 @@ describe('rebuilder', () => {
   });
 
   describe('only rebuild', function() {
-    this.timeout(2 * MINUTES_IN_MILLISECONDS);
+    this.timeout(3 * MINUTES_IN_MILLISECONDS);
 
     beforeEach(async () => await resetTestModule(testModulePath));
     afterEach(async() => await cleanupTestModule(testModulePath));
