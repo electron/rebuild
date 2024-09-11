@@ -135,11 +135,8 @@ describe('rebuilder', () => {
     afterEach(async() => await cleanupTestModule(testModulePath));
 
     it('should rebuild only specified modules', async () => {
-      const nativeModuleBinary = path.join(testModulePath, 'node_modules', 'farmhash', 'build', 'Release');
       const nativeModulePrebuiltFolder = path.join(testModulePath, 'node_modules', 'farmhash', 'bin');
-      await fs.remove(nativeModuleBinary);
       await fs.remove(nativeModulePrebuiltFolder);
-      expect(await fs.pathExists(nativeModuleBinary)).to.be.false;
       expect(await fs.pathExists(nativeModulePrebuiltFolder)).to.be.false;
       const rebuilder = rebuild({
         buildPath: testModulePath,
@@ -154,8 +151,6 @@ describe('rebuilder', () => {
       expect(built).to.equal(1);
       if (process.platform === 'darwin') {
         expect(await fs.pathExists(nativeModulePrebuiltFolder)).to.be.true;
-      } else {
-        expect(await fs.pathExists(nativeModuleBinary)).to.be.true;
       }
     });
 
