@@ -102,7 +102,7 @@ describe('rebuilder', () => {
   });
 
   describe('ignore rebuild', function() {
-    this.timeout(4 * MINUTES_IN_MILLISECONDS);
+    this.timeout(TIMEOUT_IN_MILLISECONDS);
 
     before(async () => await resetTestModule(testModulePath));
     after(async () => await cleanupTestModule(testModulePath));
@@ -113,9 +113,6 @@ describe('rebuilder', () => {
     const arch = process.arch;
 
     it('should rebuild all modules again when enabled', async function() {
-      if (process.platform === 'win32') {
-        this.timeout(5 * MINUTES_IN_MILLISECONDS);
-      }
       await rebuild({ buildPath, electronVersion, arch });
       resetMSVSVersion();
       const rebuilder = rebuild({ buildPath, electronVersion, arch, ignoreModules: ['farmhash'], force: true });
@@ -129,7 +126,7 @@ describe('rebuilder', () => {
   });
 
   describe('only rebuild', function() {
-    this.timeout(4 * MINUTES_IN_MILLISECONDS);
+    this.timeout(TIMEOUT_IN_MILLISECONDS);
 
     beforeEach(async () => await resetTestModule(testModulePath));
     afterEach(async() => await cleanupTestModule(testModulePath));

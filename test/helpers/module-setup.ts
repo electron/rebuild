@@ -5,7 +5,7 @@ import path from 'path';
 import { spawn } from '@malept/cross-spawn-promise';
 
 const originalGypMSVSVersion: string | undefined = process.env.GYP_MSVS_VERSION;
-const TIMEOUT_IN_MINUTES = process.platform === 'win32' ? 5 : 2;
+const TIMEOUT_IN_MINUTES = process.platform === 'win32' ? 5 : 4;
 
 export const MINUTES_IN_MILLISECONDS = 60 * 1000;
 export const TIMEOUT_IN_MILLISECONDS = TIMEOUT_IN_MINUTES * MINUTES_IN_MILLISECONDS;
