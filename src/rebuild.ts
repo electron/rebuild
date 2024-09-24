@@ -21,7 +21,7 @@ export interface RebuildOptions {
   electronVersion: string;
   /**
    * Override the target platform to something other than the host system platform.
-   * Note: This only applies to downloading prebuilt binaries. **It is not possible to cross-compile native modules**
+   * Note: This only applies to downloading prebuilt binaries. **It is not possible to cross-compile native modules.**
    * 
    * @defaultValue The system {@link https://nodejs.org/api/process.html#processplatform | `process.arch`} value
    */
