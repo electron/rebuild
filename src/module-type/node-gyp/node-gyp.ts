@@ -84,6 +84,10 @@ export class NodeGyp extends NativeModule {
   }
 
   async rebuildModule(): Promise<void> {
+    if (this.rebuilder.platform !== process.platform) {
+      throw new Error("node-gyp does not support cross-compiling native modules from source")
+    }
+
     if (this.modulePath.includes(' ')) {
       console.error('Attempting to build a module with a space in the path');
       console.error('See https://github.com/nodejs/node-gyp/issues/65#issuecomment-368820565 for reasons why this may not work');

@@ -54,5 +54,25 @@ describe('node-gyp', () => {
         expect(args).to.not.include('--force-process-config');
       });
     });
+
+    context('cross-compilation', async () => {
+      it('throws error early', async () => {
+        const platform: NodeJS.Platform = 'win32'
+        const rebuilder = new Rebuilder({
+          buildPath: testModulePath,
+          electronVersion: '15.3.0',
+          lifecycle: new EventEmitter(),
+          platform,
+          buildFromSource: true // to force node-gyp to execute
+        });
+        const nodeGyp = new NodeGyp(rebuilder, testModulePath);
+        const executor = () => nodeGyp.rebuildModule();
+        if (process.platform === platform) {
+          expect(executor).does.not.throw()
+        } else {
+          expect(executor).throws()
+        }
+      })
+    })
   });
 });

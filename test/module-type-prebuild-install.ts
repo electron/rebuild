@@ -5,13 +5,13 @@ import path from 'path';
 
 import { cleanupTestModule, resetTestModule, TIMEOUT_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath } from './helpers/module-setup';
 import { PrebuildInstall } from '../lib/module-type/prebuild-install';
-import { Rebuilder } from '../lib/rebuild';
+import { Rebuilder, RebuilderOptions } from '../lib/rebuild';
 
 chai.use(chaiAsPromised);
 
 describe('prebuild-install', () => {
   const modulePath = path.join(testModulePath, 'node_modules', 'farmhash');
-  const rebuilderArgs = {
+  const rebuilderArgs: RebuilderOptions = {
     buildPath: testModulePath,
     electronVersion: '8.0.0',
     arch: process.arch,
@@ -51,6 +51,26 @@ describe('prebuild-install', () => {
       });
       const prebuildInstall = new PrebuildInstall(rebuilder, modulePath);
       expect(prebuildInstall.findPrebuiltModule()).to.eventually.be.rejectedWith("Native module 'farmhash' requires Node-API but Electron v2.0.0 does not support Node-API");
+    });
+
+    it('should download for target platform', async function () {
+      if (process.platform === 'darwin' && process.arch === 'arm64') {
+        this.skip(); // farmhash module has no prebuilt binaries for ARM64
+      }
+      let rebuilder = new Rebuilder(rebuilderArgs);
+      let prebuild = new PrebuildInstall(rebuilder, modulePath);
+      expect(await prebuild.findPrebuiltModule()).to.equal(true);
+  
+      let alternativePlatform: NodeJS.Platform;
+      if (process.platform === 'win32') {
+        alternativePlatform = 'darwin';
+      } else {
+        alternativePlatform = 'win32'
+      }
+  
+      rebuilder = new Rebuilder({ ...rebuilderArgs, platform: alternativePlatform });
+      prebuild = new PrebuildInstall(rebuilder, modulePath);
+      expect(await prebuild.findPrebuiltModule()).to.equal(true);
     });
   });
 });

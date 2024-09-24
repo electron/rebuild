@@ -113,4 +113,24 @@ describe('prebuildify', () => {
       });
     });
   });
+  
+  describe('cross-platform downloads', async () => {
+    it('should download for target platform', async () => {
+      const fixtureDir = path.join(fixtureBaseDir, 'napi');
+      let rebuilder = createRebuilder();
+      let prebuildify = new Prebuildify(rebuilder, fixtureDir);
+      expect(await prebuildify.findPrebuiltModule()).to.equal(true);
+  
+      let alternativePlatform: NodeJS.Platform;
+      if (process.platform === 'win32') {
+        alternativePlatform = 'darwin';
+      } else {
+        alternativePlatform = 'win32'
+      }
+  
+      rebuilder = createRebuilder({ platform: alternativePlatform });
+      prebuildify = new Prebuildify(rebuilder, fixtureDir);
+      expect(await prebuildify.findPrebuiltModule()).to.equal(true);
+    });
+  })
 });

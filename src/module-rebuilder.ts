@@ -151,10 +151,6 @@ export class ModuleRebuilder {
       return true;
     }
 
-    if (this.rebuilder.platform !== process.platform) {
-      throw new Error("OS Limitation - It is not possible to cross-compile native modules from source")
-    }
-
     return await this.rebuildNodeGypModule(cacheKey);
   }
 }
