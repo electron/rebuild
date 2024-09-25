@@ -158,7 +158,7 @@ export class Rebuilder implements IRebuilder {
     this.lifecycle = options.lifecycle;
     this.buildPath = options.buildPath;
     this.electronVersion = options.electronVersion;
-    this.platform = options.platform || process.platform
+    this.platform = options.platform || process.platform;
     this.arch = options.arch || process.arch;
     this.force = options.force || false;
     this.headerURL = options.headerURL || 'https://www.electronjs.org/headers';

@@ -60,11 +60,11 @@ describe('node-gyp', () => {
 
     context('cross-compilation', async () => {
       it('throws error early if platform mismatch', async function () {
-        const platform: NodeJS.Platform = 'win32';
+        let platform: NodeJS.Platform = 'darwin';
 
         // we're verifying platform mismatch error throwing, not `rebuildModule` rebuilding.
         if (process.platform === platform) {
-          this.skip(); 
+          platform = 'win32';
         }
 
         const rebuilder = new Rebuilder({

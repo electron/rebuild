@@ -74,7 +74,7 @@ describe('node-pre-gyp', function () {
     if (process.platform === 'win32') {
       alternativePlatform = 'darwin';
     } else {
-      alternativePlatform = 'win32'
+      alternativePlatform = 'win32';
     }
 
     rebuilder = new Rebuilder({ ...rebuilderArgs, platform: alternativePlatform });

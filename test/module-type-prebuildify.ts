@@ -125,7 +125,7 @@ describe('prebuildify', () => {
       if (process.platform === 'win32') {
         alternativePlatform = 'darwin';
       } else {
-        alternativePlatform = 'win32'
+        alternativePlatform = 'win32';
       }
   
       rebuilder = createRebuilder({ platform: alternativePlatform });
