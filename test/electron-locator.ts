@@ -4,7 +4,7 @@ import * as path from 'path';
 
 import { locateElectronModule } from '../lib/electron-locator';
 
-const baseFixtureDir = path.resolve(__dirname, 'fixture', 'electron-locator')
+const baseFixtureDir = path.resolve(__dirname, 'fixture', 'electron-locator');
 
 async function expectElectronCanBeFound(projectRootPath: string, startDir: string): Promise<void> {
   it('should return a valid path', async () => {

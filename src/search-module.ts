@@ -76,7 +76,7 @@ export async function searchForNodeModules(cwd: string, rootPath?: string): Prom
 export async function getProjectRootPath(cwd: string): Promise<string> {
   for (const lockFilename of ['yarn.lock', 'package-lock.json', 'pnpm-lock.yaml']) {
     const pathGenerator: PathGeneratorFunction = (traversedPath) => path.join(traversedPath, lockFilename);
-    const lockPaths = await traverseAncestorDirectories(cwd, pathGenerator, undefined, 1)
+    const lockPaths = await traverseAncestorDirectories(cwd, pathGenerator, undefined, 1);
     if (lockPaths.length > 0) {
       return path.dirname(lockPaths[0]);
     }

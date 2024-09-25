@@ -21,7 +21,7 @@ process.on('message', async ({
             if (arg.startsWith('/p:')) return arg;
             return fn(arg);
           });
-        }
+        };
       }
       await promisify(nodeGyp.commands[command.name])(command.args);
       command = nodeGyp.todo.shift();

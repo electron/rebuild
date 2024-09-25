@@ -15,7 +15,7 @@ async function locateModuleByRequire(): Promise<string | null> {
     }
   }
 
-  return null
+  return null;
 }
 
 export async function locateElectronModule(

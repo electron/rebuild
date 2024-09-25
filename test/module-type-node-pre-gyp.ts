@@ -29,7 +29,7 @@ describe('node-pre-gyp', function () {
       const nodePreGyp = new NodePreGyp(rebuilder, modulePath);
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       expect(nodePreGyp.nodeAPI.getNapiVersion((await nodePreGyp.getSupportedNapiVersions())!)).to.equal(3);
-      expect(await nodePreGyp.getNodePreGypRuntimeArgs()).to.deep.equal([])
+      expect(await nodePreGyp.getNodePreGypRuntimeArgs()).to.deep.equal([]);
     });
 
     it('should not fail running node-pre-gyp', async () => {
@@ -57,7 +57,7 @@ describe('node-pre-gyp', function () {
     if (process.platform === 'win32') {
       alternativeArch = rebuilderArgs.arch === 'x64' ? 'ia32' : 'x64';
     } else {
-      alternativeArch = rebuilderArgs.arch === 'arm64' ? 'x64' : 'arm64'
+      alternativeArch = rebuilderArgs.arch === 'arm64' ? 'x64' : 'arm64';
     }
 
     rebuilder = new Rebuilder({ ...rebuilderArgs, arch: alternativeArch });

@@ -62,7 +62,7 @@ export async function getClangEnvironmentVars(electronVersion: string, targetArc
       CXX: `"${path.resolve(clangDir, 'clang++')}" ${clangArgs.join(' ')}`,
     },
     args: gypArgs,
-  }
+  };
 }
 
 function clangVersionFromRevision(update: string): string | null {
@@ -92,7 +92,7 @@ async function downloadClangVersion(electronVersion: string) {
   const chromiumRevisionMatch = chromiumRevisionExtractor.exec(electronDeps);
   if (!chromiumRevisionMatch) throw new Error('Failed to determine Chromium revision for given Electron version');
   const chromiumRevision = chromiumRevisionMatch[1];
-  d('fetching clang for Chromium:', chromiumRevision)
+  d('fetching clang for Chromium:', chromiumRevision);
 
   const base64ClangUpdate = await fetch(`https://chromium.googlesource.com/chromium/src.git/+/${chromiumRevision}/tools/clang/scripts/update.py?format=TEXT`, 'text');
   const clangUpdate = Buffer.from(base64ClangUpdate, 'base64').toString('utf8');
@@ -107,7 +107,7 @@ async function downloadClangVersion(electronVersion: string) {
   d('deflating clang');
   zlib.deflateSync(contents);
   const tarPath = path.resolve(ELECTRON_GYP_DIR, `${electronVersion}-clang.tar`);
-  if (await fs.pathExists(tarPath)) await fs.remove(tarPath)
+  if (await fs.pathExists(tarPath)) await fs.remove(tarPath);
   await fs.writeFile(tarPath, Buffer.from(contents));
   await fs.mkdirp(clangDirPath);
   d('tar running on clang');

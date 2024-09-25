@@ -32,7 +32,7 @@ describe('prebuild-install', () => {
       expect(await prebuildInstall.getPrebuildInstallRuntimeArgs()).to.deep.equal([
         '--runtime=napi',
         `--target=3`,
-      ])
+      ]);
     });
 
     it('should not fail running prebuild-install', async function () {

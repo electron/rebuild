@@ -110,7 +110,10 @@
           "ignoreRestSiblings": true,
           "vars": "all"
         }
-      ]
+      ],
+      "semi": "off",
+      "@typescript-eslint/semi": "error",
+      "no-unexpected-multiline": "error"
     }
   },
   "eslintIgnore": [

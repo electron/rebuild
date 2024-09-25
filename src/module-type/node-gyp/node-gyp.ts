@@ -49,16 +49,16 @@ export class NodeGyp extends NativeModule {
 
   async buildArgsFromBinaryField(): Promise<string[]> {
     const binary = await this.packageJSONFieldWithDefault('binary', {}) as Record<string, string>;
-    let napiBuildVersion: number | undefined = undefined
+    let napiBuildVersion: number | undefined = undefined;
     if (Array.isArray(binary.napi_versions)) {
-      napiBuildVersion = this.nodeAPI.getNapiVersion(binary.napi_versions.map(str => Number(str)))
+      napiBuildVersion = this.nodeAPI.getNapiVersion(binary.napi_versions.map(str => Number(str)));
     }
     const flags = await Promise.all(Object.entries(binary).map(async ([binaryKey, binaryValue]) => {
       if (binaryKey === 'napi_versions') {
         return;
       }
 
-      let value = binaryValue
+      let value = binaryValue;
 
       if (binaryKey === 'module_path') {
         value = path.resolve(this.modulePath, value);
@@ -71,14 +71,14 @@ export class NodeGyp extends NativeModule {
         .replace('{version}', await this.packageJSONField('version') as string)
         .replace('{libc}', await detectLibc.family() || 'unknown');
       if (napiBuildVersion !== undefined) {
-        value = value.replace('{napi_build_version}', napiBuildVersion.toString())
+        value = value.replace('{napi_build_version}', napiBuildVersion.toString());
       }
       for (const [replaceKey, replaceValue] of Object.entries(binary)) {
         value = value.replace(`{${replaceKey}}`, replaceValue);
       }
 
       return `--${binaryKey}=${value}`;
-    }))
+    }));
 
     return flags.filter(value => value) as string[];
   }
@@ -128,7 +128,7 @@ export class NodeGyp extends NativeModule {
       forkedChild.on('exit', (code) => {
         if (code === 0) return resolve();
         console.error(Buffer.concat(outputBuffers).toString());
-        reject(new Error(`node-gyp failed to rebuild '${this.modulePath}'`))
+        reject(new Error(`node-gyp failed to rebuild '${this.modulePath}'`));
       });
     });
   }

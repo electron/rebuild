@@ -13,7 +13,7 @@ describe('rebuild for yarn workspace', function() {
 
   describe('core behavior', () => {
     before(async () => {
-      await resetTestModule(testModulePath, true, 'workspace-test')
+      await resetTestModule(testModulePath, true, 'workspace-test');
       const projectRootPath = await getProjectRootPath(path.join(testModulePath, 'workspace-test', 'child-workspace'));
 
       await rebuild({

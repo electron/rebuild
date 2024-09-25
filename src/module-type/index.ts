@@ -10,7 +10,7 @@ type PackageJSONValue = string | Record<string, unknown>;
 export class NativeModule {
   protected rebuilder: IRebuilder;
   private _moduleName: string | undefined;
-  protected modulePath: string
+  protected modulePath: string;
   public nodeAPI: NodeAPI;
   private packageJSON: Record<string, PackageJSONValue | undefined>;
 

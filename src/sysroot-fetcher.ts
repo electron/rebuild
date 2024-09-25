@@ -12,9 +12,9 @@ const d = debug('electron-rebuild');
 const sysrootArchAliases = {
   x64: 'amd64',
   ia32: 'i386',
-}
+};
 
-const SYSROOT_BASE_URL = 'https://dev-cdn.electronjs.org/linux-sysroots'
+const SYSROOT_BASE_URL = 'https://dev-cdn.electronjs.org/linux-sysroots';
 
 export async function downloadLinuxSysroot(electronVersion: string, targetArch: string): Promise<string> {
   d('fetching sysroot for Electron:', electronVersion);
