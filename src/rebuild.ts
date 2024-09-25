@@ -139,7 +139,7 @@ export class Rebuilder implements IRebuilder {
   public lifecycle: EventEmitter;
   public buildPath: string;
   public electronVersion: string;
-  public platform: NodeJS.Platform
+  public platform: NodeJS.Platform;
   public arch: string;
   public force: boolean;
   public headerURL: string;
