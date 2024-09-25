@@ -56,21 +56,29 @@ describe('node-gyp', () => {
     });
 
     context('cross-compilation', async () => {
-      it('throws error early', async () => {
+      it('throws error early if platform mismatch', async () => {
         const platform: NodeJS.Platform = 'win32'
         const rebuilder = new Rebuilder({
           buildPath: testModulePath,
           electronVersion: '15.3.0',
           lifecycle: new EventEmitter(),
-          platform,
-          buildFromSource: true // to force node-gyp to execute
+          platform
         });
         const nodeGyp = new NodeGyp(rebuilder, testModulePath);
-        const executor = () => nodeGyp.rebuildModule();
+        
+        const errorMessage = "node-gyp does not support cross-compiling native modules from source."
+        let errorThrown = false
+        const executor = () => nodeGyp.rebuildModule().catch((err) => {
+          if (err.message === errorMessage) {
+            errorThrown = true
+          }
+        });
+        await executor()
+
         if (process.platform === platform) {
-          expect(executor).does.not.throw()
+          expect(errorThrown).to.be.false
         } else {
-          expect(executor).throws()
+          expect(errorThrown).to.be.true
         }
       })
     })

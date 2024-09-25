@@ -85,7 +85,7 @@ export class NodeGyp extends NativeModule {
 
   async rebuildModule(): Promise<void> {
     if (this.rebuilder.platform !== process.platform) {
-      throw new Error("node-gyp does not support cross-compiling native modules from source")
+      throw new Error("node-gyp does not support cross-compiling native modules from source.");
     }
 
     if (this.modulePath.includes(' ')) {
