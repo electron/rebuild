@@ -45,8 +45,8 @@ export class Prebuildify extends NativeModule {
       return false;
     }
 
-    const prebuiltModuleDir = path.join(prebuildsDir, `${this.rebuilder.platform}-${determineNativePrebuildArch(nodeArch)}`);
     const nodeArch = getNodeArch(this.rebuilder.arch, process.config.variables as ConfigVariables);
+    const prebuiltModuleDir = path.join(prebuildsDir, `${this.rebuilder.platform}-${determineNativePrebuildArch(nodeArch)}`);
     const nativeExt = determineNativePrebuildExtension(nodeArch);
     const electronNapiModuleFilename = path.join(prebuiltModuleDir, `electron.napi.${nativeExt}`);
     const nodejsNapiModuleFilename = path.join(prebuiltModuleDir, `node.napi.${nativeExt}`);
