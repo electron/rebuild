@@ -10,7 +10,7 @@ export class PrebuildInstall extends NativeModule {
   async usesTool(): Promise<boolean> {
     const dependencies = await this.packageJSONFieldWithDefault('dependencies', {});
     // eslint-disable-next-line no-prototype-builtins
-    return dependencies.hasOwnProperty('prebuild-install')
+    return dependencies.hasOwnProperty('prebuild-install');
   }
 
   async locateBinary(): Promise<string | null> {
@@ -59,7 +59,7 @@ export class PrebuildInstall extends NativeModule {
    * Whether a prebuild-install-based native module exists.
    */
   async prebuiltModuleExists(): Promise<boolean> {
-    return fs.pathExists(path.resolve(this.modulePath, 'prebuilds', `${this.rebuilder.platform}-${this.rebuilder.arch}`, `electron-${this.rebuilder.ABI}.node`))
+    return fs.pathExists(path.resolve(this.modulePath, 'prebuilds', `${this.rebuilder.platform}-${this.rebuilder.arch}`, `electron-${this.rebuilder.ABI}.node`));
   }
 
   async getPrebuildInstallRuntimeArgs(): Promise<string[]> {
@@ -69,12 +69,12 @@ export class PrebuildInstall extends NativeModule {
       return [
         '--runtime=napi',
         `--target=${napiVersion}`,
-      ]
+      ];
     } else {
       return [
         '--runtime=electron',
         `--target=${this.rebuilder.electronVersion}`,
-      ]
+      ];
     }
   }
 }

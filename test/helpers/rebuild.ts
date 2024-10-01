@@ -5,7 +5,7 @@ import * as path from 'path';
 type ExpectRebuildOptions = {
   buildType?: string;
   metaShouldExist?: boolean;
-}
+};
 
 export async function expectNativeModuleToBeRebuilt(
   basePath: string,

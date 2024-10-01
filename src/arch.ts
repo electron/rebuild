@@ -13,7 +13,7 @@ export function uname(): string {
 
 export type ConfigVariables = {
   arm_version?: string;
-}
+};
 
 /**
  * Generates an architecture name that would be used in an Electron or Node.js

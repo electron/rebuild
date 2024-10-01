@@ -30,7 +30,7 @@ export class NodeAPI {
     const filteredVersions = moduleNapiVersions.filter((v) => (v <= electronNapiVersion));
 
     if (filteredVersions.length === 0) {
-      throw new Error(`Native module '${this.moduleName}' supports Node-API versions ${moduleNapiVersions} but Electron v${this.electronVersion} only supports Node-API v${electronNapiVersion}`)
+      throw new Error(`Native module '${this.moduleName}' supports Node-API versions ${moduleNapiVersions} but Electron v${this.electronVersion} only supports Node-API v${electronNapiVersion}`);
     }
 
     return Math.max(...filteredVersions);

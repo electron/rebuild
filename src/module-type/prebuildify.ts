@@ -44,7 +44,7 @@ export class Prebuildify extends NativeModule {
 
     const prebuildsDir = path.join(this.modulePath, 'prebuilds');
     if (!(await fs.pathExists(prebuildsDir))) {
-      d(`Could not find the prebuilds directory at "${prebuildsDir}"`)
+      d(`Could not find the prebuilds directory at "${prebuildsDir}"`);
       return false;
     }
 
