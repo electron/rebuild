@@ -58,16 +58,18 @@ export class NativeModule {
    * Search dependencies for package using either `packageName` or
    * `@namespace/packageName` in the case of forks.
    */
-  async findPackageInDependencies(packageName: string): Promise<string | null> {
-    const dependencies = await this.packageJSONFieldWithDefault('dependencies', {});
+  async findPackageInDependencies(packageName: string, packageProperty = 'dependencies'): Promise<string | null> {
+    const dependencies = await this.packageJSONFieldWithDefault(packageProperty, {});
     if (typeof dependencies !== 'object') return null;
-    for (const dependency of Object.keys(dependencies)) {
-      // Directly using package
-      if (dependency === packageName) return dependency;
-      // Using possible forked package
-      if (dependency.endsWith(`/${packageName}`)) return dependency;
-    }
-    return null;
+
+    // Look for direct dependency match
+    // eslint-disable-next-line no-prototype-builtins
+    if (dependencies.hasOwnProperty(packageName)) return packageName;
+
+    const forkedPackage = Object.keys(dependencies).find(dependency =>
+      dependency.startsWith('@') && dependency.endsWith(`/${packageName}`));
+
+    return forkedPackage || null;
   }
 }
 
