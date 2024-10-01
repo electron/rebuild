@@ -132,5 +132,5 @@ describe('prebuildify', () => {
       prebuildify = new Prebuildify(rebuilder, fixtureDir);
       expect(await prebuildify.findPrebuiltModule()).to.equal(true);
     });
-  })
+  });
 });
