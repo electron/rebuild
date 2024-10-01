@@ -7,13 +7,17 @@ const d = debug('electron-rebuild');
 
 export class NodePreGyp extends NativeModule {
   async usesTool(): Promise<boolean> {
-    const dependencies = await this.packageJSONFieldWithDefault('dependencies', {});
-    // eslint-disable-next-line no-prototype-builtins
-    return dependencies.hasOwnProperty('@mapbox/node-pre-gyp');
+    const packageName = await this.findPackageInDependencies('node-pre-gyp');
+    return !!packageName;
   }
 
   async locateBinary(): Promise<string | null> {
-    return locateBinary(this.modulePath, 'node_modules/@mapbox/node-pre-gyp/bin/node-pre-gyp');
+    const packageName = await this.findPackageInDependencies('node-pre-gyp');
+    if (!packageName) return null;
+    return locateBinary(
+      this.modulePath,
+      `node_modules/${packageName}/bin/node-pre-gyp`
+    );
   }
 
   async run(nodePreGypPath: string): Promise<void> {

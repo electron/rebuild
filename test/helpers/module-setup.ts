@@ -1,8 +1,11 @@
+import debug from 'debug';
 import crypto from 'crypto';
 import fs from 'fs-extra';
 import os from 'os';
 import path from 'path';
 import { spawn } from '@malept/cross-spawn-promise';
+
+const d = debug('electron-rebuild');
 
 const originalGypMSVSVersion: string | undefined = process.env.GYP_MSVS_VERSION;
 const TIMEOUT_IN_MINUTES = process.platform === 'win32' ? 5 : 2;
@@ -23,6 +26,7 @@ const testModuleTmpPath = fs.mkdtempSync(path.resolve(os.tmpdir(), 'e-r-test-mod
 export async function resetTestModule(testModulePath: string, installModules = true, fixtureName = 'native-app1'): Promise<void> {
   const oneTimeModulePath = path.resolve(testModuleTmpPath, `${crypto.createHash('SHA1').update(testModulePath).digest('hex')}-${fixtureName}-${installModules}`);
   if (!await fs.pathExists(oneTimeModulePath)) {
+    d(`creating test module '%s' in %s`, fixtureName, oneTimeModulePath);
     await fs.mkdir(oneTimeModulePath, { recursive: true });
     await fs.copy(path.resolve(__dirname, `../../test/fixture/${ fixtureName }`), oneTimeModulePath);
     if (installModules) {

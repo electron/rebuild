@@ -24,6 +24,13 @@ describe('node-pre-gyp', function () {
   after(async () => await cleanupTestModule(testModulePath));
 
   describe('Node-API support', function() {
+    it('should find fork of node-pre-gyp', async () => {
+      const rebuilder = new Rebuilder(rebuilderArgs);
+      // The test module contains a dependency aliasing 'node-pre-gyp'
+      const nodePreGyp = new NodePreGyp(rebuilder, testModulePath);
+      expect(await nodePreGyp.usesTool()).to.equal(true);
+    });
+
     it('should find correct napi version and select napi args', async () => {
       const rebuilder = new Rebuilder(rebuilderArgs);
       const nodePreGyp = new NodePreGyp(rebuilder, modulePath);

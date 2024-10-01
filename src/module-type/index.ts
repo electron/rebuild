@@ -53,6 +53,22 @@ export class NativeModule {
 
     return binary?.napi_versions;
   }
+
+  /**
+   * Search dependencies for package using either `packageName` or
+   * `@namespace/packageName` in the case of forks.
+   */
+  async findPackageInDependencies(packageName: string): Promise<string | null> {
+    const dependencies = await this.packageJSONFieldWithDefault('dependencies', {});
+    if (typeof dependencies !== 'object') return null;
+    for (const dependency of Object.keys(dependencies)) {
+      // Directly using package
+      if (dependency === packageName) return dependency;
+      // Using possible forked package
+      if (dependency.endsWith(`/${packageName}`)) return dependency;
+    }
+    return null;
+  }
 }
 
 export async function locateBinary(basePath: string, suffix: string): Promise<string | null> {
