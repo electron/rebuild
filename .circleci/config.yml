@@ -40,6 +40,10 @@ workflows:
                       name: Enable Long Paths
                       command: New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
                       shell: powershell.exe
+                  - run:
+                      name: Setup distutils
+                      command: pip3 install setuptools
+                      shell: powershell.exe
           test-steps:
             - when:
                 condition:
