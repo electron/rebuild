@@ -20,6 +20,13 @@ export interface RebuildOptions {
    */
   electronVersion: string;
   /**
+   * Override the target platform to something other than the host system platform.
+   * Note: This only applies to downloading prebuilt binaries. **It is not possible to cross-compile native modules.**
+   * 
+   * @defaultValue The system {@link https://nodejs.org/api/process.html#processplatform | `process.platform`} value
+   */
+  platform?: NodeJS.Platform;
+  /**
    * Override the target rebuild architecture to something other than the host system architecture.
    * 
    * @defaultValue The system {@link https://nodejs.org/api/process.html#processarch | `process.arch`} value
@@ -132,7 +139,7 @@ export class Rebuilder implements IRebuilder {
   public lifecycle: EventEmitter;
   public buildPath: string;
   public electronVersion: string;
-  public platform: string = process.platform;
+  public platform: NodeJS.Platform;
   public arch: string;
   public force: boolean;
   public headerURL: string;
@@ -151,6 +158,7 @@ export class Rebuilder implements IRebuilder {
     this.lifecycle = options.lifecycle;
     this.buildPath = options.buildPath;
     this.electronVersion = options.electronVersion;
+    this.platform = options.platform || process.platform;
     this.arch = options.arch || process.arch;
     this.force = options.force || false;
     this.headerURL = options.headerURL || 'https://www.electronjs.org/headers';
@@ -199,6 +207,7 @@ export class Rebuilder implements IRebuilder {
       'rebuilding with args:',
       this.buildPath,
       this.electronVersion,
+      this.platform,
       this.arch,
       extraModules,
       this.force,
@@ -289,6 +298,7 @@ export class Rebuilder implements IRebuilder {
       cacheKey = await generateCacheKey({
         ABI: this.ABI,
         arch: this.arch,
+        platform: this.platform,
         debug: this.debug,
         electronVersion: this.electronVersion,
         headerURL: this.headerURL,

@@ -5,7 +5,7 @@ import path from 'path';
 
 import { cleanupTestModule, resetTestModule, TIMEOUT_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath } from './helpers/module-setup';
 import { NodePreGyp } from '../lib/module-type/node-pre-gyp';
-import { Rebuilder } from '../lib/rebuild';
+import { Rebuilder, RebuilderOptions } from '../lib/rebuild';
 
 chai.use(chaiAsPromised);
 
@@ -13,7 +13,7 @@ describe('node-pre-gyp', function () {
   this.timeout(TIMEOUT_IN_MILLISECONDS);
 
   const modulePath = path.join(testModulePath, 'node_modules', 'sqlite3');
-  const rebuilderArgs = {
+  const rebuilderArgs: RebuilderOptions = {
     buildPath: testModulePath,
     electronVersion: '8.0.0',
     arch: process.arch,
@@ -61,6 +61,23 @@ describe('node-pre-gyp', function () {
     }
 
     rebuilder = new Rebuilder({ ...rebuilderArgs, arch: alternativeArch });
+    nodePreGyp = new NodePreGyp(rebuilder, modulePath);
+    expect(await nodePreGyp.findPrebuiltModule()).to.equal(true);
+  });
+
+  it('should download for target platform', async () => {
+    let rebuilder = new Rebuilder(rebuilderArgs);
+    let nodePreGyp = new NodePreGyp(rebuilder, modulePath);
+    expect(await nodePreGyp.findPrebuiltModule()).to.equal(true);
+
+    let alternativePlatform: NodeJS.Platform;
+    if (process.platform === 'win32') {
+      alternativePlatform = 'darwin';
+    } else {
+      alternativePlatform = 'win32';
+    }
+
+    rebuilder = new Rebuilder({ ...rebuilderArgs, platform: alternativePlatform });
     nodePreGyp = new NodePreGyp(rebuilder, modulePath);
     expect(await nodePreGyp.findPrebuiltModule()).to.equal(true);
   });

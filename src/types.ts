@@ -21,7 +21,7 @@ export interface IRebuilder {
   lifecycle: EventEmitter;
   mode: RebuildMode;
   msvsVersion?: string;
-  platform: string;
+  platform: NodeJS.Platform;
   prebuildTagPrefix: string;
   buildFromSource: boolean;
   useCache: boolean;

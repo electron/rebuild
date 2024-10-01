@@ -22,6 +22,7 @@ type HashTree = { [path: string]: string | HashTree };
 type CacheOptions = {
   ABI: string;
   arch: string;
+  platform: string;
   debug: boolean;
   electronVersion: string;
   headerURL: string;
@@ -159,6 +160,7 @@ export async function generateCacheKey(opts: CacheOptions): Promise<string> {
     .update(path.basename(opts.modulePath))
     .update(opts.ABI)
     .update(opts.arch)
+    .update(opts.platform)
     .update(opts.debug ? 'debug' : 'not debug')
     .update(opts.headerURL)
     .update(opts.electronVersion);

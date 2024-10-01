@@ -1,9 +1,12 @@
 import { EventEmitter } from 'events';
-import { expect } from 'chai';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 
 import { cleanupTestModule, resetTestModule, TEST_MODULE_PATH as testModulePath } from './helpers/module-setup';
 import { NodeGyp } from '../lib/module-type/node-gyp/node-gyp';
 import { Rebuilder } from '../lib/rebuild';
+
+chai.use(chaiAsPromised);
 
 describe('node-gyp', () => {
   describe('buildArgs', () => {
@@ -54,5 +57,27 @@ describe('node-gyp', () => {
         expect(args).to.not.include('--force-process-config');
       });
     });
+
+    context('cross-compilation', async () => {
+      it('throws error early if platform mismatch', async function () {
+        let platform: NodeJS.Platform = 'darwin';
+
+        // we're verifying platform mismatch error throwing, not `rebuildModule` rebuilding.
+        if (process.platform === platform) {
+          platform = 'win32';
+        }
+
+        const rebuilder = new Rebuilder({
+          buildPath: testModulePath,
+          electronVersion: '15.3.0',
+          lifecycle: new EventEmitter(),
+          platform
+        });
+        const nodeGyp = new NodeGyp(rebuilder, testModulePath);
+        
+        const errorMessage = "node-gyp does not support cross-compiling native modules from source.";
+        expect(nodeGyp.rebuildModule()).to.eventually.be.rejectedWith(new Error(errorMessage))
+      })
+    })
   });
 });
