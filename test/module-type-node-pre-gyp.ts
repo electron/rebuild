@@ -81,4 +81,10 @@ describe('node-pre-gyp', function () {
     nodePreGyp = new NodePreGyp(rebuilder, modulePath);
     expect(await nodePreGyp.findPrebuiltModule()).to.equal(true);
   });
+
+  it('should find module fork', async () => {
+    const rebuilder = new Rebuilder(rebuilderArgs);
+    const nodePreGyp = new NodePreGyp(rebuilder, path.join(__dirname, 'fixture', 'forked-module-test'));
+    expect(await nodePreGyp.usesTool()).to.equal(true);
+  });
 });

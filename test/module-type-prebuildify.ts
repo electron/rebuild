@@ -133,4 +133,10 @@ describe('prebuildify', () => {
       expect(await prebuildify.findPrebuiltModule()).to.equal(true);
     });
   });
+
+  it('should find module fork', async () => {
+    const rebuilder = createRebuilder();
+    const prebuildify = new Prebuildify(rebuilder, path.join(__dirname, 'fixture', 'forked-module-test'));
+    expect(await prebuildify.usesTool()).to.equal(true);
+  });
 });

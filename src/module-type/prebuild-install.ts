@@ -8,13 +8,17 @@ const d = debug('electron-rebuild');
 
 export class PrebuildInstall extends NativeModule {
   async usesTool(): Promise<boolean> {
-    const dependencies = await this.packageJSONFieldWithDefault('dependencies', {});
-    // eslint-disable-next-line no-prototype-builtins
-    return dependencies.hasOwnProperty('prebuild-install');
+    const packageName = await this.findPackageInDependencies('prebuild-install');
+    return !!packageName;
   }
 
   async locateBinary(): Promise<string | null> {
-    return locateBinary(this.modulePath, 'node_modules/prebuild-install/bin.js');
+    const packageName = await this.findPackageInDependencies('prebuild-install');
+    if (!packageName) return null;
+    return locateBinary(
+      this.modulePath,
+      `node_modules/${packageName}/bin.js`
+    );
   }
 
   async run(prebuildInstallPath: string): Promise<void> {

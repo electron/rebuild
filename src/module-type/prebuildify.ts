@@ -32,14 +32,11 @@ export function determineNativePrebuildExtension(arch: string): string {
 
 export class Prebuildify extends NativeModule {
   async usesTool(): Promise<boolean> {
-    const devDependencies = await this.packageJSONFieldWithDefault('devDependencies', {});
-    // eslint-disable-next-line no-prototype-builtins
-    return devDependencies.hasOwnProperty('prebuildify');
+    const packageName = await this.findPackageInDependencies('prebuildify', 'devDependencies');
+    return !!packageName;
   }
 
   async findPrebuiltModule(): Promise<boolean> {
-    const nodeArch = getNodeArch(this.rebuilder.arch, process.config.variables as ConfigVariables);
-
     d(`Checking for prebuilds for "${this.moduleName}"`);
 
     const prebuildsDir = path.join(this.modulePath, 'prebuilds');
@@ -48,6 +45,7 @@ export class Prebuildify extends NativeModule {
       return false;
     }
 
+    const nodeArch = getNodeArch(this.rebuilder.arch, process.config.variables as ConfigVariables);
     const prebuiltModuleDir = path.join(prebuildsDir, `${this.rebuilder.platform}-${determineNativePrebuildArch(nodeArch)}`);
     const nativeExt = determineNativePrebuildExtension(nodeArch);
     const electronNapiModuleFilename = path.join(prebuiltModuleDir, `electron.napi.${nativeExt}`);
