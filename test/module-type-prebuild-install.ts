@@ -75,9 +75,8 @@ describe('prebuild-install', () => {
   });
 
   it('should find module fork', async () => {
-    await resetTestModule(testModulePath, false, 'forked-module-test');
     const rebuilder = new Rebuilder(rebuilderArgs);
-    const nodePreGyp = new PrebuildInstall(rebuilder, testModulePath);
-    expect(await nodePreGyp.usesTool()).to.equal(true);
+    const prebuildInstall = new PrebuildInstall(rebuilder, path.join(__dirname, 'fixture', 'forked-module-test'));
+    expect(await prebuildInstall.usesTool()).to.equal(true);
   });
 });
