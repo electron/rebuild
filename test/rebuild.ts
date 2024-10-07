@@ -45,7 +45,7 @@ describe('rebuilder', () => {
     });
 
     it('should not have rebuilt top level devDependencies', async () => {
-      await expectNativeModuleToNotBeRebuilt(testModulePath, 'ffi-napi');
+      await expectNativeModuleToNotBeRebuilt(testModulePath, 'ffi-rs');
     });
 
     it('should not download files in the module directory', async () => {
@@ -169,7 +169,7 @@ describe('rebuilder', () => {
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch: process.arch,
-        onlyModules: ['ffi-napi', 'ref-napi'], // TODO: check to see if there's a bug with scoped modules
+        onlyModules: ['ffi-rs', 'ref-napi'], // TODO: check to see if there's a bug with scoped modules
         force: true
       });
       let built = 0;
@@ -185,17 +185,17 @@ describe('rebuilder', () => {
     before(async () => await resetTestModule(testModulePath));
     after(async() => await cleanupTestModule(testModulePath));
 
-    it('should have rebuilt ffi-napi module in Debug mode', async () => {
+    it('should have rebuilt ffi-rs module in Debug mode', async () => {
       await rebuild({
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch: process.arch,
-        onlyModules: ['ffi-napi'],
+        onlyModules: ['ffi-rs'],
         force: true,
         debug: true
       });
-      await expectNativeModuleToBeRebuilt(testModulePath, 'ffi-napi', { buildType: 'Debug' });
-      await expectNativeModuleToNotBeRebuilt(testModulePath, 'ffi-napi');
+      await expectNativeModuleToBeRebuilt(testModulePath, 'ffi-rs', { buildType: 'Debug' });
+      await expectNativeModuleToNotBeRebuilt(testModulePath, 'ffi-rs');
     });
   });
 
@@ -205,16 +205,16 @@ describe('rebuilder', () => {
     before(async () => await resetTestModule(testModulePath));
     after(async() => await cleanupTestModule(testModulePath));
 
-    it('should have rebuilt ffi-napi module using clang mode', async () => {
+    it('should have rebuilt ffi-rs module using clang mode', async () => {
       await rebuild({
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch: process.arch,
-        onlyModules: ['ffi-napi'],
+        onlyModules: ['ffi-rs'],
         force: true,
         useElectronClang: true
       });
-      await expectNativeModuleToBeRebuilt(testModulePath, 'ffi-napi');
+      await expectNativeModuleToBeRebuilt(testModulePath, 'ffi-rs');
     });
   });
 });

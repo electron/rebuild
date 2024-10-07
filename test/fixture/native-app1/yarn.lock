@@ -56,6 +56,56 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-12.20.55.tgz#c329cbd434c42164f846b909bd6f85b5537f6240"
   integrity sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==
 
+"@yuuang/ffi-rs-darwin-arm64@1.0.96":
+  version "1.0.96"
+  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-darwin-arm64/-/ffi-rs-darwin-arm64-1.0.96.tgz#924674202aec53943ca7531dbed7c29331ab78bd"
+  integrity sha512-ktbHLC3Du7rQgQkQodQgKoLkaG41keIExYCKjPtZEexaP2FWTDSf5WisytDoDr7Jsa47liyVkj1W7Umdga4nAA==
+
+"@yuuang/ffi-rs-darwin-x64@1.0.96":
+  version "1.0.96"
+  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-darwin-x64/-/ffi-rs-darwin-x64-1.0.96.tgz#293b84ae07b89de501b464085ef994a108c6d397"
+  integrity sha512-TmFMkxhbRBvzsq6ZpnedzFqMOONxbeIR4CrElFoE/bNE+1kWnN6U9PLixso0Dd0Jo+flzNnPGMK7haDwB6CeTg==
+
+"@yuuang/ffi-rs-linux-arm-gnueabihf@1.0.96":
+  version "1.0.96"
+  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-linux-arm-gnueabihf/-/ffi-rs-linux-arm-gnueabihf-1.0.96.tgz#ffe81af42e6dca65cd8c7be700e54b0873580c56"
+  integrity sha512-kOoQS0RK2iDM+GrNf/bCR7d7U6HTZR2jThqwDk3qUToc/ww5KGhbHCTJcAljgeYZJNsf5DvlIbKP6XJjUGQ6og==
+
+"@yuuang/ffi-rs-linux-arm64-gnu@1.0.96":
+  version "1.0.96"
+  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-linux-arm64-gnu/-/ffi-rs-linux-arm64-gnu-1.0.96.tgz#c40102cc61ce34c51fc29d0f054291fc32c7a38f"
+  integrity sha512-gwCziva9a1ok0XD+/IANESiA7USAqU7oR/T3L/f4iX1eZI7+PodD05fn7/Ullkaj5Fr3v1Q+CMi0H308l0T5uQ==
+
+"@yuuang/ffi-rs-linux-arm64-musl@1.0.96":
+  version "1.0.96"
+  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-linux-arm64-musl/-/ffi-rs-linux-arm64-musl-1.0.96.tgz#4790bb05e1861437de2bff59bc62fafe799e3215"
+  integrity sha512-IDNIjrmd1iRgH5sjS52TUVH/ZJzpnDgHHZ6WttOK35msyC1KXHaEvQN5P32EFdBdyKCNbOtnErBYFnEz+aapqA==
+
+"@yuuang/ffi-rs-linux-x64-gnu@1.0.96":
+  version "1.0.96"
+  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-linux-x64-gnu/-/ffi-rs-linux-x64-gnu-1.0.96.tgz#57aa8fafb76e73971fbcc5e1bcb5a2e33987516a"
+  integrity sha512-UvTLbkokFXLt8tjlO+yZPKfys/NdNfcjT0m/YuGImF/Jp5WrqcZ27tuAf60JG1f5weRGy3V+9bFHdWYymrzz/g==
+
+"@yuuang/ffi-rs-linux-x64-musl@1.0.96":
+  version "1.0.96"
+  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-linux-x64-musl/-/ffi-rs-linux-x64-musl-1.0.96.tgz#d311677c65e2150a1e7856c98616846e1de0d29b"
+  integrity sha512-9fahKTHCq6pjmJoc9P7/qfhWLD6ydP3unFt79X6AquDXel2Cobd2B5D2/DQqgdLuf8+ijHB9XGel3PVxLh2t1A==
+
+"@yuuang/ffi-rs-win32-arm64-msvc@1.0.96":
+  version "1.0.96"
+  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-win32-arm64-msvc/-/ffi-rs-win32-arm64-msvc-1.0.96.tgz#8eda9e87718a80c43c9a661b003669853bc4cae6"
+  integrity sha512-lje7z6UVMigJTpVW6kRHt+od76CEnCbFDA1tsn0Bsb+bUDKIP3/jsxoKoj0lECV1SIxn8ABKiL76AkXQXrQiDw==
+
+"@yuuang/ffi-rs-win32-ia32-msvc@1.0.96":
+  version "1.0.96"
+  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-win32-ia32-msvc/-/ffi-rs-win32-ia32-msvc-1.0.96.tgz#debbafcd13f56d6cda5025d3288356d2c5e2a780"
+  integrity sha512-2gvyiJ1ytlaLBucE32ozT13glx6JE0QGV39LL5UCSQcUYmRDqwgHPiGLizD4WkMmHzp4KpK5vc/r5W2RpTZgiQ==
+
+"@yuuang/ffi-rs-win32-x64-msvc@1.0.96":
+  version "1.0.96"
+  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-win32-x64-msvc/-/ffi-rs-win32-x64-msvc-1.0.96.tgz#fd23c997db6772a705640fea938fa0c1d2c152f6"
+  integrity sha512-qZnumYiQfpAnSz8KTbVs21ZkHc4R+rcG7L29KPFdUbRCvxLdaGeMa9ta8Hmgtbzs7z+N/UhGA3Ef1LIh5pSEtQ==
+
 abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
@@ -263,7 +313,7 @@ core-util-is@~1.0.0:
   resolved "https://registry.yarnpkg.com/core-util-is/-/core-util-is-1.0.3.tgz#a6042d3634c2b27e9328f837b965fac83808db85"
   integrity sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==
 
-debug@4, debug@^4.1.1, debug@^4.3.3:
+debug@4, debug@^4.3.3:
   version "4.3.5"
   resolved "https://registry.yarnpkg.com/debug/-/debug-4.3.5.tgz#e83444eceb9fedd4a1da56d671ae2446a01a6e1e"
   integrity sha512-pt0bNEmneDIvdL1Xsd9oDQ/wrQRkXDT4AUWlNZNPKvW5x/jyO9VFXkJUP07vQ2upmw5PlaITaPKc31jK13V+jg==
@@ -371,17 +421,21 @@ farmhash@3.2.1:
     node-addon-api "^3.1.0"
     prebuild-install "^6.0.1"
 
-ffi-napi@4.0.3:
-  version "4.0.3"
-  resolved "https://registry.yarnpkg.com/ffi-napi/-/ffi-napi-4.0.3.tgz#27a8d42a8ea938457154895c59761fbf1a10f441"
-  integrity sha512-PMdLCIvDY9mS32RxZ0XGb95sonPRal8aqRhLbeEtWKZTe2A87qRFG9HjOhvG8EX2UmQw5XNRMIOT+1MYlWmdeg==
-  dependencies:
-    debug "^4.1.1"
-    get-uv-event-loop-napi-h "^1.0.5"
-    node-addon-api "^3.0.0"
-    node-gyp-build "^4.2.1"
-    ref-napi "^2.0.1 || ^3.0.2"
-    ref-struct-di "^1.1.0"
+ffi-rs@1.0.96:
+  version "1.0.96"
+  resolved "https://registry.yarnpkg.com/ffi-rs/-/ffi-rs-1.0.96.tgz#1200f731fccc0507e5e03d0a07a9b2a472fbd2f5"
+  integrity sha512-YrmOEr4bC2rnsvid42f/qkR8NJcW9agbHgYvBsF2aB0S59OCEpdAtlS7e+P6pmiOrR4FQgo62hMv6bRyM04NlA==
+  optionalDependencies:
+    "@yuuang/ffi-rs-darwin-arm64" "1.0.96"
+    "@yuuang/ffi-rs-darwin-x64" "1.0.96"
+    "@yuuang/ffi-rs-linux-arm-gnueabihf" "1.0.96"
+    "@yuuang/ffi-rs-linux-arm64-gnu" "1.0.96"
+    "@yuuang/ffi-rs-linux-arm64-musl" "1.0.96"
+    "@yuuang/ffi-rs-linux-x64-gnu" "1.0.96"
+    "@yuuang/ffi-rs-linux-x64-musl" "1.0.96"
+    "@yuuang/ffi-rs-win32-arm64-msvc" "1.0.96"
+    "@yuuang/ffi-rs-win32-ia32-msvc" "1.0.96"
+    "@yuuang/ffi-rs-win32-x64-msvc" "1.0.96"
 
 file-uri-to-path@1.0.0:
   version "1.0.0"
@@ -454,18 +508,6 @@ gauge@~2.7.3:
     string-width "^1.0.1"
     strip-ansi "^3.0.1"
     wide-align "^1.1.0"
-
-get-symbol-from-current-process-h@^1.0.1, get-symbol-from-current-process-h@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/get-symbol-from-current-process-h/-/get-symbol-from-current-process-h-1.0.2.tgz#510af52eaef873f7028854c3377f47f7bb200265"
-  integrity sha512-syloC6fsCt62ELLrr1VKBM1ggOpMdetX9hTrdW77UQdcApPHLmf7CI7OKcN1c9kYuNxKcDe4iJ4FY9sX3aw2xw==
-
-get-uv-event-loop-napi-h@^1.0.5:
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/get-uv-event-loop-napi-h/-/get-uv-event-loop-napi-h-1.0.6.tgz#42b0b06b74c3ed21fbac8e7c72845fdb7a200208"
-  integrity sha512-t5c9VNR84nRoF+eLiz6wFrEp1SE2Acg0wS+Ysa2zF0eROes+LzOfuTaVHxGy8AbS8rq7FHEJzjnCZo1BupwdJg==
-  dependencies:
-    get-symbol-from-current-process-h "^1.0.1"
 
 github-from-package@0.0.0:
   version "0.0.0"
@@ -939,11 +981,6 @@ node-fetch@^2.6.7:
   dependencies:
     whatwg-url "^5.0.0"
 
-node-gyp-build@^4.2.1:
-  version "4.8.0"
-  resolved "https://registry.yarnpkg.com/node-gyp-build/-/node-gyp-build-4.8.0.tgz#3fee9c1731df4581a3f9ead74664369ff00d26dd"
-  integrity sha512-u6fs2AEUljNho3EYTJNBfImO5QTo/J/1Etd+NVdCj7qWKUSN/bSLkZwhDv7I+w/MSC6qJ4cknepkAYykDdK8og==
-
 node-gyp-build@~4.1.0:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/node-gyp-build/-/node-gyp-build-4.1.1.tgz#d7270b5d86717068d114cc57fff352f96d745feb"
@@ -1189,23 +1226,6 @@ ref-napi@1.4.2:
     bindings "^1.3.0"
     debug "^3.1.0"
     node-addon-api "^1.6.2"
-
-"ref-napi@^2.0.1 || ^3.0.2":
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/ref-napi/-/ref-napi-3.0.3.tgz#e259bfc2bbafb3e169e8cd9ba49037dd00396b22"
-  integrity sha512-LiMq/XDGcgodTYOMppikEtJelWsKQERbLQsYm0IOOnzhwE9xYZC7x8txNnFC9wJNOkPferQI4vD4ZkC0mDyrOA==
-  dependencies:
-    debug "^4.1.1"
-    get-symbol-from-current-process-h "^1.0.2"
-    node-addon-api "^3.0.0"
-    node-gyp-build "^4.2.1"
-
-ref-struct-di@^1.1.0:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/ref-struct-di/-/ref-struct-di-1.1.1.tgz#5827b1d3b32372058f177547093db1fe1602dc10"
-  integrity sha512-2Xyn/0Qgz89VT+++WP0sTosdm9oeowLP23wRJYhG4BFdMUrLj3jhwHZNEytYNYgtPKLNTP3KJX4HEgBvM1/Y2g==
-  dependencies:
-    debug "^3.1.0"
 
 retry@^0.12.0:
   version "0.12.0"
