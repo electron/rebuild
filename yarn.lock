@@ -300,10 +300,9 @@
   optionalDependencies:
     global-agent "^3.0.0"
 
-"@electron/node-gyp@^10.2.0-electron.1":
+"@electron/node-gyp@https://github.com/electron/node-gyp#fd1e8912a0a0b1d839bba9046fbeb60fa2b0d76b":
   version "10.2.0-electron.1"
-  resolved "https://registry.yarnpkg.com/@electron/node-gyp/-/node-gyp-10.2.0-electron.1.tgz#ca5f125dcd0ffb275797c0c418c0d64005e0f815"
-  integrity sha512-YdpRE6qSNYyf7gBv1LBDc8OAs8f/mZthzM1k4pFzodNq8dBGf64MWC5Bq8VVlgdafjQXLpINHvtRAUC9uinoqw==
+  resolved "https://github.com/electron/node-gyp#fd1e8912a0a0b1d839bba9046fbeb60fa2b0d76b"
   dependencies:
     env-paths "^2.2.0"
     exponential-backoff "^3.1.1"
