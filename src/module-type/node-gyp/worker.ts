@@ -1,4 +1,4 @@
-import NodeGypRunner from 'node-gyp';
+import NodeGypRunner from '@electron/node-gyp';
 import { promisify } from 'util';
 
 process.on('message', async ({
