@@ -42,7 +42,7 @@
     "node": ">=12.13.0"
   },
   "dependencies": {
-    "@electron/node-gyp": "https://github.com/electron/node-gyp#6424f618322303560cc57f13566413132e74984a",
+    "@electron/node-gyp": "https://github.com/electron/node-gyp#06b29aafb7708acef8b3669835c8a7857ebc92d2",
     "@malept/cross-spawn-promise": "^2.0.0",
     "chalk": "^4.0.0",
     "debug": "^4.1.1",
