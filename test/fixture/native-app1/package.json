@@ -15,7 +15,7 @@
   },
   "devDependencies": {
     "@types/node": "^12.0.10",
-    "ffi-napi": "4.0.3"
+    "windows-active-process": "1.1.1"
   },
   "dependencies": {
     "@newrelic/native-metrics": "5.3.0",

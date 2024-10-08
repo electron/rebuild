@@ -45,7 +45,7 @@ describe('rebuilder', () => {
     });
 
     it('should not have rebuilt top level devDependencies', async () => {
-      await expectNativeModuleToNotBeRebuilt(testModulePath, 'ffi-napi');
+      await expectNativeModuleToNotBeRebuilt(testModulePath, 'windows-active-process');
     });
 
     it('should not download files in the module directory', async () => {
@@ -81,7 +81,7 @@ describe('rebuilder', () => {
         skipped++;
       });
       await rebuilder;
-      expect(skipped).to.equal(8);
+      expect(skipped).to.equal(7);
     });
 
     it('should rebuild all modules again when disabled but the electron ABI changed', async () => {
@@ -169,13 +169,13 @@ describe('rebuilder', () => {
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch: process.arch,
-        onlyModules: ['ffi-napi', 'ref-napi'], // TODO: check to see if there's a bug with scoped modules
+        onlyModules: ['windows-active-process', 'ref-napi'], // TODO: check to see if there's a bug with scoped modules
         force: true
       });
       let built = 0;
       rebuilder.lifecycle.on('module-done', () => built++);
       await rebuilder;
-      expect(built).to.equal(3);
+      expect(built).to.equal(2);
     });
   });
 
@@ -185,17 +185,17 @@ describe('rebuilder', () => {
     before(async () => await resetTestModule(testModulePath));
     after(async() => await cleanupTestModule(testModulePath));
 
-    it('should have rebuilt ffi-napi module in Debug mode', async () => {
+    it('should have rebuilt farmhash module in Debug mode', async () => {
       await rebuild({
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch: process.arch,
-        onlyModules: ['ffi-napi'],
+        onlyModules: ['farmhash'],
         force: true,
         debug: true
       });
-      await expectNativeModuleToBeRebuilt(testModulePath, 'ffi-napi', { buildType: 'Debug' });
-      await expectNativeModuleToNotBeRebuilt(testModulePath, 'ffi-napi');
+      await expectNativeModuleToBeRebuilt(testModulePath, 'farmhash', { buildType: 'Debug' });
+      await expectNativeModuleToNotBeRebuilt(testModulePath, 'farmhash');
     });
   });
 
@@ -205,16 +205,16 @@ describe('rebuilder', () => {
     before(async () => await resetTestModule(testModulePath));
     after(async() => await cleanupTestModule(testModulePath));
 
-    it('should have rebuilt ffi-napi module using clang mode', async () => {
+    it('should have rebuilt farmhash module using clang mode', async () => {
       await rebuild({
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch: process.arch,
-        onlyModules: ['ffi-napi'],
+        onlyModules: ['farmhash'],
         force: true,
         useElectronClang: true
       });
-      await expectNativeModuleToBeRebuilt(testModulePath, 'ffi-napi');
+      await expectNativeModuleToBeRebuilt(testModulePath, 'farmhash');
     });
   });
 });

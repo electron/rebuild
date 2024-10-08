@@ -29,7 +29,10 @@
   "keywords": [
     "electron"
   ],
-  "author": "Paul Betts <paul@paulbetts.org>",
+  "authors": [
+    "Ani Betts <anais@anaisbetts.org>",
+    "Electron Community"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/electron/rebuild/issues"
@@ -39,6 +42,7 @@
     "node": ">=12.13.0"
   },
   "dependencies": {
+    "@electron/node-gyp": "https://github.com/electron/node-gyp#06b29aafb7708acef8b3669835c8a7857ebc92d2",
     "@malept/cross-spawn-promise": "^2.0.0",
     "chalk": "^4.0.0",
     "debug": "^4.1.1",
@@ -47,7 +51,6 @@
     "got": "^11.7.0",
     "node-abi": "^3.45.0",
     "node-api-version": "^0.2.0",
-    "node-gyp": "^9.0.0",
     "ora": "^5.1.0",
     "read-binary-file-arch": "^1.0.6",
     "semver": "^7.3.5",

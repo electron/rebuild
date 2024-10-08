@@ -1,5 +1,4 @@
-import NodeGypRunner from 'node-gyp';
-import { promisify } from 'util';
+import NodeGypRunner from '@electron/node-gyp';
 
 process.on('message', async ({
   nodeGypArgs,
@@ -23,7 +22,7 @@ process.on('message', async ({
           });
         };
       }
-      await promisify(nodeGyp.commands[command.name])(command.args);
+      await nodeGyp.commands[command.name](command.args);
       command = nodeGyp.todo.shift();
     }
     process.exit(0);
