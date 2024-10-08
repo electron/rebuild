@@ -1,3 +1,4 @@
+import { EventEmitter } from 'events';
 import { expect } from 'chai';
 import * as fs from 'fs-extra';
 import * as path from 'path';
@@ -5,7 +6,7 @@ import * as path from 'path';
 import { cleanupTestModule, MINUTES_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath, resetMSVSVersion, resetTestModule, TIMEOUT_IN_MILLISECONDS } from './helpers/module-setup';
 import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild';
 import { getExactElectronVersionSync } from './helpers/electron-version';
-import { rebuild } from '../lib/rebuild';
+import { Rebuilder, rebuild } from '../lib/rebuild';
 
 const testElectronVersion = getExactElectronVersionSync();
 
@@ -176,6 +177,20 @@ describe('rebuilder', () => {
       rebuilder.lifecycle.on('module-done', () => built++);
       await rebuilder;
       expect(built).to.equal(2);
+    });
+  });
+
+  describe('with extraModules', () => {
+    it('should rebuild existing modules in extraModules despite them not being found during the module walk', async () => {
+      const rebuilder = new Rebuilder({
+        buildPath: path.join(__dirname, 'fixture', 'empty-project'),
+        electronVersion: testElectronVersion,
+        lifecycle: new EventEmitter(),
+        extraModules: ['extra']
+      });
+      const modulesToRebuild = await rebuilder.modulesToRebuild();
+      expect(modulesToRebuild).to.have.length(1);
+      expect(modulesToRebuild[0].endsWith('extra')).to.be.true;
     });
   });
 
