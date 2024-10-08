@@ -185,17 +185,17 @@ describe('rebuilder', () => {
     before(async () => await resetTestModule(testModulePath));
     after(async() => await cleanupTestModule(testModulePath));
 
-    it('should have rebuilt windows-active-process module in Debug mode', async () => {
+    it('should have rebuilt farmhash module in Debug mode', async () => {
       await rebuild({
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch: process.arch,
-        onlyModules: ['windows-active-process'],
+        onlyModules: ['farmhash'],
         force: true,
         debug: true
       });
-      await expectNativeModuleToBeRebuilt(testModulePath, 'windows-active-process', { buildType: 'Debug' });
-      await expectNativeModuleToNotBeRebuilt(testModulePath, 'windows-active-process');
+      await expectNativeModuleToBeRebuilt(testModulePath, 'farmhash', { buildType: 'Debug' });
+      await expectNativeModuleToNotBeRebuilt(testModulePath, 'farmhash');
     });
   });
 
@@ -205,16 +205,16 @@ describe('rebuilder', () => {
     before(async () => await resetTestModule(testModulePath));
     after(async() => await cleanupTestModule(testModulePath));
 
-    it('should have rebuilt windows-active-process module using clang mode', async () => {
+    it('should have rebuilt farmhash module using clang mode', async () => {
       await rebuild({
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch: process.arch,
-        onlyModules: ['windows-active-process'],
+        onlyModules: ['farmhash'],
         force: true,
         useElectronClang: true
       });
-      await expectNativeModuleToBeRebuilt(testModulePath, 'windows-active-process');
+      await expectNativeModuleToBeRebuilt(testModulePath, 'farmhash');
     });
   });
 });
