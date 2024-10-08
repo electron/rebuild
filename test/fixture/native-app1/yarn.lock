@@ -56,56 +56,6 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-12.20.55.tgz#c329cbd434c42164f846b909bd6f85b5537f6240"
   integrity sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==
 
-"@yuuang/ffi-rs-darwin-arm64@1.0.96":
-  version "1.0.96"
-  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-darwin-arm64/-/ffi-rs-darwin-arm64-1.0.96.tgz#924674202aec53943ca7531dbed7c29331ab78bd"
-  integrity sha512-ktbHLC3Du7rQgQkQodQgKoLkaG41keIExYCKjPtZEexaP2FWTDSf5WisytDoDr7Jsa47liyVkj1W7Umdga4nAA==
-
-"@yuuang/ffi-rs-darwin-x64@1.0.96":
-  version "1.0.96"
-  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-darwin-x64/-/ffi-rs-darwin-x64-1.0.96.tgz#293b84ae07b89de501b464085ef994a108c6d397"
-  integrity sha512-TmFMkxhbRBvzsq6ZpnedzFqMOONxbeIR4CrElFoE/bNE+1kWnN6U9PLixso0Dd0Jo+flzNnPGMK7haDwB6CeTg==
-
-"@yuuang/ffi-rs-linux-arm-gnueabihf@1.0.96":
-  version "1.0.96"
-  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-linux-arm-gnueabihf/-/ffi-rs-linux-arm-gnueabihf-1.0.96.tgz#ffe81af42e6dca65cd8c7be700e54b0873580c56"
-  integrity sha512-kOoQS0RK2iDM+GrNf/bCR7d7U6HTZR2jThqwDk3qUToc/ww5KGhbHCTJcAljgeYZJNsf5DvlIbKP6XJjUGQ6og==
-
-"@yuuang/ffi-rs-linux-arm64-gnu@1.0.96":
-  version "1.0.96"
-  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-linux-arm64-gnu/-/ffi-rs-linux-arm64-gnu-1.0.96.tgz#c40102cc61ce34c51fc29d0f054291fc32c7a38f"
-  integrity sha512-gwCziva9a1ok0XD+/IANESiA7USAqU7oR/T3L/f4iX1eZI7+PodD05fn7/Ullkaj5Fr3v1Q+CMi0H308l0T5uQ==
-
-"@yuuang/ffi-rs-linux-arm64-musl@1.0.96":
-  version "1.0.96"
-  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-linux-arm64-musl/-/ffi-rs-linux-arm64-musl-1.0.96.tgz#4790bb05e1861437de2bff59bc62fafe799e3215"
-  integrity sha512-IDNIjrmd1iRgH5sjS52TUVH/ZJzpnDgHHZ6WttOK35msyC1KXHaEvQN5P32EFdBdyKCNbOtnErBYFnEz+aapqA==
-
-"@yuuang/ffi-rs-linux-x64-gnu@1.0.96":
-  version "1.0.96"
-  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-linux-x64-gnu/-/ffi-rs-linux-x64-gnu-1.0.96.tgz#57aa8fafb76e73971fbcc5e1bcb5a2e33987516a"
-  integrity sha512-UvTLbkokFXLt8tjlO+yZPKfys/NdNfcjT0m/YuGImF/Jp5WrqcZ27tuAf60JG1f5weRGy3V+9bFHdWYymrzz/g==
-
-"@yuuang/ffi-rs-linux-x64-musl@1.0.96":
-  version "1.0.96"
-  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-linux-x64-musl/-/ffi-rs-linux-x64-musl-1.0.96.tgz#d311677c65e2150a1e7856c98616846e1de0d29b"
-  integrity sha512-9fahKTHCq6pjmJoc9P7/qfhWLD6ydP3unFt79X6AquDXel2Cobd2B5D2/DQqgdLuf8+ijHB9XGel3PVxLh2t1A==
-
-"@yuuang/ffi-rs-win32-arm64-msvc@1.0.96":
-  version "1.0.96"
-  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-win32-arm64-msvc/-/ffi-rs-win32-arm64-msvc-1.0.96.tgz#8eda9e87718a80c43c9a661b003669853bc4cae6"
-  integrity sha512-lje7z6UVMigJTpVW6kRHt+od76CEnCbFDA1tsn0Bsb+bUDKIP3/jsxoKoj0lECV1SIxn8ABKiL76AkXQXrQiDw==
-
-"@yuuang/ffi-rs-win32-ia32-msvc@1.0.96":
-  version "1.0.96"
-  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-win32-ia32-msvc/-/ffi-rs-win32-ia32-msvc-1.0.96.tgz#debbafcd13f56d6cda5025d3288356d2c5e2a780"
-  integrity sha512-2gvyiJ1ytlaLBucE32ozT13glx6JE0QGV39LL5UCSQcUYmRDqwgHPiGLizD4WkMmHzp4KpK5vc/r5W2RpTZgiQ==
-
-"@yuuang/ffi-rs-win32-x64-msvc@1.0.96":
-  version "1.0.96"
-  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-win32-x64-msvc/-/ffi-rs-win32-x64-msvc-1.0.96.tgz#fd23c997db6772a705640fea938fa0c1d2c152f6"
-  integrity sha512-qZnumYiQfpAnSz8KTbVs21ZkHc4R+rcG7L29KPFdUbRCvxLdaGeMa9ta8Hmgtbzs7z+N/UhGA3Ef1LIh5pSEtQ==
-
 abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
@@ -217,7 +167,15 @@ bcrypt@5.0.0:
     node-addon-api "^3.0.0"
     node-pre-gyp "0.15.0"
 
-bindings@^1.2.1, bindings@^1.3.0:
+better-sqlite3@11.3.0:
+  version "11.3.0"
+  resolved "https://registry.yarnpkg.com/better-sqlite3/-/better-sqlite3-11.3.0.tgz#f10b32ddff665c33176d148e707bd1e57dfd0284"
+  integrity sha512-iHt9j8NPYF3oKCNOO5ZI4JwThjt3Z6J6XrcwG85VNMVzv1ByqrHWv5VILEbCMFWDsoHhXvQ7oC8vgRXFAKgl9w==
+  dependencies:
+    bindings "^1.5.0"
+    prebuild-install "^7.1.1"
+
+bindings@^1.2.1, bindings@^1.3.0, bindings@^1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/bindings/-/bindings-1.5.0.tgz#10353c9e945334bc0511a6d90b38fbc7c9c504df"
   integrity sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==
@@ -334,6 +292,13 @@ decompress-response@^4.2.0:
   dependencies:
     mimic-response "^2.0.0"
 
+decompress-response@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/decompress-response/-/decompress-response-6.0.0.tgz#ca387612ddb7e104bd16d85aab00d5ecf09c66fc"
+  integrity sha512-aW35yZM6Bb/4oJlZncMH2LCoZtJXTRxES17vE3hoRiowU2kWHaJKFkSBDnDR+cm9J+9QhXmREyIfv0pji9ejCQ==
+  dependencies:
+    mimic-response "^3.1.0"
+
 deep-extend@^0.6.0:
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/deep-extend/-/deep-extend-0.6.0.tgz#c4fa7c95404a17a9c3e8ca7e1537312b736330ac"
@@ -420,22 +385,6 @@ farmhash@3.2.1:
   dependencies:
     node-addon-api "^3.1.0"
     prebuild-install "^6.0.1"
-
-ffi-rs@1.0.96:
-  version "1.0.96"
-  resolved "https://registry.yarnpkg.com/ffi-rs/-/ffi-rs-1.0.96.tgz#1200f731fccc0507e5e03d0a07a9b2a472fbd2f5"
-  integrity sha512-YrmOEr4bC2rnsvid42f/qkR8NJcW9agbHgYvBsF2aB0S59OCEpdAtlS7e+P6pmiOrR4FQgo62hMv6bRyM04NlA==
-  optionalDependencies:
-    "@yuuang/ffi-rs-darwin-arm64" "1.0.96"
-    "@yuuang/ffi-rs-darwin-x64" "1.0.96"
-    "@yuuang/ffi-rs-linux-arm-gnueabihf" "1.0.96"
-    "@yuuang/ffi-rs-linux-arm64-gnu" "1.0.96"
-    "@yuuang/ffi-rs-linux-arm64-musl" "1.0.96"
-    "@yuuang/ffi-rs-linux-x64-gnu" "1.0.96"
-    "@yuuang/ffi-rs-linux-x64-musl" "1.0.96"
-    "@yuuang/ffi-rs-win32-arm64-msvc" "1.0.96"
-    "@yuuang/ffi-rs-win32-ia32-msvc" "1.0.96"
-    "@yuuang/ffi-rs-win32-x64-msvc" "1.0.96"
 
 file-uri-to-path@1.0.0:
   version "1.0.0"
@@ -798,6 +747,11 @@ mimic-response@^2.0.0:
   resolved "https://registry.yarnpkg.com/mimic-response/-/mimic-response-2.1.0.tgz#d13763d35f613d09ec37ebb30bac0469c0ee8f43"
   integrity sha512-wXqjST+SLt7R009ySCglWBCFpjUygmCIfD790/kVbiGmUgfYGuB14PiTd5DwVxSV4NcYHjzMkoj5LjQZwTQLEA==
 
+mimic-response@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/mimic-response/-/mimic-response-3.1.0.tgz#2d1d59af9c1b129815accc2c46a022a5ce1fa3c9"
+  integrity sha512-z0yWI+4FDrrweS8Zmt4Ej5HdJmky15+L2e6Wgn3+iK5fWzb6T3fhNFq2+MeTRb064c6Wr4N/wv0DzQTjNzHNGQ==
+
 minimatch@^3.0.4, minimatch@^3.1.1:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.1.2.tgz#19cd194bfd3e428f049a70817c038d89ab4be35b"
@@ -958,6 +912,13 @@ node-abi@^2.21.0:
   integrity sha512-/2D0wOQPgaUWzVSVgRMx+trKJRC2UG4SUc4oCJoXx9Uxjtp0Vy3/kt7zcbxHF8+Z/pK3UloLWzBISg72brfy1w==
   dependencies:
     semver "^5.4.1"
+
+node-abi@^3.3.0:
+  version "3.68.0"
+  resolved "https://registry.yarnpkg.com/node-abi/-/node-abi-3.68.0.tgz#8f37fb02ecf4f43ebe694090dcb52e0c4cc4ba25"
+  integrity sha512-7vbj10trelExNjFSBm5kTvZXXa7pZyKWx9RCKIyqe6I9Ev3IzGpQoqBP3a+cOdxY+pWj6VkP28n/2wWysBHD/A==
+  dependencies:
+    semver "^7.3.5"
 
 node-addon-api@^1.6.2:
   version "1.7.2"
@@ -1155,6 +1116,24 @@ prebuild-install@^6.0.1:
     tar-fs "^2.0.0"
     tunnel-agent "^0.6.0"
 
+prebuild-install@^7.1.1:
+  version "7.1.2"
+  resolved "https://registry.yarnpkg.com/prebuild-install/-/prebuild-install-7.1.2.tgz#a5fd9986f5a6251fbc47e1e5c65de71e68c0a056"
+  integrity sha512-UnNke3IQb6sgarcZIDU3gbMeTp/9SSU1DAIkil7PrqG1vZlBtY5msYccSKSHDqa3hNg436IXK+SNImReuA1wEQ==
+  dependencies:
+    detect-libc "^2.0.0"
+    expand-template "^2.0.3"
+    github-from-package "0.0.0"
+    minimist "^1.2.3"
+    mkdirp-classic "^0.5.3"
+    napi-build-utils "^1.0.1"
+    node-abi "^3.3.0"
+    pump "^3.0.0"
+    rc "^1.2.7"
+    simple-get "^4.0.0"
+    tar-fs "^2.0.0"
+    tunnel-agent "^0.6.0"
+
 process-nextick-args@~2.0.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/process-nextick-args/-/process-nextick-args-2.0.1.tgz#7820d9b16120cc55ca9ae7792680ae7dba6d7fe2"
@@ -1302,6 +1281,15 @@ simple-get@^3.0.3:
   integrity sha512-CQ5LTKGfCpvE1K0n2us+kuMPbk/q0EKl82s4aheV9oXjFEz6W/Y7oQFVJuU6QG77hRT4Ghb5RURteF5vnWjupA==
   dependencies:
     decompress-response "^4.2.0"
+    once "^1.3.1"
+    simple-concat "^1.0.0"
+
+simple-get@^4.0.0:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/simple-get/-/simple-get-4.0.1.tgz#4a39db549287c979d352112fa03fd99fd6bc3543"
+  integrity sha512-brv7p5WgH0jmQJr1ZDDfKDOSeWWg+OVypG99A/5vYGPqJ6pxiaHLy8nxtFjBA7oMa01ebA9gfh1uMCFqOuXxvA==
+  dependencies:
+    decompress-response "^6.0.0"
     once "^1.3.1"
     simple-concat "^1.0.0"
 

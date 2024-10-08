@@ -45,7 +45,7 @@ describe('rebuilder', () => {
     });
 
     it('should not have rebuilt top level devDependencies', async () => {
-      await expectNativeModuleToNotBeRebuilt(testModulePath, 'ffi-rs');
+      await expectNativeModuleToNotBeRebuilt(testModulePath, 'better-sqlite3');
     });
 
     it('should not download files in the module directory', async () => {
@@ -169,7 +169,7 @@ describe('rebuilder', () => {
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch: process.arch,
-        onlyModules: ['ffi-rs', 'ref-napi'], // TODO: check to see if there's a bug with scoped modules
+        onlyModules: ['better-sqlite3', 'ref-napi'], // TODO: check to see if there's a bug with scoped modules
         force: true
       });
       let built = 0;
@@ -185,17 +185,17 @@ describe('rebuilder', () => {
     before(async () => await resetTestModule(testModulePath));
     after(async() => await cleanupTestModule(testModulePath));
 
-    it('should have rebuilt ffi-rs module in Debug mode', async () => {
+    it('should have rebuilt better-sqlite3 module in Debug mode', async () => {
       await rebuild({
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch: process.arch,
-        onlyModules: ['ffi-rs'],
+        onlyModules: ['better-sqlite3'],
         force: true,
         debug: true
       });
-      await expectNativeModuleToBeRebuilt(testModulePath, 'ffi-rs', { buildType: 'Debug' });
-      await expectNativeModuleToNotBeRebuilt(testModulePath, 'ffi-rs');
+      await expectNativeModuleToBeRebuilt(testModulePath, 'better-sqlite3', { buildType: 'Debug' });
+      await expectNativeModuleToNotBeRebuilt(testModulePath, 'better-sqlite3');
     });
   });
 
@@ -205,16 +205,16 @@ describe('rebuilder', () => {
     before(async () => await resetTestModule(testModulePath));
     after(async() => await cleanupTestModule(testModulePath));
 
-    it('should have rebuilt ffi-rs module using clang mode', async () => {
+    it('should have rebuilt better-sqlite3 module using clang mode', async () => {
       await rebuild({
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch: process.arch,
-        onlyModules: ['ffi-rs'],
+        onlyModules: ['better-sqlite3'],
         force: true,
         useElectronClang: true
       });
-      await expectNativeModuleToBeRebuilt(testModulePath, 'ffi-rs');
+      await expectNativeModuleToBeRebuilt(testModulePath, 'better-sqlite3');
     });
   });
 });
