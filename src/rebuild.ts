@@ -192,7 +192,7 @@ export class Rebuilder implements IRebuilder {
 
     this.ABIVersion = options.forceABI?.toString();
     const onlyModules = options.onlyModules || null;
-    const extraModules = (options.extraModules || []).reduce((acc: Set<string>, x: string) => acc.add(x), new Set<string>());
+    const extraModules = new Set(options.extraModules);
     const types = options.types || defaultTypes;
     this.moduleWalker = new ModuleWalker(
       this.buildPath,
@@ -237,13 +237,7 @@ export class Rebuilder implements IRebuilder {
 
     this.lifecycle.emit('start');
 
-    await this.moduleWalker.walkModules();
-
-    for (const nodeModulesPath of await this.moduleWalker.nodeModulesPaths) {
-      await this.moduleWalker.findAllModulesIn(nodeModulesPath);
-    }
-
-    for (const modulePath of this.moduleWalker.modulesToRebuild) {
+    for (const modulePath of await this.modulesToRebuild()) {
       this.rebuilds.push(() => this.rebuildModuleAt(modulePath));
     }
 
@@ -256,6 +250,16 @@ export class Rebuilder implements IRebuilder {
         await rebuildFn();
       }
     }
+  }
+
+  async modulesToRebuild(): Promise<string[]> {
+    await this.moduleWalker.walkModules();
+
+    for (const nodeModulesPath of await this.moduleWalker.nodeModulesPaths) {
+      await this.moduleWalker.findAllModulesIn(nodeModulesPath);
+    }
+
+    return this.moduleWalker.modulesToRebuild;
   }
 
   async rebuildModuleAt(modulePath: string): Promise<void> {
