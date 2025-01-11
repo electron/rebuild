@@ -44,7 +44,7 @@ npm run rebuild
 
 ### What are the requirements?
 
-Node v12.13.0 or higher is required. Building native modules from source uses
+Node v22.0.0 or higher is required. Building native modules from source uses
 [`node-gyp`](https://github.com/nodejs/node-gyp#installation), refer to the link for its
 installation/runtime requirements.
 

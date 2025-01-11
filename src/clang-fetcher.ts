@@ -13,7 +13,7 @@ const d = debug('electron-rebuild');
 const CDS_URL = 'https://commondatastorage.googleapis.com/chromium-browser-clang';
 
 function getPlatformUrlPrefix(hostOS: string, hostArch: string) {
-  const prefixMap = {
+  const prefixMap: Record<string, string> = {
       'linux': 'Linux_x64',
       'darwin': 'Mac',
       'win32': 'Win',
@@ -102,7 +102,7 @@ async function downloadClangVersion(electronVersion: string) {
   d('fetching clang:', clangVersionString);
 
   const clangDownloadURL = getClangDownloadURL('clang', clangVersionString, process.platform, process.arch);
-  
+
   const contents = await fetch(clangDownloadURL, 'buffer');
   d('deflating clang');
   zlib.deflateSync(contents);
