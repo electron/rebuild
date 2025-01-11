@@ -9,7 +9,7 @@ import { fetch } from './fetcher';
 
 const d = debug('electron-rebuild');
 
-const sysrootArchAliases = {
+const sysrootArchAliases: Record<string, string> = {
   x64: 'amd64',
   ia32: 'i386',
 };

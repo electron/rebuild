@@ -17,10 +17,7 @@ jobs:
     strategy:
       matrix:
         node-version:
-          - '20.9'
-          - '18.17'
-          - '16.20'
-          - '14.16'
+          - '22.0.0'
         os:
           - macos-latest
           - ubuntu-latest
@@ -33,9 +30,6 @@ jobs:
       GYP_MSVS_VERSION: '2022'
     steps:
       - run: git config --global core.autocrlf input
-      - name: Install Rosetta
-        if: ${{ matrix.os == 'macos-latest' && (matrix.node-version == '14.16' || matrix.node-version == '12.22') }}
-        run: /usr/sbin/softwareupdate --install-rosetta --agree-to-license
       - name: Enable Long Paths (Windows)
         if : ${{ matrix.os == 'windows-latest' }}
         run: |
@@ -53,11 +47,7 @@ jobs:
         with:
           node-version: "${{ matrix.node-version }}"
           cache: 'yarn'
-          architecture: ${{ matrix.os == 'macos-latest' && (matrix.node-version == '14.16' || matrix.node-version == '12.22') && 'x64' || env.RUNNER_ARCH }}
-      - name: Update npm
-        if: ${{ matrix.node-version == '14.16' || matrix.node-version == '12.22' }}
-        run: npm install -g npm@8 # Update npm so it works with latest Python 3
-      - name: Install
+      - name: Install dependencies
         run: yarn install --frozen-lockfile
       - name: Lint
         run: yarn run lint

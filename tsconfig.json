@@ -6,7 +6,6 @@
     "declaration": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
-    "suppressImplicitAnyIndexErrors": true,
     "strictNullChecks": true,
     "noUnusedLocals": true,
     "noImplicitThis": true,
@@ -15,7 +14,10 @@
     "moduleResolution": "node",
     "esModuleInterop": true,
     "pretty": true,
-    "target": "ES2019",
+    "target": "ES2023",
+    "lib": [
+      "ES2023"
+    ],
     "outDir": "lib"
   },
   "formatCodeOptions": {
