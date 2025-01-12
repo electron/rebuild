@@ -1,0 +1,77 @@
+name: Test
+
+on:
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: '0 22 * * 3'
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test
+    strategy:
+      matrix:
+        node-version:
+          - '20.9'
+          - '18.17'
+          - '16.20'
+          - '14.16'
+          - '12.22'
+        os:
+          - macos-latest
+          - ubuntu-latest
+          - windows-latest
+        exclude:
+          - os: windows-latest
+            node-version: '14.16'
+          - os: windows-latest
+            node-version: '12.22'
+    runs-on: "${{ matrix.os }}"
+    env:
+      GYP_MSVS_VERSION: '2022'
+    steps:
+      - run: git config --global core.autocrlf input
+      - name: Install Rosetta
+        if: ${{ matrix.os == 'macos-latest' && (matrix.node-version == '14.16' || matrix.node-version == '12.22') }}
+        run: /usr/sbin/softwareupdate --install-rosetta --agree-to-license
+      - name: Enable Long Paths (Windows)
+        if : ${{ matrix.os == 'windows-latest' }}
+        run: |
+          New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
+      - name: Setup distutils (Windows)
+        if : ${{ matrix.os == 'windows-latest' }}
+        run: pip3 install setuptools
+      - name: Setup distutils (macOS)
+        if : ${{ matrix.os == 'macos-latest' }}
+        run: pip3 install --break-system-packages --user setuptools
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Setup Node.js
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+        with:
+          node-version: "${{ matrix.node-version }}"
+          cache: 'yarn'
+          architecture: ${{ matrix.os == 'macos-latest' && (matrix.node-version == '14.16' || matrix.node-version == '12.22') && 'x64' || env.RUNNER_ARCH }}
+      - name: Update npm
+        if: ${{ matrix.node-version == '14.16' || matrix.node-version == '12.22' }}
+        run: npm install -g npm@8 # Update npm so it works with latest Python 3
+      - name: Install
+        run: yarn install --frozen-lockfile
+      - name: Lint
+        run: yarn run lint
+      - name: Test & Report Coverage
+        env:
+          DEBUG: electron-rebuild
+        run: |
+          yarn run coverage
+          yarn run coverage:report
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@1e68e06f1dbfde0e4cefc87efeba9e4643565303 # v5.1.2
+        with:
+          files: ./coverage.lcov
+          token: ${{ secrets.CODECOV_TOKEN }}

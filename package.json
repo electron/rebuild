@@ -5,9 +5,9 @@
   "main": "lib/main.js",
   "typings": "lib/main.d.ts",
   "scripts": {
-    "codecov": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "compile": "tsc",
     "coverage": "npm run prewarm-headers && nyc npm run spec",
+    "coverage:report": "nyc report --reporter=text-lcov > coverage.lcov",
     "watch": "tsc -w",
     "prepare": "npm run compile",
     "mocha": "cross-env TS_NODE_FILES=true mocha",
@@ -41,6 +41,9 @@
   "engines": {
     "node": ">=12.13.0"
   },
+  "publishConfig": {
+    "provenance": true
+  },
   "dependencies": {
     "@electron/node-gyp": "https://github.com/electron/node-gyp#06b29aafb7708acef8b3669835c8a7857ebc92d2",
     "@malept/cross-spawn-promise": "^2.0.0",
@@ -73,7 +76,6 @@
     "@typescript-eslint/parser": "^4.0.1",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
-    "codecov": "^3.7.2",
     "cross-env": "^7.0.2",
     "electron": "^22.0.0",
     "eslint": "^7.7.0",
