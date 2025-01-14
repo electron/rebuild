@@ -1,6 +1,6 @@
 ## Electron Rebuild
 
-[![CircleCI](https://circleci.com/gh/electron/rebuild.svg?style=svg)](https://circleci.com/gh/electron/rebuild)
+[![Test](https://github.com/electron/rebuild/actions/workflows/test.yml/badge.svg)](https://github.com/electron/rebuild/actions/workflows/test.yml)
 [![NPM](https://img.shields.io/npm/v/@electron/rebuild.svg?style=flat)](https://npm.im/@electron/rebuild)
 [![Coverage Status](https://codecov.io/gh/electron/rebuild/branch/main/graph/badge.svg)](https://codecov.io/gh/electron/rebuild)
 
