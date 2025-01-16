@@ -21,7 +21,6 @@ jobs:
           - '18.17'
           - '16.20'
           - '14.16'
-          - '12.22'
         os:
           - macos-latest
           - ubuntu-latest
@@ -29,8 +28,6 @@ jobs:
         exclude:
           - os: windows-latest
             node-version: '14.16'
-          - os: windows-latest
-            node-version: '12.22'
     runs-on: "${{ matrix.os }}"
     env:
       GYP_MSVS_VERSION: '2022'
