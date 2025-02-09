@@ -1,4 +1,5 @@
 {
+  "extends": "@tsconfig/node22/tsconfig.json",
   "compilerOptions": {
     "removeComments": false,
     "preserveConstEnums": true,
@@ -6,19 +7,12 @@
     "declaration": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
-    "strictNullChecks": true,
     "noUnusedLocals": true,
     "noImplicitThis": true,
     "noUnusedParameters": true,
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "esModuleInterop": true,
     "pretty": true,
-    "target": "ES2023",
-    "lib": [
-      "ES2023"
-    ],
-    "outDir": "lib"
+    "outDir": "lib",
+    "types": ["node"]
   },
   "formatCodeOptions": {
     "indentSize": 2,

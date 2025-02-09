@@ -51,7 +51,7 @@ export class NodePreGyp extends NativeModule {
       } catch (err) {
         d('failed to use node-pre-gyp:', err);
 
-        if (err?.message?.includes('requires Node-API but Electron')) {
+        if ((err as Error)?.message?.includes('requires Node-API but Electron')) {
           throw err;
         }
       }
@@ -89,7 +89,7 @@ export class NodePreGyp extends NativeModule {
           moduleArch = await readBinaryFileArch(modulePath);
           d('module arch:', moduleArch);
         } catch (error) {
-          d('failed to read module arch:', error.message);
+          d('failed to read module arch:', (error as Error).message);
           continue;
         }
 
@@ -100,7 +100,7 @@ export class NodePreGyp extends NativeModule {
         }
       }
     } catch (error) {
-      d('failed to get existing binary arch:', error.message);
+      d('failed to get existing binary arch:', (error as Error).message);
 
       // Assume architecture differs
       shouldUpdate = true;

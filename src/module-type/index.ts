@@ -12,7 +12,7 @@ export class NativeModule {
   private _moduleName: string | undefined;
   protected modulePath: string;
   public nodeAPI: NodeAPI;
-  private packageJSON: Record<string, PackageJSONValue | undefined>;
+  private packageJSON!: Record<string, PackageJSONValue | undefined>;
 
   constructor(rebuilder: IRebuilder, modulePath: string) {
     this.rebuilder = rebuilder;

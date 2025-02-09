@@ -48,7 +48,7 @@ export class PrebuildInstall extends NativeModule {
       } catch (err) {
         d('failed to use prebuild-install:', err);
 
-        if (err?.message?.includes('requires Node-API but Electron')) {
+        if ((err as Error)?.message?.includes('requires Node-API but Electron')) {
           throw err;
         }
       }
