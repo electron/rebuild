@@ -22,13 +22,13 @@ export interface RebuildOptions {
   /**
    * Override the target platform to something other than the host system platform.
    * Note: This only applies to downloading prebuilt binaries. **It is not possible to cross-compile native modules.**
-   * 
+   *
    * @defaultValue The system {@link https://nodejs.org/api/process.html#processplatform | `process.platform`} value
    */
   platform?: NodeJS.Platform;
   /**
    * Override the target rebuild architecture to something other than the host system architecture.
-   * 
+   *
    * @defaultValue The system {@link https://nodejs.org/api/process.html#processarch | `process.arch`} value
    */
   arch?: string;
@@ -52,25 +52,25 @@ export interface RebuildOptions {
   headerURL?: string;
   /**
    * Array of types of dependencies to rebuild. Possible values are `prod`, `dev`, and `optional`.
-   * 
+   *
    * @defaultValue `['prod', 'optional']`
    */
   types?: ModuleType[];
   /**
    * Whether to rebuild modules sequentially or in parallel.
-   * 
+   *
    * @defaultValue `sequential`
    */
   mode?: RebuildMode;
   /**
    * Rebuilds a Debug build of target modules. If this is `false`, a Release build will be generated instead.
-   * 
+   *
    * @defaultValue false
    */
   debug?: boolean;
   /**
    * Enables hash-based caching to speed up local rebuilds.
-   * 
+   *
    * @experimental
    * @defaultValue false
    */
@@ -100,7 +100,7 @@ export interface RebuildOptions {
   /**
    * Override the Application Binary Interface (ABI) version for the version of Electron you are targeting.
    * Only use when targeting nightly releases.
-   * 
+   *
    * @see the {@link https://github.com/electron/node-abi | electron/node-abi} repository for a list of Electron and Node.js ABIs
    */
   forceABI?: number;
@@ -133,7 +133,6 @@ const defaultTypes: ModuleType[] = ['prod', 'optional'];
 export class Rebuilder implements IRebuilder {
   private ABIVersion: string | undefined;
   private moduleWalker: ModuleWalker;
-  nodeGypPath: string;
   rebuilds: (() => Promise<void>)[];
 
   public lifecycle: EventEmitter;
