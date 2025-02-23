@@ -5,11 +5,11 @@
   "main": "lib/main.js",
   "typings": "lib/main.d.ts",
   "scripts": {
-    "compile": "tsc",
+    "build": "tsc",
     "coverage": "npm run prewarm-headers && nyc npm run spec",
     "coverage:report": "nyc report --reporter=text-lcov > coverage.lcov",
     "watch": "tsc -w",
-    "prepare": "npm run compile",
+    "prepare": "npm run build",
     "mocha": "cross-env TS_NODE_FILES=true mocha",
     "lint": "eslint --ext .ts .",
     "spec": "tsc && npm run mocha -- test/*.ts",
