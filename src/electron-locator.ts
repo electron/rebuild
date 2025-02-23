@@ -1,13 +1,14 @@
 import fs from 'graceful-fs';
 import path from 'node:path';
 import { searchForModule } from './search-module.js';
+import { fileURLToPath } from 'node:url';
 
 const electronModuleNames = ['electron',  'electron-prebuilt-compile'];
 
-async function locateModuleByRequire(): Promise<string | null> {
+async function locateModuleByImport(): Promise<string | null> {
   for (const moduleName of electronModuleNames) {
     try {
-      const modulePath = path.resolve(require.resolve(path.join(moduleName, 'package.json')), '..');
+      const modulePath = path.resolve(fileURLToPath(import.meta.resolve(path.join(moduleName, 'package.json'))), '..');
       if (fs.existsSync(path.join(modulePath, 'package.json'))) {
         return modulePath;
       }
@@ -33,5 +34,5 @@ export async function locateElectronModule(
     }
   }
 
-  return locateModuleByRequire();
+  return locateModuleByImport();
 }

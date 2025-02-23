@@ -3,13 +3,14 @@
 import chalk from 'chalk';
 import fs from 'graceful-fs';
 import path from 'node:path';
-import ora = require('ora');
+import ora from 'ora';
 import yargs from 'yargs/yargs';
 
 import { getProjectRootPath } from './search-module.js';
 import { locateElectronModule } from './electron-locator.js';
 import { ModuleType } from './module-walker.js';
 import { rebuild } from './rebuild.js';
+import { pathToFileURL } from 'node:url';
 
 const argv = yargs(process.argv.slice(2)).version(false).options({
   version: { alias: 'v', type: 'string', description: 'The version of Electron to build against' },
@@ -39,13 +40,28 @@ const argv = yargs(process.argv.slice(2)).version(false).options({
   .parseSync();
 
 if (process.argv.length === 3 && process.argv[2] === '--version') {
-  /* eslint-disable @typescript-eslint/no-var-requires */
   try {
-    console.log('Electron Rebuild Version:', require(path.resolve(import.meta.dirname, '../../package.json')).version);
+    console.log(
+      'Electron Rebuild Version:',
+      (
+        await import(
+          pathToFileURL(path.resolve(import.meta.dirname, '../../package.json')).toString(),
+          { with: { type: 'json' } }
+        )
+      ).default.version,
+    );
   } catch (err) {
-    console.log('Electron Rebuild Version:', require(path.resolve(import.meta.dirname, '../package.json')).version);
+    console.log(
+      'Electron Rebuild Version:',
+      (
+        await import(
+          pathToFileURL(path.resolve(import.meta.dirname, '../package.json')).toString(),
+          { with: { type: 'json' } }
+        )
+      ).default.version,
+    );
   }
-  /* eslint-enable @typescript-eslint/no-var-requires */
+
   process.exit(0);
 }
 
@@ -67,10 +83,9 @@ process.on('unhandledRejection', handler);
   if (!electronModuleVersion) {
     try {
       if (!electronModulePath) throw new Error('Prebuilt electron module not found');
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const pkgJson = require(path.join(electronModulePath, 'package.json'));
+      const pkgJson = await import(pathToFileURL(path.join(electronModulePath, 'package.json')).toString(), { with: { type: 'json' }});
 
-      electronModuleVersion = pkgJson.version;
+      electronModuleVersion = pkgJson.default.version;
     } catch (e) {
       throw new Error(`Unable to find electron's version number, either install it or specify an explicit version`);
     }

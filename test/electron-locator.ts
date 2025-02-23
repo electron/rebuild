@@ -33,7 +33,7 @@ describe('locateElectronModule', () => {
     });
   });
 
-  describe('using require.resolve() in the current project to search', () => {
+  describe('using import.meta.resolve() in the current project to search', () => {
     const fixtureDir = path.join(baseFixtureDir, 'not-installed');
     expectElectronCanBeFound(fixtureDir, fixtureDir);
   });
