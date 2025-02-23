@@ -1,4 +1,4 @@
-import * as path from 'path';
+import path from 'node:path';
 
 import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild';
 import { getExactElectronVersionSync } from './helpers/electron-version';

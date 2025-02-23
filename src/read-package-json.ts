@@ -1,5 +1,5 @@
-import * as fs from 'fs-extra';
-import * as path from 'path';
+import fs from 'fs-extra';
+import path from 'node:path';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function readPackageJson(dir: string, safe = false): Promise<any> {

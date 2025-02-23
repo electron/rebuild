@@ -1,12 +1,12 @@
 import debug from 'debug';
 import detectLibc from 'detect-libc';
-import path from 'path';
+import path from 'node:path';
 import semver from 'semver';
 
 import { ELECTRON_GYP_DIR } from '../../constants';
 import { getClangEnvironmentVars } from '../../clang-fetcher';
 import { NativeModule } from '..';
-import { fork } from 'child_process';
+import { fork } from 'node:child_process';
 
 const d = debug('electron-rebuild');
 

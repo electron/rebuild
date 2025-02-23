@@ -1,9 +1,9 @@
-import * as cp from 'child_process';
+import cp from 'node:child_process';
 import debug from 'debug';
-import * as fs from 'fs-extra';
-import * as path from 'path';
-import * as tar from 'tar';
-import * as zlib from 'zlib';
+import fs from 'fs-extra';
+import path from 'node:path';
+import tar from 'tar';
+import zlib from 'node:zlib';
 import { ELECTRON_GYP_DIR } from './constants';
 import { fetch } from './fetcher';
 import { downloadLinuxSysroot } from './sysroot-fetcher';

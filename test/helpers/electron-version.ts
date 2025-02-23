@@ -1,5 +1,5 @@
-import * as fs from 'fs-extra';
-import * as path from 'path';
+import fs from 'fs-extra';
+import path from 'node:path';
 
 function electronVersionPath() {
   // eslint-disable-next-line @typescript-eslint/no-var-requires

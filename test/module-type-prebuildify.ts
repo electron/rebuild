@@ -1,6 +1,6 @@
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'node:events';
 import { expect } from 'chai';
-import path from 'path';
+import path from 'node:path';
 
 import {
   determineNativePrebuildArch,

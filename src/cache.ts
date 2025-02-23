@@ -1,8 +1,8 @@
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 import debug from 'debug';
 import fs from 'fs-extra';
-import path from 'path';
-import zlib from 'zlib';
+import path from 'node:path';
+import zlib from 'node:zlib';
 
 const d = debug('electron-rebuild');
 

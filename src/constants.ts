@@ -1,4 +1,4 @@
-import * as os from 'os';
-import * as path from 'path';
+import os from 'node:os';
+import path from 'node:path';
 
 export const ELECTRON_GYP_DIR = path.resolve(os.homedir(), '.electron-gyp');

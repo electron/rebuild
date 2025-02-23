@@ -1,5 +1,5 @@
 import fs from 'fs-extra';
-import path from 'path';
+import path from 'node:path';
 
 import { NodeAPI } from '../node-api';
 import { readPackageJson } from '../read-package-json';
