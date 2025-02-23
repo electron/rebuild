@@ -28,7 +28,7 @@ export async function resetTestModule(testModulePath: string, installModules = t
   if (!fs.existsSync(oneTimeModulePath)) {
     d(`creating test module '%s' in %s`, fixtureName, oneTimeModulePath);
     await fs.promises.mkdir(oneTimeModulePath, { recursive: true });
-    await fs.promises.cp(path.resolve(__dirname, `../../test/fixture/${ fixtureName }`), oneTimeModulePath, { recursive: true, force: true });
+    await fs.promises.cp(path.resolve(import.meta.dirname, `../../test/fixture/${ fixtureName }`), oneTimeModulePath, { recursive: true, force: true });
     if (installModules) {
       await spawn('yarn', ['install'], { cwd: oneTimeModulePath });
     }

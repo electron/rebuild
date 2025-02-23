@@ -41,9 +41,9 @@ const argv = yargs(process.argv.slice(2)).version(false).options({
 if (process.argv.length === 3 && process.argv[2] === '--version') {
   /* eslint-disable @typescript-eslint/no-var-requires */
   try {
-    console.log('Electron Rebuild Version:', require(path.resolve(__dirname, '../../package.json')).version);
+    console.log('Electron Rebuild Version:', require(path.resolve(import.meta.dirname, '../../package.json')).version);
   } catch (err) {
-    console.log('Electron Rebuild Version:', require(path.resolve(__dirname, '../package.json')).version);
+    console.log('Electron Rebuild Version:', require(path.resolve(import.meta.dirname, '../package.json')).version);
   }
   /* eslint-enable @typescript-eslint/no-var-requires */
   process.exit(0);
@@ -82,7 +82,7 @@ process.on('unhandledRejection', handler);
     // NB: We assume here that we're going to rebuild the immediate parent's
     // node modules, which might not always be the case but it's at least a
     // good guess
-    rootDirectory = path.resolve(__dirname, '../../..');
+    rootDirectory = path.resolve(import.meta.dirname, '../../..');
     if (!fs.existsSync(rootDirectory) || !fs.existsSync(path.resolve(rootDirectory, 'package.json'))) {
       // Then we try the CWD
       rootDirectory = process.cwd();
