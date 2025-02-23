@@ -4,7 +4,7 @@ import path from 'node:path';
 
 import { locateElectronModule } from '../lib/electron-locator.js';
 
-const baseFixtureDir = path.resolve(__dirname, 'fixture', 'electron-locator');
+const baseFixtureDir = path.resolve(import.meta.dirname, 'fixture', 'electron-locator');
 
 async function expectElectronCanBeFound(projectRootPath: string, startDir: string): Promise<void> {
   it('should return a valid path', async () => {
@@ -17,7 +17,7 @@ async function expectElectronCanBeFound(projectRootPath: string, startDir: strin
 
 describe('locateElectronModule', () => {
   describe('when electron is not installed', () => {
-    const electronDir = path.resolve(__dirname, '..', 'node_modules', 'electron');
+    const electronDir = path.resolve(import.meta.dirname, '..', 'node_modules', 'electron');
 
     before(async () => {
       await fs.promises.rename(electronDir, `${electronDir}-moved`);

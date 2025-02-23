@@ -34,7 +34,7 @@ describe('determineNativePrebuildExtension', () => {
 });
 
 describe('prebuildify', () => {
-  const fixtureBaseDir = path.join(__dirname, 'fixture', 'prebuildify');
+  const fixtureBaseDir = path.join(import.meta.dirname, 'fixture', 'prebuildify');
   const rebuilderArgs = {
     buildPath: 'nonexistent-path',
     electronVersion: '13.0.0',
@@ -65,7 +65,7 @@ describe('prebuildify', () => {
   describe('findPrebuiltModule', () => {
     describe('with no prebuilds directory', () => {
       it('should not find a prebuilt native module', async () => {
-        const noPrebuildsDir = __dirname;
+        const noPrebuildsDir = import.meta.dirname;
         const rebuilder = createRebuilder();
         const prebuildify = new Prebuildify(rebuilder, noPrebuildsDir);
         expect(await prebuildify.findPrebuiltModule()).to.equal(false);
@@ -136,7 +136,7 @@ describe('prebuildify', () => {
 
   it('should find module fork', async () => {
     const rebuilder = createRebuilder();
-    const prebuildify = new Prebuildify(rebuilder, path.join(__dirname, 'fixture', 'forked-module-test'));
+    const prebuildify = new Prebuildify(rebuilder, path.join(import.meta.dirname, 'fixture', 'forked-module-test'));
     expect(await prebuildify.usesTool()).to.equal(true);
   });
 });

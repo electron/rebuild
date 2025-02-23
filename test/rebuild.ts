@@ -183,7 +183,7 @@ describe('rebuilder', () => {
   describe('with extraModules', () => {
     it('should rebuild existing modules in extraModules despite them not being found during the module walk', async () => {
       const rebuilder = new Rebuilder({
-        buildPath: path.join(__dirname, 'fixture', 'empty-project'),
+        buildPath: path.join(import.meta.dirname, 'fixture', 'empty-project'),
         electronVersion: testElectronVersion,
         lifecycle: new EventEmitter(),
         extraModules: ['extra']

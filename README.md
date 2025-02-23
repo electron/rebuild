@@ -155,7 +155,7 @@ const childProcess = require('child_process');
 const pathToElectron = require('electron');
 
   rebuild({
-    buildPath: __dirname,
+    buildPath: import.meta.dirname,
     electronVersion: '1.4.12'
   })
     .then(() => console.info('Rebuild Successful'))

@@ -22,7 +22,7 @@ describe('search-module', () => {
         describe(lockFile, () => {
           before(async () => {
             await createTempDir();
-            await fs.promises.cp(path.resolve(__dirname, 'fixture', 'multi-level-workspace'), baseDir, { recursive: true, force: true });
+            await fs.promises.cp(path.resolve(import.meta.dirname, 'fixture', 'multi-level-workspace'), baseDir, { recursive: true, force: true });
 
             const lockfilePath = path.join(baseDir, lockFile);
 

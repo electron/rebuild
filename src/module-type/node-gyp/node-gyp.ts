@@ -109,7 +109,7 @@ export class NodeGyp extends NativeModule {
     const nodeGypArgs = await this.buildArgs(extraNodeGypArgs);
     d('rebuilding', this.moduleName, 'with args', nodeGypArgs);
 
-    const forkedChild = fork(path.resolve(__dirname, 'worker.js'), {
+    const forkedChild = fork(path.resolve(import.meta.dirname, 'worker.js'), {
       env,
       cwd: this.modulePath,
       stdio: 'pipe',

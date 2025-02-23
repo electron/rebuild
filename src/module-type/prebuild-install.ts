@@ -25,7 +25,7 @@ export class PrebuildInstall extends NativeModule {
     await spawn(
       process.execPath,
       [
-        path.resolve(__dirname, '..', `prebuild-shim.js`),
+        path.resolve(import.meta.dirname, '..', `prebuild-shim.js`),
         prebuildInstallPath,
         `--arch=${this.rebuilder.arch}`,
         `--platform=${this.rebuilder.platform}`,
