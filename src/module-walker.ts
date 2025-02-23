@@ -1,6 +1,6 @@
 import debug from 'debug';
 import fs from 'fs-extra';
-import path from 'path';
+import path from 'node:path';
 
 import { readPackageJson } from './read-package-json';
 import { searchForModule, searchForNodeModules } from './search-module';

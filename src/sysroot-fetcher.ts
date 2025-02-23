@@ -1,8 +1,8 @@
 import { spawn } from '@malept/cross-spawn-promise';
-import * as crypto from 'crypto';
+import crypto from 'node:crypto';
 import debug from 'debug';
-import * as fs from 'fs-extra';
-import * as path from 'path';
+import fs from 'fs-extra';
+import path from 'node:path';
 
 import { ELECTRON_GYP_DIR } from './constants';
 import { fetch } from './fetcher';

@@ -1,4 +1,4 @@
-import * as path from 'path';
+import path from 'node:path';
 import { expect } from 'chai';
 
 import { readPackageJson } from '../lib/read-package-json';

@@ -1,5 +1,5 @@
-import * as fs from 'fs-extra';
-import * as path from 'path';
+import fs from 'fs-extra';
+import path from 'node:path';
 
 async function shouldContinueSearch(traversedPath: string, rootPath?: string, stopAtPackageJSON?: boolean): Promise<boolean> {
   if (rootPath) {

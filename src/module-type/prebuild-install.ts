@@ -1,6 +1,6 @@
 import debug from 'debug';
 import fs from 'fs-extra';
-import path from 'path';
+import path from 'node:path';
 import { spawn } from '@malept/cross-spawn-promise';
 
 import { locateBinary, NativeModule } from '.';

@@ -1,7 +1,7 @@
 import { expect } from 'chai';
-import * as fs from 'fs-extra';
-import * as os from 'os';
-import * as path from 'path';
+import fs from 'fs-extra';
+import os from 'node:os';
+import path from 'node:path';
 
 import { getProjectRootPath } from '../lib/search-module';
 

@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { EventEmitter } from 'events';
-import path from 'path';
+import { EventEmitter } from 'node:events';
+import path from 'node:path';
 
 import { cleanupTestModule, resetTestModule, TIMEOUT_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath } from './helpers/module-setup';
 import { NodePreGyp } from '../lib/module-type/node-pre-gyp';

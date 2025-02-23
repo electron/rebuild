@@ -1,7 +1,7 @@
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'node:events';
 import { expect } from 'chai';
-import * as fs from 'fs-extra';
-import * as path from 'path';
+import fs from 'fs-extra';
+import path from 'node:path';
 
 import { cleanupTestModule, MINUTES_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath, resetMSVSVersion, resetTestModule, TIMEOUT_IN_MILLISECONDS } from './helpers/module-setup';
 import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild';

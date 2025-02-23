@@ -1,9 +1,9 @@
 import debug from 'debug';
-import { EventEmitter } from 'events';
-import * as fs from 'fs-extra';
-import * as nodeAbi from 'node-abi';
-import * as os from 'os';
-import * as path from 'path';
+import { EventEmitter } from 'node:events';
+import fs from 'fs-extra';
+import nodeAbi from 'node-abi';
+import os from 'node:os';
+import path from 'node:path';
 
 import { generateCacheKey, lookupModuleState } from './cache';
 import { BuildType, IRebuilder, RebuildMode } from './types';
