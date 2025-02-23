@@ -3,9 +3,9 @@ import detectLibc from 'detect-libc';
 import path from 'node:path';
 import semver from 'semver';
 
-import { ELECTRON_GYP_DIR } from '../../constants';
-import { getClangEnvironmentVars } from '../../clang-fetcher';
-import { NativeModule } from '..';
+import { ELECTRON_GYP_DIR } from '../../constants.js';
+import { getClangEnvironmentVars } from '../../clang-fetcher.js';
+import { NativeModule } from '../index.js';
 import { fork } from 'node:child_process';
 
 const d = debug('electron-rebuild');

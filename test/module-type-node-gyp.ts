@@ -2,9 +2,9 @@ import { EventEmitter } from 'node:events';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
-import { cleanupTestModule, resetTestModule, TEST_MODULE_PATH as testModulePath } from './helpers/module-setup';
-import { NodeGyp } from '../lib/module-type/node-gyp/node-gyp';
-import { Rebuilder } from '../lib/rebuild';
+import { cleanupTestModule, resetTestModule, TEST_MODULE_PATH as testModulePath } from './helpers/module-setup.js';
+import { NodeGyp } from '../lib/module-type/node-gyp/node-gyp.js';
+import { Rebuilder } from '../lib/rebuild.js';
 
 chai.use(chaiAsPromised);
 

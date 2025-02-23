@@ -1,3 +1,3 @@
-import { rebuild, RebuildOptions } from './rebuild';
+import { rebuild, RebuildOptions } from './rebuild.js';
 
 export { rebuild, RebuildOptions };

@@ -2,12 +2,12 @@ import debug from 'debug';
 import fs from 'graceful-fs';
 import path from 'node:path';
 
-import { cacheModuleState } from './cache';
-import { NodeGyp } from './module-type/node-gyp/node-gyp';
-import { Prebuildify } from './module-type/prebuildify';
-import { PrebuildInstall } from './module-type/prebuild-install';
-import { NodePreGyp } from './module-type/node-pre-gyp';
-import { IRebuilder } from './types';
+import { cacheModuleState } from './cache.js';
+import { NodeGyp } from './module-type/node-gyp/node-gyp.js';
+import { Prebuildify } from './module-type/prebuildify.js';
+import { PrebuildInstall } from './module-type/prebuild-install.js';
+import { NodePreGyp } from './module-type/node-pre-gyp.js';
+import { IRebuilder } from './types.js';
 
 const d = debug('electron-rebuild');
 

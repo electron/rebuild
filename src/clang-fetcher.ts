@@ -4,9 +4,9 @@ import fs from 'graceful-fs';
 import path from 'node:path';
 import tar from 'tar';
 import zlib from 'node:zlib';
-import { ELECTRON_GYP_DIR } from './constants';
-import { fetch } from './fetcher';
-import { downloadLinuxSysroot } from './sysroot-fetcher';
+import { ELECTRON_GYP_DIR } from './constants.js';
+import { fetch } from './fetcher.js';
+import { downloadLinuxSysroot } from './sysroot-fetcher.js';
 
 const d = debug('electron-rebuild');
 

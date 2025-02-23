@@ -3,10 +3,10 @@ import { expect } from 'chai';
 import fs from 'graceful-fs';
 import path from 'node:path';
 
-import { cleanupTestModule, MINUTES_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath, resetMSVSVersion, resetTestModule, TIMEOUT_IN_MILLISECONDS } from './helpers/module-setup';
-import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild';
-import { getExactElectronVersionSync } from './helpers/electron-version';
-import { Rebuilder, rebuild } from '../lib/rebuild';
+import { cleanupTestModule, MINUTES_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath, resetMSVSVersion, resetTestModule, TIMEOUT_IN_MILLISECONDS } from './helpers/module-setup.js';
+import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild.js';
+import { getExactElectronVersionSync } from './helpers/electron-version.js';
+import { Rebuilder, rebuild } from '../lib/rebuild.js';
 
 const testElectronVersion = getExactElectronVersionSync();
 

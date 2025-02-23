@@ -1,6 +1,6 @@
 import fs from 'graceful-fs';
 import path from 'node:path';
-import { searchForModule } from './search-module';
+import { searchForModule } from './search-module.js';
 
 const electronModuleNames = ['electron',  'electron-prebuilt-compile'];
 

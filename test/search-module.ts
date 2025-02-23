@@ -3,7 +3,7 @@ import fs from 'graceful-fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { getProjectRootPath } from '../lib/search-module';
+import { getProjectRootPath } from '../lib/search-module.js';
 
 let baseDir: string;
 

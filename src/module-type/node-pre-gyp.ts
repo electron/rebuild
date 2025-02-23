@@ -2,7 +2,7 @@ import debug from 'debug';
 import { spawn } from '@malept/cross-spawn-promise';
 import { readBinaryFileArch } from 'read-binary-file-arch';
 
-import { locateBinary, NativeModule } from '.';
+import { locateBinary, NativeModule } from './index.js';
 const d = debug('electron-rebuild');
 
 export class NodePreGyp extends NativeModule {

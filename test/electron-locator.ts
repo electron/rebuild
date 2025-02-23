@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import fs from 'graceful-fs';
 import path from 'node:path';
 
-import { locateElectronModule } from '../lib/electron-locator';
+import { locateElectronModule } from '../lib/electron-locator.js';
 
 const baseFixtureDir = path.resolve(__dirname, 'fixture', 'electron-locator');
 
