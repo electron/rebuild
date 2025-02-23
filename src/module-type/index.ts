@@ -1,4 +1,4 @@
-import fs from 'fs-extra';
+import fs from 'graceful-fs';
 import path from 'node:path';
 
 import { NodeAPI } from '../node-api';
@@ -80,7 +80,7 @@ export async function locateBinary(basePath: string, suffix: string): Promise<st
   while (testPath !== parentPath) {
     testPath = parentPath;
     const checkPath = path.resolve(testPath, suffix);
-    if (await fs.pathExists(checkPath)) {
+    if (fs.existsSync(checkPath)) {
       return checkPath;
     }
     parentPath = path.resolve(testPath, '..');

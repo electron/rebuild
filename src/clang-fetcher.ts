@@ -1,6 +1,6 @@
 import cp from 'node:child_process';
 import debug from 'debug';
-import fs from 'fs-extra';
+import fs from 'graceful-fs';
 import path from 'node:path';
 import tar from 'tar';
 import zlib from 'node:zlib';
@@ -47,7 +47,7 @@ export async function getClangEnvironmentVars(electronVersion: string, targetArc
 
   const gypArgs = [];
   if (process.platform === 'win32') {
-    console.log(fs.readdirSync(clangDir));
+    console.log(await fs.promises.readdir(clangDir));
     gypArgs.push(`/p:CLToolExe=clang-cl.exe`, `/p:CLToolPath=${clangDir}`);
   }
 
@@ -84,8 +84,8 @@ function clangVersionFromSVN(update: string): string | null {
 async function downloadClangVersion(electronVersion: string) {
   d('fetching clang for Electron:', electronVersion);
   const clangDirPath = path.resolve(ELECTRON_GYP_DIR, `${electronVersion}-clang`);
-  if (await fs.pathExists(path.resolve(clangDirPath, 'bin', 'clang'))) return clangDirPath;
-  if (!await fs.pathExists(ELECTRON_GYP_DIR)) await fs.mkdirp(ELECTRON_GYP_DIR);
+  if (fs.existsSync(path.resolve(clangDirPath, 'bin', 'clang'))) return clangDirPath;
+  await fs.promises.mkdir(ELECTRON_GYP_DIR, { recursive: true });
 
   const electronDeps = await fetch(`https://raw.githubusercontent.com/electron/electron/v${electronVersion}/DEPS`, 'text');
   const chromiumRevisionExtractor = /'chromium_version':\n\s+'([^']+)/g;
@@ -107,15 +107,15 @@ async function downloadClangVersion(electronVersion: string) {
   d('deflating clang');
   zlib.deflateSync(contents);
   const tarPath = path.resolve(ELECTRON_GYP_DIR, `${electronVersion}-clang.tar`);
-  if (await fs.pathExists(tarPath)) await fs.remove(tarPath);
-  await fs.writeFile(tarPath, Buffer.from(contents));
-  await fs.mkdirp(clangDirPath);
+  if (fs.existsSync(tarPath)) await fs.promises.rm(tarPath, { recursive: true, force: true });
+  await fs.promises.writeFile(tarPath, Buffer.from(contents));
+  await fs.promises.mkdir(clangDirPath, { recursive: true });
   d('tar running on clang');
   await tar.x({
     file: tarPath,
     cwd: clangDirPath,
   });
-  await fs.remove(tarPath);
+  await fs.promises.rm(tarPath, { recursive: true, force: true });
   d('cleaning up clang tar file');
   return clangDirPath;
 }

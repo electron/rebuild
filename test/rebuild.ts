@@ -1,6 +1,6 @@
 import { EventEmitter } from 'node:events';
 import { expect } from 'chai';
-import fs from 'fs-extra';
+import fs from 'graceful-fs';
 import path from 'node:path';
 
 import { cleanupTestModule, MINUTES_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath, resetMSVSVersion, resetTestModule, TIMEOUT_IN_MILLISECONDS } from './helpers/module-setup';
@@ -51,7 +51,7 @@ describe('rebuilder', () => {
 
     it('should not download files in the module directory', async () => {
       const modulePath = path.resolve(testModulePath, 'node_modules/ref-napi');
-      const fileNames = await fs.readdir(modulePath);
+      const fileNames = await fs.promises.readdir(modulePath);
 
       expect(fileNames).to.not.contain(testElectronVersion);
     });
@@ -148,9 +148,9 @@ describe('rebuilder', () => {
 
     it('should rebuild only specified modules', async () => {
       const nativeModuleBinary = path.join(testModulePath, 'node_modules', 'native-hello-world', 'build', 'Release', 'hello_world.node');
-      expect(await fs.pathExists(nativeModuleBinary)).to.be.true;
-      await fs.remove(nativeModuleBinary);
-      expect(await fs.pathExists(nativeModuleBinary)).to.be.false;
+      expect(fs.existsSync(nativeModuleBinary)).to.be.true;
+      await fs.promises.rm(nativeModuleBinary, { recursive: true, force: true });
+      expect(fs.existsSync(nativeModuleBinary)).to.be.false;
       const rebuilder = rebuild({
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
@@ -162,7 +162,7 @@ describe('rebuilder', () => {
       rebuilder.lifecycle.on('module-done', () => built++);
       await rebuilder;
       expect(built).to.equal(1);
-      expect(await fs.pathExists(nativeModuleBinary)).to.be.true;
+      expect(fs.existsSync(nativeModuleBinary)).to.be.true;
     });
 
     it('should rebuild multiple specified modules via --only option', async () => {

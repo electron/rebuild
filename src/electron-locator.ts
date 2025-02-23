@@ -1,4 +1,4 @@
-import fs from 'fs-extra';
+import fs from 'graceful-fs';
 import path from 'node:path';
 import { searchForModule } from './search-module';
 
@@ -8,7 +8,7 @@ async function locateModuleByRequire(): Promise<string | null> {
   for (const moduleName of electronModuleNames) {
     try {
       const modulePath = path.resolve(require.resolve(path.join(moduleName, 'package.json')), '..');
-      if (await fs.pathExists(path.join(modulePath, 'package.json'))) {
+      if (fs.existsSync(path.join(modulePath, 'package.json'))) {
         return modulePath;
       }
     } catch { // eslint-disable-line no-empty
@@ -26,7 +26,7 @@ export async function locateElectronModule(
 
   for (const moduleName of electronModuleNames) {
     const electronPaths = await searchForModule(startDir, moduleName, projectRootPath);
-    const electronPath = electronPaths.find(async (ePath: string) => await fs.pathExists(path.join(ePath, 'package.json')));
+    const electronPath = electronPaths.find((ePath: string) => fs.existsSync(path.join(ePath, 'package.json')));
 
     if (electronPath) {
       return electronPath;

@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import fs from 'fs-extra';
+import fs from 'graceful-fs';
 import path from 'node:path';
 
 import { locateElectronModule } from '../lib/electron-locator';
@@ -11,7 +11,7 @@ async function expectElectronCanBeFound(projectRootPath: string, startDir: strin
     const electronPath = await locateElectronModule(projectRootPath, startDir);
     expect(electronPath).to.be.a('string');
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    expect(await fs.pathExists(electronPath!)).to.be.equal(true);
+    expect(fs.existsSync(electronPath!)).to.be.equal(true);
   });
 }
 
@@ -20,7 +20,7 @@ describe('locateElectronModule', () => {
     const electronDir = path.resolve(__dirname, '..', 'node_modules', 'electron');
 
     before(async () => {
-      await fs.rename(electronDir, `${electronDir}-moved`);
+      await fs.promises.rename(electronDir, `${electronDir}-moved`);
     });
 
     it('should return null when electron is not installed', async () => {
@@ -29,7 +29,7 @@ describe('locateElectronModule', () => {
     });
 
     after(async () => {
-      await fs.rename(`${electronDir}-moved`, electronDir);
+      await fs.promises.rename(`${electronDir}-moved`, electronDir);
     });
   });
 
