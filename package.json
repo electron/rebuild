@@ -2,7 +2,8 @@
   "name": "@electron/rebuild",
   "version": "0.0.0-development",
   "description": "Electron supporting package to rebuild native node modules against the currently installed electron",
-  "main": "lib/main.js",
+  "type": "module",
+  "exports": "./lib/main.js",
   "typings": "lib/main.d.ts",
   "scripts": {
     "build": "tsc",

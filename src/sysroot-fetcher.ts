@@ -4,8 +4,8 @@ import debug from 'debug';
 import fs from 'graceful-fs';
 import path from 'node:path';
 
-import { ELECTRON_GYP_DIR } from './constants';
-import { fetch } from './fetcher';
+import { ELECTRON_GYP_DIR } from './constants.js';
+import { fetch } from './fetcher.js';
 
 const d = debug('electron-rebuild');
 

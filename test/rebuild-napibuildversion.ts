@@ -2,10 +2,10 @@ import fs from 'graceful-fs';
 import path from 'node:path';
 
 import { expect } from 'chai';
-import { rebuild } from '../lib/rebuild';
-import { getExactElectronVersionSync } from './helpers/electron-version';
-import { TIMEOUT_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath, cleanupTestModule, resetTestModule } from './helpers/module-setup';
-import { expectNativeModuleToBeRebuilt } from './helpers/rebuild';
+import { rebuild } from '../lib/rebuild.js';
+import { getExactElectronVersionSync } from './helpers/electron-version.js';
+import { TIMEOUT_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath, cleanupTestModule, resetTestModule } from './helpers/module-setup.js';
+import { expectNativeModuleToBeRebuilt } from './helpers/rebuild.js';
 import detectLibc from 'detect-libc';
 
 const testElectronVersion = getExactElectronVersionSync();

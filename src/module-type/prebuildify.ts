@@ -2,8 +2,8 @@ import debug from 'debug';
 import fs from 'graceful-fs';
 import path from 'node:path';
 
-import { ConfigVariables, getNodeArch } from '../arch';
-import { NativeModule } from '.';
+import { ConfigVariables, getNodeArch } from '../arch.js';
+import { NativeModule } from './index.js';
 
 const d = debug('electron-rebuild');
 

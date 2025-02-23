@@ -5,10 +5,10 @@ import nodeAbi from 'node-abi';
 import os from 'node:os';
 import path from 'node:path';
 
-import { generateCacheKey, lookupModuleState } from './cache';
-import { BuildType, IRebuilder, RebuildMode } from './types';
-import { ModuleRebuilder } from './module-rebuilder';
-import { ModuleType, ModuleWalker } from './module-walker';
+import { generateCacheKey, lookupModuleState } from './cache.js';
+import { BuildType, IRebuilder, RebuildMode } from './types.js';
+import { ModuleRebuilder } from './module-rebuilder.js';
+import { ModuleType, ModuleWalker } from './module-walker.js';
 
 export interface RebuildOptions {
   /**

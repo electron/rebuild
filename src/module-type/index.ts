@@ -1,9 +1,9 @@
 import fs from 'graceful-fs';
 import path from 'node:path';
 
-import { NodeAPI } from '../node-api';
-import { readPackageJson } from '../read-package-json';
-import { IRebuilder } from '../types';
+import { NodeAPI } from '../node-api.js';
+import { readPackageJson } from '../read-package-json.js';
+import { IRebuilder } from '../types.js';
 
 type PackageJSONValue = string | Record<string, unknown>;
 

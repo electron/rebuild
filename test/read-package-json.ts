@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { expect } from 'chai';
 
-import { readPackageJson } from '../lib/read-package-json';
+import { readPackageJson } from '../lib/read-package-json.js';
 
 describe('read-package-json', () => {
   it('should find a package.json file from the given directory', async () => {
