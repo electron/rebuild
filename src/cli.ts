@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import chalk from 'chalk';
-import fs from 'fs-extra';
+import fs from 'graceful-fs';
 import path from 'node:path';
 import ora = require('ora');
 import yargs from 'yargs/yargs';
@@ -83,10 +83,10 @@ process.on('unhandledRejection', handler);
     // node modules, which might not always be the case but it's at least a
     // good guess
     rootDirectory = path.resolve(__dirname, '../../..');
-    if (!await fs.pathExists(rootDirectory) || !await fs.pathExists(path.resolve(rootDirectory, 'package.json'))) {
+    if (!fs.existsSync(rootDirectory) || !fs.existsSync(path.resolve(rootDirectory, 'package.json'))) {
       // Then we try the CWD
       rootDirectory = process.cwd();
-      if (!await fs.pathExists(rootDirectory) || !await fs.pathExists(path.resolve(rootDirectory, 'package.json'))) {
+      if (!fs.existsSync(rootDirectory) || !fs.existsSync(path.resolve(rootDirectory, 'package.json'))) {
         throw new Error('Unable to find parent node_modules directory, specify it via --module-dir, E.g. "--module-dir ." for the current directory');
       }
     }

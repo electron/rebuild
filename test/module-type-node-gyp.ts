@@ -74,7 +74,7 @@ describe('node-gyp', () => {
           platform
         });
         const nodeGyp = new NodeGyp(rebuilder, testModulePath);
-        
+
         const errorMessage = "node-gyp does not support cross-compiling native modules from source.";
         expect(nodeGyp.rebuildModule()).to.eventually.be.rejectedWith(new Error(errorMessage));
       });

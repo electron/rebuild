@@ -1,4 +1,4 @@
-import fs from 'fs-extra';
+import fs from 'graceful-fs';
 import path from 'node:path';
 
 function electronVersionPath() {

@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import debug from 'debug';
-import fs from 'fs-extra';
+import fs from 'graceful-fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
 
@@ -31,14 +31,14 @@ type CacheOptions = {
 
 const takeSnapshot = async (dir: string, relativeTo = dir): Promise<Snapshot> => {
   const snap: Snapshot = {};
-  await Promise.all((await fs.readdir(dir)).map(async (child) => {
+  await Promise.all((await fs.promises.readdir(dir)).map(async (child) => {
     if (child === 'node_modules') return;
     const childPath = path.resolve(dir, child);
     const relative = path.relative(relativeTo, childPath);
-    if ((await fs.stat(childPath)).isDirectory()) {
+    if ((await fs.promises.stat(childPath)).isDirectory()) {
       snap[relative] = await takeSnapshot(childPath, relativeTo);
     } else {
-      const data = await fs.readFile(childPath);
+      const data = await fs.promises.readFile(childPath);
       snap[relative] = new Snap(
         crypto.createHash('SHA256').update(data).digest('hex'),
         data,
@@ -51,10 +51,10 @@ const takeSnapshot = async (dir: string, relativeTo = dir): Promise<Snapshot> =>
 const writeSnapshot = async (diff: Snapshot, dir: string): Promise<void> => {
   for (const key in diff) {
     if (diff[key] instanceof Snap) {
-      await fs.mkdirp(path.dirname(path.resolve(dir, key)));
-      await fs.writeFile(path.resolve(dir, key), (diff[key] as Snap).data);
+      await fs.promises.mkdir(path.dirname(path.resolve(dir, key)), { recursive: true });
+      await fs.promises.writeFile(path.resolve(dir, key), (diff[key] as Snap).data);
     } else {
-      await fs.mkdirp(path.resolve(dir, key));
+      await fs.promises.mkdir(path.resolve(dir, key), { recursive: true });
       await writeSnapshot(diff[key] as Snapshot, dir);
     }
   }
@@ -99,17 +99,17 @@ export const cacheModuleState = async (dir: string, cachePath: string, key: stri
   const snap = await takeSnapshot(dir);
 
   const moduleBuffer = Buffer.from(JSON.stringify(serialize(snap)));
-  const zipped = await new Promise(resolve => zlib.gzip(moduleBuffer, (_, result) => resolve(result)));
-  await fs.mkdirp(cachePath);
-  await fs.writeFile(path.resolve(cachePath, key), zipped);
+  const zipped = await new Promise<Buffer>(resolve => zlib.gzip(moduleBuffer, (_, result) => resolve(result)));
+  await fs.promises.mkdir(cachePath, { recursive: true });
+  await fs.promises.writeFile(path.resolve(cachePath, key), zipped);
 };
 
 type ApplyDiffFunction = (dir: string) => Promise<void>;
 
 export const lookupModuleState = async (cachePath: string, key: string): Promise<ApplyDiffFunction | boolean> => {
-  if (await fs.pathExists(path.resolve(cachePath, key))) {
+  if (fs.existsSync(path.resolve(cachePath, key))) {
     return async function applyDiff(dir: string): Promise<void> {
-      const zipped = await fs.readFile(path.resolve(cachePath, key));
+      const zipped = await fs.promises.readFile(path.resolve(cachePath, key));
       const unzipped: Buffer = await new Promise(resolve => { zlib.gunzip(zipped, (_, result) => resolve(result)); });
       const diff = unserialize(JSON.parse(unzipped.toString()));
       await writeSnapshot(diff, dir);
@@ -133,7 +133,7 @@ async function hashDirectory(dir: string, relativeTo?: string): Promise<HashTree
   relativeTo ??= dir;
   d('hashing dir', dir);
   const dirTree: HashTree = {};
-  await Promise.all((await fs.readdir(dir)).map(async (child) => {
+  await Promise.all((await fs.promises.readdir(dir)).map(async (child) => {
     d('found child', child, 'in dir', dir);
     // Ignore output directories
     if (dir === relativeTo && (child === 'build' || child === 'bin')) return;
@@ -143,10 +143,10 @@ async function hashDirectory(dir: string, relativeTo?: string): Promise<HashTree
     const childPath = path.resolve(dir, child);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const relative = path.relative(relativeTo!, childPath);
-    if ((await fs.stat(childPath)).isDirectory()) {
+    if ((await fs.promises.stat(childPath)).isDirectory()) {
       dirTree[relative] = await hashDirectory(childPath, relativeTo);
     } else {
-      dirTree[relative] = crypto.createHash('SHA256').update(await fs.readFile(childPath)).digest('hex');
+      dirTree[relative] = crypto.createHash('SHA256').update(await fs.promises.readFile(childPath)).digest('hex');
     }
   }));
 

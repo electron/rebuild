@@ -1,6 +1,6 @@
 import debug from 'debug';
 import { EventEmitter } from 'node:events';
-import fs from 'fs-extra';
+import fs from 'graceful-fs';
 import nodeAbi from 'node-abi';
 import os from 'node:os';
 import path from 'node:path';
@@ -262,7 +262,7 @@ export class Rebuilder implements IRebuilder {
   }
 
   async rebuildModuleAt(modulePath: string): Promise<void> {
-    if (!(await fs.pathExists(path.resolve(modulePath, 'binding.gyp')))) {
+    if (!(fs.existsSync(path.resolve(modulePath, 'binding.gyp')))) {
       return;
     }
 

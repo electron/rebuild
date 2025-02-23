@@ -1,6 +1,6 @@
 import debug from 'debug';
 import crypto from 'node:crypto';
-import fs from 'fs-extra';
+import fs from 'graceful-fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawn } from '@malept/cross-spawn-promise';
@@ -25,24 +25,24 @@ const testModuleTmpPath = fs.mkdtempSync(path.resolve(os.tmpdir(), 'e-r-test-mod
 
 export async function resetTestModule(testModulePath: string, installModules = true, fixtureName = 'native-app1'): Promise<void> {
   const oneTimeModulePath = path.resolve(testModuleTmpPath, `${crypto.createHash('SHA1').update(testModulePath).digest('hex')}-${fixtureName}-${installModules}`);
-  if (!await fs.pathExists(oneTimeModulePath)) {
+  if (!fs.existsSync(oneTimeModulePath)) {
     d(`creating test module '%s' in %s`, fixtureName, oneTimeModulePath);
-    await fs.mkdir(oneTimeModulePath, { recursive: true });
-    await fs.copy(path.resolve(__dirname, `../../test/fixture/${ fixtureName }`), oneTimeModulePath);
+    await fs.promises.mkdir(oneTimeModulePath, { recursive: true });
+    await fs.promises.cp(path.resolve(__dirname, `../../test/fixture/${ fixtureName }`), oneTimeModulePath, { recursive: true, force: true });
     if (installModules) {
       await spawn('yarn', ['install'], { cwd: oneTimeModulePath });
     }
   }
-  await fs.remove(testModulePath);
-  await fs.copy(oneTimeModulePath, testModulePath);
+  await fs.promises.rm(testModulePath, { recursive: true, force: true });
+  await fs.promises.cp(oneTimeModulePath, testModulePath, { recursive: true, force: true });
   resetMSVSVersion();
 }
 
 export async function cleanupTestModule(testModulePath: string): Promise<void> {
-  await fs.rm(testModulePath, { recursive: true, maxRetries: 10 });
+  await fs.promises.rm(testModulePath, { recursive: true, force: true, maxRetries: 10 });
   resetMSVSVersion();
 }
 
 process.on('exit', () => {
-  fs.removeSync(testModuleTmpPath);
+  fs.rmSync(testModuleTmpPath, { recursive: true, force: true });
 });

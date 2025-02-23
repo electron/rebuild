@@ -1,4 +1,4 @@
-import fs from 'fs-extra';
+import fs from 'graceful-fs';
 import path from 'node:path';
 
 import { expect } from 'chai';
@@ -29,11 +29,9 @@ describe('rebuild with napi_build_versions in binary config', async function () 
     it(`${ arch } arch should have rebuilt binary with 'napi_build_versions' array and 'libc' provided`, async () => {
       const libc = await detectLibc.family() || 'unknown';
       const binaryPath = napiBuildVersionSpecificPath(arch, libc);
-      
-      if (await fs.pathExists(binaryPath)) {
-        fs.removeSync(binaryPath);
-      }
-      expect(await fs.pathExists(binaryPath)).to.be.false;
+
+      await fs.promises.rm(binaryPath, { recursive: true, force: true });
+      expect(fs.existsSync(binaryPath)).to.be.false;
 
       await rebuild({
         buildPath: testModulePath,
@@ -41,9 +39,9 @@ describe('rebuild with napi_build_versions in binary config', async function () 
         arch,
         buildFromSource: true, // need to skip node-pre-gyp prebuilt binary
       });
-      
+
       await expectNativeModuleToBeRebuilt(testModulePath, 'sqlite3');
-      expect(await fs.pathExists(binaryPath)).to.be.true;
+      expect(fs.existsSync(binaryPath)).to.be.true;
     });
   }
 

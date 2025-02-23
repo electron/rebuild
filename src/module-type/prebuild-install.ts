@@ -1,5 +1,5 @@
 import debug from 'debug';
-import fs from 'fs-extra';
+import fs from 'graceful-fs';
 import path from 'node:path';
 import { spawn } from '@malept/cross-spawn-promise';
 
@@ -63,7 +63,7 @@ export class PrebuildInstall extends NativeModule {
    * Whether a prebuild-install-based native module exists.
    */
   async prebuiltModuleExists(): Promise<boolean> {
-    return fs.pathExists(path.resolve(this.modulePath, 'prebuilds', `${this.rebuilder.platform}-${this.rebuilder.arch}`, `electron-${this.rebuilder.ABI}.node`));
+    return fs.existsSync(path.resolve(this.modulePath, 'prebuilds', `${this.rebuilder.platform}-${this.rebuilder.arch}`, `electron-${this.rebuilder.ABI}.node`));
   }
 
   async getPrebuildInstallRuntimeArgs(): Promise<string[]> {
