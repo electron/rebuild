@@ -102,7 +102,7 @@ for Electron Packager. For example:
 
 ```javascript
 import packager from '@electron/packager';
-import rebuild from '@electron/rebuild';
+import { rebuild } from '@electron/rebuild';
 
 packager({
   // … other options
@@ -128,7 +128,7 @@ electron-rebuild is also a library that you can require into your app or
 build process. It has a very simple API:
 
 ```javascript
-import rebuild from '@electron/rebuild';
+import { rebuild } from '@electron/rebuild';
 
 // Public: Rebuilds a node_modules directory with the given Electron version.
 //
