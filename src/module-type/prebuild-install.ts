@@ -1,9 +1,9 @@
 import debug from 'debug';
-import fs from 'fs-extra';
-import path from 'path';
+import fs from 'graceful-fs';
+import path from 'node:path';
 import { spawn } from '@malept/cross-spawn-promise';
 
-import { locateBinary, NativeModule } from '.';
+import { locateBinary, NativeModule } from './index.js';
 const d = debug('electron-rebuild');
 
 export class PrebuildInstall extends NativeModule {
@@ -25,7 +25,7 @@ export class PrebuildInstall extends NativeModule {
     await spawn(
       process.execPath,
       [
-        path.resolve(__dirname, '..', `prebuild-shim.js`),
+        path.resolve(import.meta.dirname, '..', `prebuild-shim.js`),
         prebuildInstallPath,
         `--arch=${this.rebuilder.arch}`,
         `--platform=${this.rebuilder.platform}`,
@@ -48,7 +48,7 @@ export class PrebuildInstall extends NativeModule {
       } catch (err) {
         d('failed to use prebuild-install:', err);
 
-        if (err?.message?.includes('requires Node-API but Electron')) {
+        if ((err as Error)?.message?.includes('requires Node-API but Electron')) {
           throw err;
         }
       }
@@ -63,7 +63,7 @@ export class PrebuildInstall extends NativeModule {
    * Whether a prebuild-install-based native module exists.
    */
   async prebuiltModuleExists(): Promise<boolean> {
-    return fs.pathExists(path.resolve(this.modulePath, 'prebuilds', `${this.rebuilder.platform}-${this.rebuilder.arch}`, `electron-${this.rebuilder.ABI}.node`));
+    return fs.existsSync(path.resolve(this.modulePath, 'prebuilds', `${this.rebuilder.platform}-${this.rebuilder.arch}`, `electron-${this.rebuilder.ABI}.node`));
   }
 
   async getPrebuildInstallRuntimeArgs(): Promise<string[]> {
