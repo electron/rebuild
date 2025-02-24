@@ -1,0 +1,10 @@
+// See also: https://github.com/mochajs/mocha/blob/b720ec1b3ca630a90f80311da391b2a0cdfead4e/example/config/.mocharc.js
+{
+  "$schema": "https://json.schemastore.org/mocharc",
+  "color": false,
+  "extensions": [
+    "ts"
+  ],
+  "import": "tsx",
+  "spec": ["test/*.ts"]
+}
