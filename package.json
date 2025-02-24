@@ -11,9 +11,8 @@
     "coverage:report": "nyc report --reporter=text-lcov > coverage.lcov",
     "watch": "tsc -w",
     "prepare": "npm run build",
-    "mocha": "cross-env TS_NODE_FILES=true mocha",
     "lint": "eslint --ext .ts .",
-    "spec": "tsc && npm run mocha -- test/*.ts",
+    "spec": "tsc && mocha",
     "test": "npm run prewarm-headers && npm run lint && npm run spec",
     "prewarm-headers": "node-gyp install --ensure"
   },
@@ -78,20 +77,13 @@
     "@typescript-eslint/parser": "^6.21.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
-    "cross-env": "^7.0.2",
     "electron": "^22.0.0",
     "eslint": "^7.7.0",
     "eslint-plugin-mocha": "^9.0.0",
-    "mocha": "^10.8.2",
+    "mocha": "^11.1.0",
     "nyc": "^15.1.0",
-    "ts-node": "^10.9.2",
+    "tsx": "^4.19.3",
     "typescript": "~5.4.5"
-  },
-  "mocha": {
-    "extensions": [
-      "ts"
-    ],
-    "require": "ts-node/register"
   },
   "nyc": {
     "extends": "@istanbuljs/nyc-config-typescript"
