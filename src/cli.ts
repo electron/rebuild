@@ -1,15 +1,16 @@
 #!/usr/bin/env node
 
 import chalk from 'chalk';
-import * as fs from 'fs-extra';
-import * as path from 'path';
-import ora = require('ora');
+import fs from 'graceful-fs';
+import path from 'node:path';
+import ora from 'ora';
 import yargs from 'yargs/yargs';
 
-import { getProjectRootPath } from './search-module';
-import { locateElectronModule } from './electron-locator';
-import { ModuleType } from './module-walker';
-import { rebuild } from './rebuild';
+import { getProjectRootPath } from './search-module.js';
+import { locateElectronModule } from './electron-locator.js';
+import { ModuleType } from './module-walker.js';
+import { rebuild } from './rebuild.js';
+import { pathToFileURL } from 'node:url';
 
 const argv = yargs(process.argv.slice(2)).version(false).options({
   version: { alias: 'v', type: 'string', description: 'The version of Electron to build against' },
@@ -39,13 +40,28 @@ const argv = yargs(process.argv.slice(2)).version(false).options({
   .parseSync();
 
 if (process.argv.length === 3 && process.argv[2] === '--version') {
-  /* eslint-disable @typescript-eslint/no-var-requires */
   try {
-    console.log('Electron Rebuild Version:', require(path.resolve(__dirname, '../../package.json')).version);
+    console.log(
+      'Electron Rebuild Version:',
+      (
+        await import(
+          pathToFileURL(path.resolve(import.meta.dirname, '../../package.json')).toString(),
+          { with: { type: 'json' } }
+        )
+      ).default.version,
+    );
   } catch (err) {
-    console.log('Electron Rebuild Version:', require(path.resolve(__dirname, '../package.json')).version);
+    console.log(
+      'Electron Rebuild Version:',
+      (
+        await import(
+          pathToFileURL(path.resolve(import.meta.dirname, '../package.json')).toString(),
+          { with: { type: 'json' } }
+        )
+      ).default.version,
+    );
   }
-  /* eslint-enable @typescript-eslint/no-var-requires */
+
   process.exit(0);
 }
 
@@ -67,10 +83,9 @@ process.on('unhandledRejection', handler);
   if (!electronModuleVersion) {
     try {
       if (!electronModulePath) throw new Error('Prebuilt electron module not found');
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const pkgJson = require(path.join(electronModulePath, 'package.json'));
+      const pkgJson = await import(pathToFileURL(path.join(electronModulePath, 'package.json')).toString(), { with: { type: 'json' }});
 
-      electronModuleVersion = pkgJson.version;
+      electronModuleVersion = pkgJson.default.version;
     } catch (e) {
       throw new Error(`Unable to find electron's version number, either install it or specify an explicit version`);
     }
@@ -82,11 +97,11 @@ process.on('unhandledRejection', handler);
     // NB: We assume here that we're going to rebuild the immediate parent's
     // node modules, which might not always be the case but it's at least a
     // good guess
-    rootDirectory = path.resolve(__dirname, '../../..');
-    if (!await fs.pathExists(rootDirectory) || !await fs.pathExists(path.resolve(rootDirectory, 'package.json'))) {
+    rootDirectory = path.resolve(import.meta.dirname, '../../..');
+    if (!fs.existsSync(rootDirectory) || !fs.existsSync(path.resolve(rootDirectory, 'package.json'))) {
       // Then we try the CWD
       rootDirectory = process.cwd();
-      if (!await fs.pathExists(rootDirectory) || !await fs.pathExists(path.resolve(rootDirectory, 'package.json'))) {
+      if (!fs.existsSync(rootDirectory) || !fs.existsSync(path.resolve(rootDirectory, 'package.json'))) {
         throw new Error('Unable to find parent node_modules directory, specify it via --module-dir, E.g. "--module-dir ." for the current directory');
       }
     }

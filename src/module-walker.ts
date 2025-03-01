@@ -1,9 +1,9 @@
 import debug from 'debug';
-import fs from 'fs-extra';
-import path from 'path';
+import fs from 'graceful-fs';
+import path from 'node:path';
 
-import { readPackageJson } from './read-package-json';
-import { searchForModule, searchForNodeModules } from './search-module';
+import { readPackageJson } from './read-package-json.js';
+import { searchForModule, searchForNodeModules } from './search-module.js';
 
 const d = debug('electron-rebuild');
 
@@ -82,7 +82,7 @@ export class ModuleWalker {
   }
 
   async markChildrenAsProdDeps(modulePath: string): Promise<void> {
-    if (!await fs.pathExists(modulePath)) {
+    if (!fs.existsSync(modulePath)) {
       return;
     }
 
@@ -113,7 +113,7 @@ export class ModuleWalker {
     // Some package managers use symbolic links when installing node modules
     // we need to be sure we've never tested the a package before by resolving
     // all symlinks in the path and testing against a set
-    const realNodeModulesPath = await fs.realpath(nodeModulesPath);
+    const realNodeModulesPath = await fs.promises.realpath(nodeModulesPath);
     if (this.realNodeModulesPaths.has(realNodeModulesPath)) {
       return;
     }
@@ -121,12 +121,12 @@ export class ModuleWalker {
 
     d('scanning:', realNodeModulesPath);
 
-    for (const modulePath of await fs.readdir(realNodeModulesPath)) {
+    for (const modulePath of await fs.promises.readdir(realNodeModulesPath)) {
       // Ignore the magical .bin directory
       if (modulePath === '.bin') continue;
       // Ensure that we don't mark modules as needing to be rebuilt more than once
       // by ignoring / resolving symlinks
-      const realPath = await fs.realpath(path.resolve(nodeModulesPath, modulePath));
+      const realPath = await fs.promises.realpath(path.resolve(nodeModulesPath, modulePath));
 
       if (this.realModulePaths.has(realPath)) {
         continue;
@@ -141,7 +141,7 @@ export class ModuleWalker {
         await this.findAllModulesIn(realPath, `${modulePath}/`);
       }
 
-      if (await fs.pathExists(path.resolve(nodeModulesPath, modulePath, 'node_modules'))) {
+      if (fs.existsSync(path.resolve(nodeModulesPath, modulePath, 'node_modules'))) {
         await this.findAllModulesIn(path.resolve(realPath, 'node_modules'));
       }
     }
