@@ -11,7 +11,7 @@ export async function fetch<T extends 'buffer' | 'text', RT = T extends 'buffer'
   if (retries === 0) throw new Error('Failed to fetch a clang resource, run with DEBUG=electron-rebuild for more information');
   d('downloading:', url);
   try {
-    const response = await got.get(url, {
+    const response = await got.default.get(url, {
       responseType,
     });
     if (response.statusCode !== 200) {

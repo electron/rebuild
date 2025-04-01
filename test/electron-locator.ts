@@ -1,26 +1,26 @@
 import { expect } from 'chai';
-import * as fs from 'fs-extra';
-import * as path from 'path';
+import fs from 'graceful-fs';
+import path from 'node:path';
 
-import { locateElectronModule } from '../lib/electron-locator';
+import { locateElectronModule } from '../lib/electron-locator.js';
 
-const baseFixtureDir = path.resolve(__dirname, 'fixture', 'electron-locator');
+const baseFixtureDir = path.resolve(import.meta.dirname, 'fixture', 'electron-locator');
 
 async function expectElectronCanBeFound(projectRootPath: string, startDir: string): Promise<void> {
   it('should return a valid path', async () => {
     const electronPath = await locateElectronModule(projectRootPath, startDir);
     expect(electronPath).to.be.a('string');
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    expect(await fs.pathExists(electronPath!)).to.be.equal(true);
+    expect(fs.existsSync(electronPath!)).to.be.equal(true);
   });
 }
 
 describe('locateElectronModule', () => {
   describe('when electron is not installed', () => {
-    const electronDir = path.resolve(__dirname, '..', 'node_modules', 'electron');
+    const electronDir = path.resolve(import.meta.dirname, '..', 'node_modules', 'electron');
 
     before(async () => {
-      await fs.rename(electronDir, `${electronDir}-moved`);
+      await fs.promises.rename(electronDir, `${electronDir}-moved`);
     });
 
     it('should return null when electron is not installed', async () => {
@@ -29,11 +29,11 @@ describe('locateElectronModule', () => {
     });
 
     after(async () => {
-      await fs.rename(`${electronDir}-moved`, electronDir);
+      await fs.promises.rename(`${electronDir}-moved`, electronDir);
     });
   });
 
-  describe('using require.resolve() in the current project to search', () => {
+  describe('using import.meta.resolve() in the current project to search', () => {
     const fixtureDir = path.join(baseFixtureDir, 'not-installed');
     expectElectronCanBeFound(fixtureDir, fixtureDir);
   });

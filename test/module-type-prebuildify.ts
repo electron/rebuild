@@ -1,13 +1,13 @@
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'node:events';
 import { expect } from 'chai';
-import path from 'path';
+import path from 'node:path';
 
 import {
   determineNativePrebuildArch,
   determineNativePrebuildExtension,
   Prebuildify
-} from '../lib/module-type/prebuildify';
-import { Rebuilder, RebuilderOptions } from '../lib/rebuild';
+} from '../lib/module-type/prebuildify.js';
+import { Rebuilder, RebuilderOptions } from '../lib/rebuild.js';
 
 describe('determineNativePrebuildArch', () => {
   it('returns arm if passed in armv7l', () => {
@@ -34,7 +34,7 @@ describe('determineNativePrebuildExtension', () => {
 });
 
 describe('prebuildify', () => {
-  const fixtureBaseDir = path.join(__dirname, 'fixture', 'prebuildify');
+  const fixtureBaseDir = path.join(import.meta.dirname, 'fixture', 'prebuildify');
   const rebuilderArgs = {
     buildPath: 'nonexistent-path',
     electronVersion: '13.0.0',
@@ -65,7 +65,7 @@ describe('prebuildify', () => {
   describe('findPrebuiltModule', () => {
     describe('with no prebuilds directory', () => {
       it('should not find a prebuilt native module', async () => {
-        const noPrebuildsDir = __dirname;
+        const noPrebuildsDir = import.meta.dirname;
         const rebuilder = createRebuilder();
         const prebuildify = new Prebuildify(rebuilder, noPrebuildsDir);
         expect(await prebuildify.findPrebuiltModule()).to.equal(false);
@@ -113,21 +113,21 @@ describe('prebuildify', () => {
       });
     });
   });
-  
+
   describe('cross-platform downloads', async () => {
     it('should download for target platform', async () => {
       const fixtureDir = path.join(fixtureBaseDir, 'napi');
       let rebuilder = createRebuilder();
       let prebuildify = new Prebuildify(rebuilder, fixtureDir);
       expect(await prebuildify.findPrebuiltModule()).to.equal(true);
-  
+
       let alternativePlatform: NodeJS.Platform;
       if (process.platform === 'win32') {
         alternativePlatform = 'darwin';
       } else {
         alternativePlatform = 'win32';
       }
-  
+
       rebuilder = createRebuilder({ platform: alternativePlatform });
       prebuildify = new Prebuildify(rebuilder, fixtureDir);
       expect(await prebuildify.findPrebuiltModule()).to.equal(true);
@@ -136,7 +136,7 @@ describe('prebuildify', () => {
 
   it('should find module fork', async () => {
     const rebuilder = createRebuilder();
-    const prebuildify = new Prebuildify(rebuilder, path.join(__dirname, 'fixture', 'forked-module-test'));
+    const prebuildify = new Prebuildify(rebuilder, path.join(import.meta.dirname, 'fixture', 'forked-module-test'));
     expect(await prebuildify.usesTool()).to.equal(true);
   });
 });

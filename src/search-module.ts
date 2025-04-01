@@ -1,11 +1,11 @@
-import * as fs from 'fs-extra';
-import * as path from 'path';
+import fs from 'graceful-fs';
+import path from 'node:path';
 
 async function shouldContinueSearch(traversedPath: string, rootPath?: string, stopAtPackageJSON?: boolean): Promise<boolean> {
   if (rootPath) {
     return Promise.resolve(traversedPath !== path.dirname(rootPath));
   } else if (stopAtPackageJSON) {
-    return fs.pathExists(path.join(traversedPath, 'package.json'));
+    return fs.existsSync(path.join(traversedPath, 'package.json'));
   } else {
     return true;
   }
@@ -25,7 +25,7 @@ async function traverseAncestorDirectories(
 
   while (await shouldContinueSearch(traversedPath, rootPath, stopAtPackageJSON)) {
     const generatedPath = pathGenerator(traversedPath);
-    if (await fs.pathExists(generatedPath)) {
+    if (fs.existsSync(generatedPath)) {
       paths.push(generatedPath);
     }
 
