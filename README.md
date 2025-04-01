@@ -97,7 +97,7 @@ This package is automatically used with Electron Forge when packaging an Electro
 
 ### How can I integrate this into [Electron Packager](https://github.com/electron/packager)?
 
-electron-rebuild provides a function compatible with the [`afterCopy` hook](https://electron.github.io/packager/main/interfaces/electronpackager.options.html#aftercopy)
+electron-rebuild provides a function compatible with the [`afterCopy` hook](https://electron.github.io/packager/main/interfaces/Options.html#afterCopy)
 for Electron Packager. For example:
 
 ```javascript
