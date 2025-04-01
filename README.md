@@ -151,8 +151,23 @@ import { rebuild } from '@electron/rebuild';
 A full build process might look something like:
 
 ```javascript
+// CommonJS
 const childProcess = require('child_process');
 const pathToElectron = require('electron');
+
+  rebuild({
+    buildPath: __dirname,
+    electronVersion: '1.4.12'
+  })
+    .then(() => console.info('Rebuild Successful'))
+    .catch((e) => {
+      console.error("Building modules didn't work!");
+      console.error(e);
+    });
+  
+// ESM
+import childProcess from 'child_process';
+import pathToElectron from 'electron';
 
   rebuild({
     buildPath: import.meta.dirname,
