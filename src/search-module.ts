@@ -79,8 +79,8 @@ export async function getProjectRootPath(cwd: string): Promise<string> {
     const pathGenerator: PathGeneratorFunction = (traversedPath) => path.join(traversedPath, lockFilename);
     const lockPaths = await traverseAncestorDirectories(cwd, pathGenerator, undefined, 1);
     if (lockPaths.length > 0) {
-      let lockDir = path.dirname(lockPaths[0]);
-      if(lockDir.length > projectRootPath.length) {
+      const lockDir = path.dirname(lockPaths[0]);
+      if (lockDir.length > projectRootPath.length) {
         projectRootPath = lockDir;
       }
     }
