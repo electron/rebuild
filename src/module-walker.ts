@@ -124,9 +124,24 @@ export class ModuleWalker {
     for (const modulePath of await fs.readdir(realNodeModulesPath)) {
       // Ignore the magical .bin directory
       if (modulePath === '.bin') continue;
+
+      const subPath = path.resolve(nodeModulesPath, modulePath);
+
       // Ensure that we don't mark modules as needing to be rebuilt more than once
       // by ignoring / resolving symlinks
-      const realPath = await fs.realpath(path.resolve(nodeModulesPath, modulePath));
+      let realPath: string;
+      try {
+        realPath = await fs.realpath(subPath);
+      } catch (error) {
+        // pnpm leaves dangling symlinks when modules are removed
+        if (error.code === 'ENOENT') {
+          const stat = await fs.lstat(subPath);
+          if (stat.isSymbolicLink()) {
+            continue;
+          }
+        }
+        throw error;
+      }
 
       if (this.realModulePaths.has(realPath)) {
         continue;
