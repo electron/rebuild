@@ -45,5 +45,23 @@ describe('search-module', () => {
 
       after(removeTempDir);
     });
+
+    describe('multiple lockfiles', () => {
+      before(async () => {
+        await createTempDir();
+        await fs.copy(path.resolve(__dirname, 'fixture', 'multi-level-workspace'), baseDir);
+        await fs.ensureFile(path.join(baseDir, 'yarn.lock'));
+        await fs.ensureFile(path.join(baseDir, 'packages', 'foo', 'package-lock.json'));
+      });
+
+      it('return the nearest directory with a lockfile', async () => {
+        const packageDir = path.join(baseDir, 'packages', 'foo');
+        expect(await getProjectRootPath(packageDir)).to.equal(packageDir);
+      });
+
+      after(removeTempDir);
+
+    });
+
   });
 });
