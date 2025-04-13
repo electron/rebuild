@@ -1,9 +1,9 @@
-import * as fs from 'fs-extra';
-import * as path from 'path';
+import fs from 'graceful-fs';
+import path from 'node:path';
+import electron from 'electron';
 
 function electronVersionPath() {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const electronPath = require('electron');
+  const electronPath = electron as unknown as string;
   if (process.platform === 'darwin') {
     return path.resolve(path.dirname(electronPath), '..', '..', '..', 'version');
   } else {

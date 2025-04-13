@@ -1,9 +1,9 @@
 import debug from 'debug';
-import fs from 'fs-extra';
-import path from 'path';
+import fs from 'graceful-fs';
+import path from 'node:path';
 
-import { ConfigVariables, getNodeArch } from '../arch';
-import { NativeModule } from '.';
+import { ConfigVariables, getNodeArch } from '../arch.js';
+import { NativeModule } from './index.js';
 
 const d = debug('electron-rebuild');
 
@@ -40,7 +40,7 @@ export class Prebuildify extends NativeModule {
     d(`Checking for prebuilds for "${this.moduleName}"`);
 
     const prebuildsDir = path.join(this.modulePath, 'prebuilds');
-    if (!(await fs.pathExists(prebuildsDir))) {
+    if (!(fs.existsSync(prebuildsDir))) {
       d(`Could not find the prebuilds directory at "${prebuildsDir}"`);
       return false;
     }
@@ -52,10 +52,10 @@ export class Prebuildify extends NativeModule {
     const nodejsNapiModuleFilename = path.join(prebuiltModuleDir, `node.napi.${nativeExt}`);
     const abiModuleFilename = path.join(prebuiltModuleDir, `electron.abi${this.rebuilder.ABI}.${nativeExt}`);
 
-    if (await fs.pathExists(electronNapiModuleFilename) || await fs.pathExists(nodejsNapiModuleFilename)) {
+    if (fs.existsSync(electronNapiModuleFilename) || fs.existsSync(nodejsNapiModuleFilename)) {
       this.nodeAPI.ensureElectronSupport();
       d(`Found prebuilt Node-API module in ${prebuiltModuleDir}"`);
-    } else if (await fs.pathExists(abiModuleFilename)) {
+    } else if (fs.existsSync(abiModuleFilename)) {
       d(`Found prebuilt module: "${abiModuleFilename}"`);
     } else {
       d(`Could not locate "${electronNapiModuleFilename}", "${nodejsNapiModuleFilename}", or "${abiModuleFilename}"`);

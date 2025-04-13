@@ -1,11 +1,17 @@
-import * as path from 'path';
+import path from 'node:path';
 import { expect } from 'chai';
 
-import { readPackageJson } from '../lib/read-package-json';
+import { readPackageJson } from '../lib/read-package-json.js';
+import { pathToFileURL } from 'node:url';
 
 describe('read-package-json', () => {
   it('should find a package.json file from the given directory', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    expect(await readPackageJson(path.resolve(__dirname, '..'))).to.deep.equal(require('../package.json'));
+    expect(await readPackageJson(path.resolve(import.meta.dirname, '..'))).to.deep.equal(
+      (
+        await import(pathToFileURL(path.join(import.meta.dirname, '../package.json')).toString(), {
+          with: { type: 'json' },
+        })
+      ).default,
+    );
   });
 });

@@ -44,7 +44,7 @@ npm run rebuild
 
 ### What are the requirements?
 
-Node v12.13.0 or higher is required. Building native modules from source uses
+Node v22.12.0 or higher is required. Building native modules from source uses
 [`node-gyp`](https://github.com/nodejs/node-gyp#installation), refer to the link for its
 installation/runtime requirements.
 
@@ -102,7 +102,7 @@ for Electron Packager. For example:
 
 ```javascript
 import packager from '@electron/packager';
-import rebuild from '@electron/rebuild';
+import { rebuild } from '@electron/rebuild';
 
 packager({
   // … other options
@@ -128,7 +128,7 @@ electron-rebuild is also a library that you can require into your app or
 build process. It has a very simple API:
 
 ```javascript
-import rebuild from '@electron/rebuild';
+import { rebuild } from '@electron/rebuild';
 
 // Public: Rebuilds a node_modules directory with the given Electron version.
 //
@@ -151,16 +151,29 @@ import rebuild from '@electron/rebuild';
 A full build process might look something like:
 
 ```javascript
-const childProcess = require('child_process');
-const pathToElectron = require('electron');
+// ESM
+import { rebuild } from '@electron/rebuild'
 
-  rebuild({
-    buildPath: __dirname,
-    electronVersion: '1.4.12'
-  })
-    .then(() => console.info('Rebuild Successful'))
-    .catch((e) => {
-      console.error("Building modules didn't work!");
-      console.error(e);
-    });
+rebuild({
+  buildPath: import.meta.dirname,
+  electronVersion: '35.1.5'
+})
+.then(() => console.info('Rebuild Successful'))
+.catch((e) => {
+  console.error('Building modules didn\'t work!')
+  console.error(e)
+})
+
+// CommonJS
+const { rebuild } = require('@electron/rebuild')
+
+rebuild({
+  buildPath: __dirname,
+  electronVersion: '35.1.5'
+})
+.then(() => console.info('Rebuild Successful'))
+.catch((e) => {
+  console.error('Building modules didn\'t work!')
+  console.error(e)
+})
 ```

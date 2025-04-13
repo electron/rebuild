@@ -1,7 +1,3 @@
-import { rebuild, RebuildOptions } from './rebuild';
+import { rebuild, RebuildOptions } from './rebuild.js';
 
 export { rebuild, RebuildOptions };
-export default rebuild;
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
