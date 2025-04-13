@@ -1,7 +1,7 @@
 import debug from 'debug';
 import { EventEmitter } from 'node:events';
 import fs from 'graceful-fs';
-import nodeAbi from 'node-abi';
+import { getAbi } from 'node-abi';
 import os from 'node:os';
 import path from 'node:path';
 
@@ -218,7 +218,7 @@ export class Rebuilder implements IRebuilder {
 
   get ABI(): string {
     if (this.ABIVersion === undefined) {
-      this.ABIVersion = nodeAbi.getAbi(this.electronVersion, 'electron');
+      this.ABIVersion = getAbi(this.electronVersion, 'electron');
     }
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
