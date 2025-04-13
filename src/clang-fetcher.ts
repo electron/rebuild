@@ -7,6 +7,7 @@ import zlib from 'node:zlib';
 import { ELECTRON_GYP_DIR } from './constants.js';
 import { fetch } from './fetcher.js';
 import { downloadLinuxSysroot } from './sysroot-fetcher.js';
+import { promisifiedGracefulFs } from './promisifiedGracefulFs.js';
 
 const d = debug('electron-rebuild');
 
@@ -47,7 +48,7 @@ export async function getClangEnvironmentVars(electronVersion: string, targetArc
 
   const gypArgs = [];
   if (process.platform === 'win32') {
-    console.log(await fs.promises.readdir(clangDir));
+    console.log(await promisifiedGracefulFs.readdir(clangDir));
     gypArgs.push(`/p:CLToolExe=clang-cl.exe`, `/p:CLToolPath=${clangDir}`);
   }
 
@@ -108,7 +109,7 @@ async function downloadClangVersion(electronVersion: string) {
   zlib.deflateSync(contents);
   const tarPath = path.resolve(ELECTRON_GYP_DIR, `${electronVersion}-clang.tar`);
   if (fs.existsSync(tarPath)) await fs.promises.rm(tarPath, { recursive: true, force: true });
-  await fs.promises.writeFile(tarPath, Buffer.from(contents));
+  await promisifiedGracefulFs.writeFile(tarPath, Buffer.from(contents));
   await fs.promises.mkdir(clangDirPath, { recursive: true });
   d('tar running on clang');
   await tar.x({

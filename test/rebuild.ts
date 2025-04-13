@@ -7,6 +7,7 @@ import { cleanupTestModule, MINUTES_IN_MILLISECONDS, TEST_MODULE_PATH as testMod
 import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild.js';
 import { getExactElectronVersionSync } from './helpers/electron-version.js';
 import { Rebuilder, rebuild } from '../lib/rebuild.js';
+import { promisifiedGracefulFs } from '../lib/promisifiedGracefulFs.js';
 
 const testElectronVersion = getExactElectronVersionSync();
 
@@ -51,7 +52,7 @@ describe('rebuilder', () => {
 
     it('should not download files in the module directory', async () => {
       const modulePath = path.resolve(testModulePath, 'node_modules/ref-napi');
-      const fileNames = await fs.promises.readdir(modulePath);
+      const fileNames = await promisifiedGracefulFs.readdir(modulePath);
 
       expect(fileNames).to.not.contain(testElectronVersion);
     });

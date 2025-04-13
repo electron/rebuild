@@ -6,6 +6,7 @@ import path from 'node:path';
 
 import { ELECTRON_GYP_DIR } from './constants.js';
 import { fetch } from './fetcher.js';
+import { promisifiedGracefulFs } from './promisifiedGracefulFs.js';
 
 const d = debug('electron-rebuild');
 
@@ -37,7 +38,7 @@ export async function downloadLinuxSysroot(electronVersion: string, targetArch: 
   d('writing sysroot to disk');
   const tmpTarFile = path.resolve(ELECTRON_GYP_DIR, `${electronVersion}-${fileName}`);
   if (fs.existsSync(tmpTarFile)) await fs.promises.rm(tmpTarFile, { recursive: true, force: true });
-  await fs.promises.writeFile(tmpTarFile, sysrootBuffer);
+  await promisifiedGracefulFs.writeFile(tmpTarFile, sysrootBuffer);
 
   d('decompressing sysroot');
   await spawn('tar', ['-xf', tmpTarFile, '-C', sysrootDir], { stdio: 'ignore' });

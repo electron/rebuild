@@ -4,6 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { getProjectRootPath } from '../lib/search-module.js';
+import { promisifiedGracefulFs } from '../lib/promisifiedGracefulFs.js';
 
 let baseDir: string;
 
@@ -28,7 +29,7 @@ describe('search-module', () => {
 
             if(!fs.existsSync(lockfilePath)) {
               await fs.promises.mkdir(baseDir, { recursive: true });
-              await fs.promises.writeFile(lockfilePath, Buffer.from([]), {});
+              await promisifiedGracefulFs.writeFile(lockfilePath, Buffer.from([]), {});
             }
           });
 
