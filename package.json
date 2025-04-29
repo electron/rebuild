@@ -7,6 +7,7 @@
   "typings": "lib/main.d.ts",
   "scripts": {
     "build": "tsc",
+    "build:docs": "typedoc src/main.ts",
     "coverage": "npm run prewarm-headers && nyc npm run spec",
     "coverage:report": "nyc report --reporter=text-lcov > coverage.lcov",
     "watch": "tsc -w",
@@ -83,6 +84,7 @@
     "mocha": "^11.1.0",
     "nyc": "^15.1.0",
     "tsx": "^4.19.3",
+    "typedoc": "~0.25.13",
     "typescript": "~5.4.5"
   },
   "nyc": {
