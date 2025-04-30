@@ -1,11 +1,11 @@
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { EventEmitter } from 'events';
-import path from 'path';
+import { EventEmitter } from 'node:events';
+import path from 'node:path';
 
-import { cleanupTestModule, resetTestModule, TIMEOUT_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath } from './helpers/module-setup';
-import { PrebuildInstall } from '../lib/module-type/prebuild-install';
-import { Rebuilder, RebuilderOptions } from '../lib/rebuild';
+import { cleanupTestModule, resetTestModule, TIMEOUT_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath } from './helpers/module-setup.js';
+import { PrebuildInstall } from '../lib/module-type/prebuild-install.js';
+import { Rebuilder, RebuilderOptions } from '../lib/rebuild.js';
 
 chai.use(chaiAsPromised);
 
@@ -36,9 +36,6 @@ describe('prebuild-install', () => {
     });
 
     it('should not fail running prebuild-install', async function () {
-      if (process.platform === 'darwin' && process.arch === 'arm64') {
-        this.skip(); // farmhash module has no prebuilt binaries for ARM64
-      }
       const rebuilder = new Rebuilder(rebuilderArgs);
       const prebuildInstall = new PrebuildInstall(rebuilder, modulePath);
       expect(await prebuildInstall.findPrebuiltModule()).to.equal(true);
@@ -54,21 +51,23 @@ describe('prebuild-install', () => {
     });
 
     it('should download for target platform', async function () {
-      if (process.platform === 'darwin' && process.arch === 'arm64') {
-        this.skip(); // farmhash module has no prebuilt binaries for ARM64
-      }
       let rebuilder = new Rebuilder(rebuilderArgs);
       let prebuild = new PrebuildInstall(rebuilder, modulePath);
       expect(await prebuild.findPrebuiltModule()).to.equal(true);
-  
+
       let alternativePlatform: NodeJS.Platform;
+      let arch = process.arch;
+
       if (process.platform === 'win32') {
         alternativePlatform = 'darwin';
       } else {
         alternativePlatform = 'win32';
+
+        // farmhash has no prebuilt binaries for ARM64 Windows
+        arch = 'x64';
       }
-  
-      rebuilder = new Rebuilder({ ...rebuilderArgs, platform: alternativePlatform });
+
+      rebuilder = new Rebuilder({ ...rebuilderArgs, platform: alternativePlatform, arch });
       prebuild = new PrebuildInstall(rebuilder, modulePath);
       expect(await prebuild.findPrebuiltModule()).to.equal(true);
     });
@@ -76,7 +75,7 @@ describe('prebuild-install', () => {
 
   it('should find module fork', async () => {
     const rebuilder = new Rebuilder(rebuilderArgs);
-    const prebuildInstall = new PrebuildInstall(rebuilder, path.join(__dirname, 'fixture', 'forked-module-test'));
+    const prebuildInstall = new PrebuildInstall(rebuilder, path.join(import.meta.dirname, 'fixture', 'forked-module-test'));
     expect(await prebuildInstall.usesTool()).to.equal(true);
   });
 });

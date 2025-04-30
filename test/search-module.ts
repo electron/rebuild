@@ -1,18 +1,19 @@
 import { expect } from 'chai';
-import * as fs from 'fs-extra';
-import * as os from 'os';
-import * as path from 'path';
+import fs from 'graceful-fs';
+import os from 'node:os';
+import path from 'node:path';
 
-import { getProjectRootPath } from '../lib/search-module';
+import { getProjectRootPath } from '../lib/search-module.js';
+import { promisifiedGracefulFs } from '../lib/promisifiedGracefulFs.js';
 
 let baseDir: string;
 
 async function createTempDir(): Promise<void> {
-  baseDir = await fs.mkdtemp(path.join(os.tmpdir(), 'electron-rebuild-test-'));
+  baseDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'electron-rebuild-test-'));
 }
 
 async function removeTempDir(): Promise<void> {
-  await fs.remove(baseDir);
+  await fs.promises.rm(baseDir, { recursive: true, force: true });
 }
 
 describe('search-module', () => {
@@ -22,8 +23,14 @@ describe('search-module', () => {
         describe(lockFile, () => {
           before(async () => {
             await createTempDir();
-            await fs.copy(path.resolve(__dirname, 'fixture', 'multi-level-workspace'), baseDir);
-            await fs.ensureFile(path.join(baseDir, lockFile));
+            await fs.promises.cp(path.resolve(import.meta.dirname, 'fixture', 'multi-level-workspace'), baseDir, { recursive: true, force: true });
+
+            const lockfilePath = path.join(baseDir, lockFile);
+
+            if(!fs.existsSync(lockfilePath)) {
+              await fs.promises.mkdir(baseDir, { recursive: true });
+              await promisifiedGracefulFs.writeFile(lockfilePath, Buffer.from([]), {});
+            }
           });
 
           it('finds the folder with the lockfile', async () => {

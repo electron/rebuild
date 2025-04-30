@@ -1,10 +1,10 @@
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'node:events';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
-import { cleanupTestModule, resetTestModule, TEST_MODULE_PATH as testModulePath } from './helpers/module-setup';
-import { NodeGyp } from '../lib/module-type/node-gyp/node-gyp';
-import { Rebuilder } from '../lib/rebuild';
+import { cleanupTestModule, resetTestModule, TEST_MODULE_PATH as testModulePath } from './helpers/module-setup.js';
+import { NodeGyp } from '../lib/module-type/node-gyp/node-gyp.js';
+import { Rebuilder } from '../lib/rebuild.js';
 
 chai.use(chaiAsPromised);
 
@@ -74,7 +74,7 @@ describe('node-gyp', () => {
           platform
         });
         const nodeGyp = new NodeGyp(rebuilder, testModulePath);
-        
+
         const errorMessage = "node-gyp does not support cross-compiling native modules from source.";
         expect(nodeGyp.rebuildModule()).to.eventually.be.rejectedWith(new Error(errorMessage));
       });

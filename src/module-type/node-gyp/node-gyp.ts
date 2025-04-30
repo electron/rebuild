@@ -1,12 +1,12 @@
 import debug from 'debug';
 import detectLibc from 'detect-libc';
-import path from 'path';
+import path from 'node:path';
 import semver from 'semver';
 
-import { ELECTRON_GYP_DIR } from '../../constants';
-import { getClangEnvironmentVars } from '../../clang-fetcher';
-import { NativeModule } from '..';
-import { fork } from 'child_process';
+import { ELECTRON_GYP_DIR } from '../../constants.js';
+import { getClangEnvironmentVars } from '../../clang-fetcher.js';
+import { NativeModule } from '../index.js';
+import { fork } from 'node:child_process';
 
 const d = debug('electron-rebuild');
 
@@ -109,7 +109,7 @@ export class NodeGyp extends NativeModule {
     const nodeGypArgs = await this.buildArgs(extraNodeGypArgs);
     d('rebuilding', this.moduleName, 'with args', nodeGypArgs);
 
-    const forkedChild = fork(path.resolve(__dirname, 'worker.js'), {
+    const forkedChild = fork(path.resolve(import.meta.dirname, 'worker.js'), {
       env,
       cwd: this.modulePath,
       stdio: 'pipe',

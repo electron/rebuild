@@ -1,15 +1,16 @@
 import { spawn } from '@malept/cross-spawn-promise';
-import * as crypto from 'crypto';
+import crypto from 'node:crypto';
 import debug from 'debug';
-import * as fs from 'fs-extra';
-import * as path from 'path';
+import fs from 'graceful-fs';
+import path from 'node:path';
 
-import { ELECTRON_GYP_DIR } from './constants';
-import { fetch } from './fetcher';
+import { ELECTRON_GYP_DIR } from './constants.js';
+import { fetch } from './fetcher.js';
+import { promisifiedGracefulFs } from './promisifiedGracefulFs.js';
 
 const d = debug('electron-rebuild');
 
-const sysrootArchAliases = {
+const sysrootArchAliases: Record<string, string> = {
   x64: 'amd64',
   ia32: 'i386',
 };
@@ -19,8 +20,8 @@ const SYSROOT_BASE_URL = 'https://dev-cdn.electronjs.org/linux-sysroots';
 export async function downloadLinuxSysroot(electronVersion: string, targetArch: string): Promise<string> {
   d('fetching sysroot for Electron:', electronVersion);
   const sysrootDir = path.resolve(ELECTRON_GYP_DIR, `${electronVersion}-sysroot`);
-  if (await fs.pathExists(path.resolve(sysrootDir, 'lib'))) return sysrootDir;
-  if (!await fs.pathExists(sysrootDir)) await fs.mkdirp(sysrootDir);
+  if (fs.existsSync(path.resolve(sysrootDir, 'lib'))) return sysrootDir;
+  await fs.promises.mkdir(sysrootDir, { recursive: true });
 
   const linuxArch = sysrootArchAliases[targetArch] || targetArch;
   const electronSysroots = JSON.parse(await fetch(`https://raw.githubusercontent.com/electron/electron/v${electronVersion}/script/sysroots.json`, 'text'));
@@ -36,8 +37,8 @@ export async function downloadLinuxSysroot(electronVersion: string, targetArch: 
 
   d('writing sysroot to disk');
   const tmpTarFile = path.resolve(ELECTRON_GYP_DIR, `${electronVersion}-${fileName}`);
-  if (await fs.pathExists(tmpTarFile)) await fs.remove(tmpTarFile);
-  await fs.writeFile(tmpTarFile, sysrootBuffer);
+  if (fs.existsSync(tmpTarFile)) await fs.promises.rm(tmpTarFile, { recursive: true, force: true });
+  await promisifiedGracefulFs.writeFile(tmpTarFile, sysrootBuffer);
 
   d('decompressing sysroot');
   await spawn('tar', ['-xf', tmpTarFile, '-C', sysrootDir], { stdio: 'ignore' });

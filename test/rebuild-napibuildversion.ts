@@ -1,11 +1,11 @@
-import * as fs from 'fs-extra';
-import * as path from 'path';
+import fs from 'graceful-fs';
+import path from 'node:path';
 
 import { expect } from 'chai';
-import { rebuild } from '../lib/rebuild';
-import { getExactElectronVersionSync } from './helpers/electron-version';
-import { TIMEOUT_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath, cleanupTestModule, resetTestModule } from './helpers/module-setup';
-import { expectNativeModuleToBeRebuilt } from './helpers/rebuild';
+import { rebuild } from '../lib/rebuild.js';
+import { getExactElectronVersionSync } from './helpers/electron-version.js';
+import { TIMEOUT_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath, cleanupTestModule, resetTestModule } from './helpers/module-setup.js';
+import { expectNativeModuleToBeRebuilt } from './helpers/rebuild.js';
 import detectLibc from 'detect-libc';
 
 const testElectronVersion = getExactElectronVersionSync();
@@ -29,11 +29,9 @@ describe('rebuild with napi_build_versions in binary config', async function () 
     it(`${ arch } arch should have rebuilt binary with 'napi_build_versions' array and 'libc' provided`, async () => {
       const libc = await detectLibc.family() || 'unknown';
       const binaryPath = napiBuildVersionSpecificPath(arch, libc);
-      
-      if (await fs.pathExists(binaryPath)) {
-        fs.removeSync(binaryPath);
-      }
-      expect(await fs.pathExists(binaryPath)).to.be.false;
+
+      await fs.promises.rm(binaryPath, { recursive: true, force: true });
+      expect(fs.existsSync(binaryPath)).to.be.false;
 
       await rebuild({
         buildPath: testModulePath,
@@ -41,9 +39,9 @@ describe('rebuild with napi_build_versions in binary config', async function () 
         arch,
         buildFromSource: true, // need to skip node-pre-gyp prebuilt binary
       });
-      
+
       await expectNativeModuleToBeRebuilt(testModulePath, 'sqlite3');
-      expect(await fs.pathExists(binaryPath)).to.be.true;
+      expect(fs.existsSync(binaryPath)).to.be.true;
     });
   }
 

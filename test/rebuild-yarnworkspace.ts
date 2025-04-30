@@ -1,10 +1,10 @@
-import * as path from 'path';
+import path from 'node:path';
 
-import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild';
-import { getExactElectronVersionSync } from './helpers/electron-version';
-import { getProjectRootPath } from '../lib/search-module';
-import { rebuild } from '../lib/rebuild';
-import { TIMEOUT_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath, cleanupTestModule, resetTestModule } from './helpers/module-setup';
+import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild.js';
+import { getExactElectronVersionSync } from './helpers/electron-version.js';
+import { getProjectRootPath } from '../lib/search-module.js';
+import { rebuild } from '../lib/rebuild.js';
+import { TIMEOUT_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath, cleanupTestModule, resetTestModule } from './helpers/module-setup.js';
 
 const testElectronVersion = getExactElectronVersionSync();
 

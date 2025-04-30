@@ -1,9 +1,9 @@
-import fs from 'fs-extra';
-import path from 'path';
+import fs from 'graceful-fs';
+import path from 'node:path';
 
-import { NodeAPI } from '../node-api';
-import { readPackageJson } from '../read-package-json';
-import { IRebuilder } from '../types';
+import { NodeAPI } from '../node-api.js';
+import { readPackageJson } from '../read-package-json.js';
+import { IRebuilder } from '../types.js';
 
 type PackageJSONValue = string | Record<string, unknown>;
 
@@ -12,7 +12,7 @@ export class NativeModule {
   private _moduleName: string | undefined;
   protected modulePath: string;
   public nodeAPI: NodeAPI;
-  private packageJSON: Record<string, PackageJSONValue | undefined>;
+  private packageJSON!: Record<string, PackageJSONValue | undefined>;
 
   constructor(rebuilder: IRebuilder, modulePath: string) {
     this.rebuilder = rebuilder;
@@ -80,7 +80,7 @@ export async function locateBinary(basePath: string, suffix: string): Promise<st
   while (testPath !== parentPath) {
     testPath = parentPath;
     const checkPath = path.resolve(testPath, suffix);
-    if (await fs.pathExists(checkPath)) {
+    if (fs.existsSync(checkPath)) {
       return checkPath;
     }
     parentPath = path.resolve(testPath, '..');

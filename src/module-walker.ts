@@ -1,9 +1,10 @@
 import debug from 'debug';
-import fs from 'fs-extra';
-import path from 'path';
+import fs from 'graceful-fs';
+import path from 'node:path';
 
-import { readPackageJson } from './read-package-json';
-import { searchForModule, searchForNodeModules } from './search-module';
+import { readPackageJson } from './read-package-json.js';
+import { searchForModule, searchForNodeModules } from './search-module.js';
+import { promisifiedGracefulFs } from './promisifiedGracefulFs.js';
 
 const d = debug('electron-rebuild');
 
@@ -82,7 +83,7 @@ export class ModuleWalker {
   }
 
   async markChildrenAsProdDeps(modulePath: string): Promise<void> {
-    if (!await fs.pathExists(modulePath)) {
+    if (!fs.existsSync(modulePath)) {
       return;
     }
 
@@ -113,7 +114,7 @@ export class ModuleWalker {
     // Some package managers use symbolic links when installing node modules
     // we need to be sure we've never tested the a package before by resolving
     // all symlinks in the path and testing against a set
-    const realNodeModulesPath = await fs.realpath(nodeModulesPath);
+    const realNodeModulesPath = await fs.promises.realpath(nodeModulesPath);
     if (this.realNodeModulesPaths.has(realNodeModulesPath)) {
       return;
     }
@@ -121,7 +122,7 @@ export class ModuleWalker {
 
     d('scanning:', realNodeModulesPath);
 
-    for (const modulePath of await fs.readdir(realNodeModulesPath)) {
+    for (const modulePath of await promisifiedGracefulFs.readdir(realNodeModulesPath)) {
       // Ignore the magical .bin directory
       if (modulePath === '.bin') continue;
 
@@ -131,11 +132,11 @@ export class ModuleWalker {
       // by ignoring / resolving symlinks
       let realPath: string;
       try {
-        realPath = await fs.realpath(subPath);
+        realPath = await fs.promises.realpath(subPath);
       } catch (error) {
         // pnpm leaves dangling symlinks when modules are removed
-        if (error.code === 'ENOENT') {
-          const stat = await fs.lstat(subPath);
+        if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+          const stat = await fs.promises.lstat(subPath);
           if (stat.isSymbolicLink()) {
             continue;
           }
@@ -156,7 +157,7 @@ export class ModuleWalker {
         await this.findAllModulesIn(realPath, `${modulePath}/`);
       }
 
-      if (await fs.pathExists(path.resolve(nodeModulesPath, modulePath, 'node_modules'))) {
+      if (fs.existsSync(path.resolve(nodeModulesPath, modulePath, 'node_modules'))) {
         await this.findAllModulesIn(path.resolve(realPath, 'node_modules'));
       }
     }
