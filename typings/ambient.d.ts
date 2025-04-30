@@ -1,1 +1,1 @@
-declare module '@electron/node-gyp';
+declare module 'node-gyp';

@@ -1,4 +1,4 @@
-import NodeGypRunner from '@electron/node-gyp';
+import NodeGypRunner from 'node-gyp';
 
 process.on('message', async ({
   nodeGypArgs,
