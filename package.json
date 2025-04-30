@@ -46,7 +46,6 @@
     "provenance": true
   },
   "dependencies": {
-    "@electron/node-gyp": "https://github.com/electron/node-gyp#06b29aafb7708acef8b3669835c8a7857ebc92d2",
     "@malept/cross-spawn-promise": "^2.0.0",
     "chalk": "^4.0.0",
     "debug": "^4.1.1",
@@ -55,6 +54,7 @@
     "graceful-fs": "^4.2.11",
     "node-abi": "^4.2.0",
     "node-api-version": "^0.2.1",
+    "node-gyp": "^11.2.0",
     "ora": "^5.1.0",
     "read-binary-file-arch": "^1.0.6",
     "semver": "^7.3.5",
