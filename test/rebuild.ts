@@ -1,7 +1,7 @@
 import { EventEmitter } from 'node:events';
-import { expect } from 'chai';
 import fs from 'graceful-fs';
 import path from 'node:path';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import { cleanupTestModule, MINUTES_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath, resetMSVSVersion, resetTestModule, TIMEOUT_IN_MILLISECONDS } from './helpers/module-setup.js';
 import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild.js';
@@ -13,10 +13,8 @@ const testElectronVersion = getExactElectronVersionSync();
 
 describe('rebuilder', () => {
 
-  describe('core behavior', function() {
-    this.timeout(TIMEOUT_IN_MILLISECONDS);
-
-    before(async () => {
+  describe('core behavior', { timeout: TIMEOUT_IN_MILLISECONDS }, () => {
+    beforeAll(async () => {
       await resetTestModule(testModulePath);
 
       await rebuild({
@@ -24,7 +22,7 @@ describe('rebuilder', () => {
         electronVersion: testElectronVersion,
         arch: process.arch
       });
-    });
+    }, TIMEOUT_IN_MILLISECONDS);
 
     it('should have rebuilt top level prod dependencies', async () => {
       await expectNativeModuleToBeRebuilt(testModulePath, 'ref-napi');
@@ -57,16 +55,14 @@ describe('rebuilder', () => {
       expect(fileNames).to.not.contain(testElectronVersion);
     });
 
-    after(async () => {
+    afterAll(async () => {
       await cleanupTestModule(testModulePath);
     });
   });
 
-  describe('force rebuild', function() {
-    this.timeout(TIMEOUT_IN_MILLISECONDS);
-
-    before(async () => await resetTestModule(testModulePath));
-    after(async () => await cleanupTestModule(testModulePath));
+  describe('force rebuild', { timeout: TIMEOUT_IN_MILLISECONDS }, () => {
+    beforeAll(async () => await resetTestModule(testModulePath), TIMEOUT_IN_MILLISECONDS);
+    afterAll(async () => await cleanupTestModule(testModulePath), TIMEOUT_IN_MILLISECONDS);
     afterEach(resetMSVSVersion);
 
     const buildPath = testModulePath;
@@ -98,10 +94,7 @@ describe('rebuilder', () => {
       expect(skipped).to.equal(0);
     });
 
-    it('should rebuild all modules again when enabled', async function() {
-      if (process.platform === 'darwin') {
-        this.timeout(5 * MINUTES_IN_MILLISECONDS);
-      }
+    it('should rebuild all modules again when enabled', { timeout: 5 * MINUTES_IN_MILLISECONDS }, async () => {
       await rebuild({ buildPath, electronVersion, arch });
       resetMSVSVersion();
       const rebuilder = rebuild({ buildPath, electronVersion, arch, extraModules, force: true });
@@ -114,21 +107,16 @@ describe('rebuilder', () => {
     });
   });
 
-  describe('ignore rebuild', function() {
-    this.timeout(2 * MINUTES_IN_MILLISECONDS);
-
-    before(async () => await resetTestModule(testModulePath));
-    after(async () => await cleanupTestModule(testModulePath));
+  describe('ignore rebuild', { timeout: 2 * MINUTES_IN_MILLISECONDS }, () => {
+    beforeAll(async () => await resetTestModule(testModulePath), 2 * MINUTES_IN_MILLISECONDS);
+    afterAll(async () => await cleanupTestModule(testModulePath), 2 * MINUTES_IN_MILLISECONDS);
     afterEach(resetMSVSVersion);
 
     const buildPath = testModulePath;
     const electronVersion = testElectronVersion;
     const arch = process.arch;
 
-    it('should rebuild all modules again when enabled', async function() {
-      if (process.platform === 'win32') {
-        this.timeout(5 * MINUTES_IN_MILLISECONDS);
-      }
+    it('should rebuild all modules again when enabled', { timeout: 5 * MINUTES_IN_MILLISECONDS }, async () => {
       await rebuild({ buildPath, electronVersion, arch });
       resetMSVSVersion();
       const rebuilder = rebuild({ buildPath, electronVersion, arch, ignoreModules: ['native-hello-world'], force: true });
@@ -141,11 +129,9 @@ describe('rebuilder', () => {
     });
   });
 
-  describe('only rebuild', function() {
-    this.timeout(2 * MINUTES_IN_MILLISECONDS);
-
-    beforeEach(async () => await resetTestModule(testModulePath));
-    afterEach(async() => await cleanupTestModule(testModulePath));
+  describe('only rebuild', { timeout: 2 * MINUTES_IN_MILLISECONDS }, () => {
+    beforeEach(async () => await resetTestModule(testModulePath), 2 * MINUTES_IN_MILLISECONDS);
+    afterEach(async() => await cleanupTestModule(testModulePath), 2 * MINUTES_IN_MILLISECONDS);
 
     it('should rebuild only specified modules', async () => {
       const nativeModuleBinary = path.join(testModulePath, 'node_modules', 'native-hello-world', 'build', 'Release', 'hello_world.node');
@@ -195,11 +181,9 @@ describe('rebuilder', () => {
     });
   });
 
-  describe('debug rebuild', function() {
-    this.timeout(10 * MINUTES_IN_MILLISECONDS);
-
-    before(async () => await resetTestModule(testModulePath));
-    after(async() => await cleanupTestModule(testModulePath));
+  describe('debug rebuild', { timeout: 10 * MINUTES_IN_MILLISECONDS }, () => {
+    beforeAll(async () => await resetTestModule(testModulePath), 10 * MINUTES_IN_MILLISECONDS);
+    afterAll(async() => await cleanupTestModule(testModulePath), 10 * MINUTES_IN_MILLISECONDS);
 
     it('should have rebuilt farmhash module in Debug mode', async () => {
       await rebuild({
@@ -215,11 +199,9 @@ describe('rebuilder', () => {
     });
   });
 
-  describe('useElectronClang rebuild', function() {
-    this.timeout(10 * MINUTES_IN_MILLISECONDS);
-
-    before(async () => await resetTestModule(testModulePath));
-    after(async() => await cleanupTestModule(testModulePath));
+  describe('useElectronClang rebuild', { timeout: 10 * MINUTES_IN_MILLISECONDS }, () => {
+    beforeAll(async () => await resetTestModule(testModulePath), 10 * MINUTES_IN_MILLISECONDS);
+    afterAll(async() => await cleanupTestModule(testModulePath), 10 * MINUTES_IN_MILLISECONDS);
 
     it('should have rebuilt farmhash module using clang mode', async () => {
       await rebuild({
