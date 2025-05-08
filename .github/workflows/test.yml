@@ -22,9 +22,6 @@ jobs:
           - macos-latest
           - ubuntu-latest
           - windows-latest
-        exclude:
-          - os: windows-latest
-            node-version: '14.16'
     runs-on: "${{ matrix.os }}"
     env:
       GYP_MSVS_VERSION: '2022'
