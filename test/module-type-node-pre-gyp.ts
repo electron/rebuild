@@ -1,17 +1,12 @@
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import { EventEmitter } from 'node:events';
 import path from 'node:path';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { cleanupTestModule, resetTestModule, TIMEOUT_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath } from './helpers/module-setup.js';
 import { NodePreGyp } from '../lib/module-type/node-pre-gyp.js';
 import { Rebuilder, RebuilderOptions } from '../lib/rebuild.js';
 
-chai.use(chaiAsPromised);
-
-describe('node-pre-gyp', function () {
-  this.timeout(TIMEOUT_IN_MILLISECONDS);
-
+describe('node-pre-gyp', { timeout: TIMEOUT_IN_MILLISECONDS }, () => {
   const modulePath = path.join(testModulePath, 'node_modules', 'sqlite3');
   const rebuilderArgs: RebuilderOptions = {
     buildPath: testModulePath,
@@ -20,10 +15,10 @@ describe('node-pre-gyp', function () {
     lifecycle: new EventEmitter()
   };
 
-  before(async () => await resetTestModule(testModulePath));
-  after(async () => await cleanupTestModule(testModulePath));
+  beforeAll(async () => await resetTestModule(testModulePath), TIMEOUT_IN_MILLISECONDS);
+  afterAll(async () => await cleanupTestModule(testModulePath), TIMEOUT_IN_MILLISECONDS);
 
-  describe('Node-API support', function() {
+  describe('Node-API support', () => {
     it('should find correct napi version and select napi args', async () => {
       const rebuilder = new Rebuilder(rebuilderArgs);
       const nodePreGyp = new NodePreGyp(rebuilder, modulePath);
@@ -44,7 +39,7 @@ describe('node-pre-gyp', function () {
         electronVersion: '2.0.0',
       });
       const nodePreGyp = new NodePreGyp(rebuilder, modulePath);
-      expect(nodePreGyp.findPrebuiltModule()).to.eventually.be.rejectedWith("Native module 'sqlite3' requires Node-API but Electron v2.0.0 does not support Node-API");
+      await expect(nodePreGyp.findPrebuiltModule()).rejects.toBe("Native module 'sqlite3' requires Node-API but Electron v2.0.0 does not support Node-API");
     });
   });
 

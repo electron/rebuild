@@ -12,7 +12,7 @@
     "noUnusedParameters": true,
     "pretty": true,
     "outDir": "lib",
-    "types": ["node", "mocha"]
+    "types": ["node"]
   },
   "formatCodeOptions": {
     "indentSize": 2,
