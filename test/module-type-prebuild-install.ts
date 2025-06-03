@@ -1,13 +1,10 @@
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import { EventEmitter } from 'node:events';
 import path from 'node:path';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { cleanupTestModule, resetTestModule, TIMEOUT_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath } from './helpers/module-setup.js';
 import { PrebuildInstall } from '../lib/module-type/prebuild-install.js';
 import { Rebuilder, RebuilderOptions } from '../lib/rebuild.js';
-
-chai.use(chaiAsPromised);
 
 describe('prebuild-install', () => {
   const modulePath = path.join(testModulePath, 'node_modules', 'farmhash');
@@ -18,11 +15,9 @@ describe('prebuild-install', () => {
     lifecycle: new EventEmitter()
   };
 
-  describe('Node-API support', function() {
-    this.timeout(TIMEOUT_IN_MILLISECONDS);
-
-    before(async () => await resetTestModule(testModulePath));
-    after(async () => await cleanupTestModule(testModulePath));
+  describe('Node-API support', { timeout: TIMEOUT_IN_MILLISECONDS }, () => {
+    beforeAll(async () => await resetTestModule(testModulePath), 30_000);
+    afterAll(async () => await cleanupTestModule(testModulePath), 30_000);
 
     it('should find correct napi version and select napi args', async () => {
       const rebuilder = new Rebuilder(rebuilderArgs);
@@ -35,7 +30,7 @@ describe('prebuild-install', () => {
       ]);
     });
 
-    it('should not fail running prebuild-install', async function () {
+    it('should not fail running prebuild-install', async () => {
       const rebuilder = new Rebuilder(rebuilderArgs);
       const prebuildInstall = new PrebuildInstall(rebuilder, modulePath);
       expect(await prebuildInstall.findPrebuiltModule()).to.equal(true);
@@ -47,10 +42,10 @@ describe('prebuild-install', () => {
         electronVersion: '2.0.0',
       });
       const prebuildInstall = new PrebuildInstall(rebuilder, modulePath);
-      expect(prebuildInstall.findPrebuiltModule()).to.eventually.be.rejectedWith("Native module 'farmhash' requires Node-API but Electron v2.0.0 does not support Node-API");
+      expect(prebuildInstall.findPrebuiltModule()).rejects.toThrow("Native module 'farmhash' requires Node-API but Electron v2.0.0 does not support Node-API");
     });
 
-    it('should download for target platform', async function () {
+    it('should download for target platform', async () => {
       let rebuilder = new Rebuilder(rebuilderArgs);
       let prebuild = new PrebuildInstall(rebuilder, modulePath);
       expect(await prebuild.findPrebuiltModule()).to.equal(true);

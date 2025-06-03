@@ -1,18 +1,15 @@
 import { EventEmitter } from 'node:events';
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { cleanupTestModule, resetTestModule, TEST_MODULE_PATH as testModulePath } from './helpers/module-setup.js';
 import { NodeGyp } from '../lib/module-type/node-gyp/node-gyp.js';
 import { Rebuilder } from '../lib/rebuild.js';
 
-chai.use(chaiAsPromised);
-
 describe('node-gyp', () => {
   describe('buildArgs', () => {
 
-    before(async () => await resetTestModule(testModulePath, false));
-    after(async () => await cleanupTestModule(testModulePath));
+    beforeAll(async () => await resetTestModule(testModulePath, false), 30_000);
+    afterAll(async () => await cleanupTestModule(testModulePath), 30_000);
 
     function nodeGypArgsForElectronVersion(electronVersion: string): Promise<string[]> {
       const rebuilder = new Rebuilder({
@@ -24,7 +21,7 @@ describe('node-gyp', () => {
       return nodeGyp.buildArgs([]);
     }
 
-    context('sufficiently old Electron versions which lack a bundled config.gypi', () => {
+    describe('sufficiently old Electron versions which lack a bundled config.gypi', () => {
       it('adds --force-process-config for < 14', async () => {
         const args = await nodeGypArgsForElectronVersion('12.0.0');
         expect(args).to.include('--force-process-config');
@@ -41,7 +38,7 @@ describe('node-gyp', () => {
       });
     });
 
-    context('for sufficiently new Electron versions', () => {
+    describe('for sufficiently new Electron versions', () => {
       it('does not add --force-process-config for ^14.2.0', async () => {
         const args = await nodeGypArgsForElectronVersion('14.2.0');
         expect(args).to.not.include('--force-process-config');
@@ -58,8 +55,8 @@ describe('node-gyp', () => {
       });
     });
 
-    context('cross-compilation', async () => {
-      it('throws error early if platform mismatch', async function () {
+    describe('cross-compilation', async () => {
+      it('throws error early if platform mismatch', async () => {
         let platform: NodeJS.Platform = 'darwin';
 
         // we're verifying platform mismatch error throwing, not `rebuildModule` rebuilding.
@@ -76,7 +73,7 @@ describe('node-gyp', () => {
         const nodeGyp = new NodeGyp(rebuilder, testModulePath);
 
         const errorMessage = "node-gyp does not support cross-compiling native modules from source.";
-        expect(nodeGyp.rebuildModule()).to.eventually.be.rejectedWith(new Error(errorMessage));
+        await expect(nodeGyp.rebuildModule()).rejects.toThrow(new Error(errorMessage));
       });
     });
   });
