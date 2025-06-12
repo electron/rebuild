@@ -1,6 +1,6 @@
 import { EventEmitter } from 'node:events';
-import { expect } from 'chai';
 import path from 'node:path';
+import { describe, expect, it } from 'vitest';
 
 import {
   determineNativePrebuildArch,

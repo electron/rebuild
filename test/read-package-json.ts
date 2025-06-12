@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { expect } from 'chai';
+import { describe, expect, it } from 'vitest';
 
 import { readPackageJson } from '../lib/read-package-json.js';
 import { pathToFileURL } from 'node:url';
