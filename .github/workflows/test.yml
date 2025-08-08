@@ -15,13 +15,16 @@ jobs:
   test:
     name: Test
     strategy:
+      fail-fast: false
       matrix:
         node-version:
           - '22.12.x'
         os:
           - macos-latest
           - ubuntu-latest
+          - ubuntu-24.04-arm
           - windows-latest
+          - windows-11-arm
     runs-on: "${{ matrix.os }}"
     env:
       GYP_MSVS_VERSION: '2022'
