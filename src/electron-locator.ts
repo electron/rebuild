@@ -12,7 +12,8 @@ async function locateModuleByImport(): Promise<string | null> {
       if (fs.existsSync(path.join(modulePath, 'package.json'))) {
         return modulePath;
       }
-    } catch { // eslint-disable-line no-empty
+    } catch (err) { // eslint-disable-line no-empty
+      console.log(err);
     }
   }
 

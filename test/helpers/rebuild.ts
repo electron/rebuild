@@ -1,6 +1,6 @@
-import { expect } from 'chai';
 import fs from 'graceful-fs';
 import path from 'node:path';
+import { expect } from 'vitest';
 
 type ExpectRebuildOptions = {
   buildType?: string;

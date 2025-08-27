@@ -1,6 +1,6 @@
-import { expect } from 'chai';
 import fs from 'graceful-fs';
 import path from 'node:path';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { locateElectronModule } from '../lib/electron-locator.js';
 
@@ -19,7 +19,7 @@ describe('locateElectronModule', () => {
   describe('when electron is not installed', () => {
     const electronDir = path.resolve(import.meta.dirname, '..', 'node_modules', 'electron');
 
-    before(async () => {
+    beforeAll(async () => {
       await fs.promises.rename(electronDir, `${electronDir}-moved`);
     });
 
@@ -28,7 +28,7 @@ describe('locateElectronModule', () => {
       expect(await locateElectronModule(fixtureDir, fixtureDir)).to.be.equal(null);
     });
 
-    after(async () => {
+    afterAll(async () => {
       await fs.promises.rename(`${electronDir}-moved`, electronDir);
     });
   });
