@@ -6,6 +6,7 @@ import path from 'node:path';
 import { cleanupTestModule, resetTestModule, TIMEOUT_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath } from './helpers/module-setup.js';
 import { NodePreGyp } from '../lib/module-type/node-pre-gyp.js';
 import { Rebuilder, RebuilderOptions } from '../lib/rebuild.js';
+import { existsSync, readdirSync } from 'node:fs';
 
 chai.use(chaiAsPromised);
 
