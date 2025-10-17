@@ -8,13 +8,13 @@
   "scripts": {
     "build": "tsc",
     "build:docs": "typedoc src/main.ts",
-    "coverage": "npm run prewarm-headers && nyc npm run spec",
+    "coverage": "yarn prewarm-headers && nyc yarn spec",
     "coverage:report": "nyc report --reporter=text-lcov > coverage.lcov",
     "watch": "tsc -w",
-    "prepare": "npm run build",
+    "prepare": "yarn build",
     "lint": "eslint --ext .ts .",
     "spec": "tsc && mocha",
-    "test": "npm run prewarm-headers && npm run lint && npm run spec",
+    "test": "yarn prewarm-headers && yarn lint && yarn spec",
     "prewarm-headers": "node-gyp install --ensure"
   },
   "bin": {
@@ -89,5 +89,11 @@
   },
   "nyc": {
     "extends": "@istanbuljs/nyc-config-typescript"
+  },
+  "packageManager": "yarn@4.10.3+sha512.c38cafb5c7bb273f3926d04e55e1d8c9dfa7d9c3ea1f36a4868fa028b9e5f72298f0b7f401ad5eb921749eb012eb1c3bb74bf7503df3ee43fd600d14a018266f",
+  "dependenciesMeta": {
+    "electron": {
+      "built": true
+    }
   }
 }

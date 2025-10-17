@@ -33,15 +33,18 @@ export async function resetTestModule(testModulePath: string, installModules = t
 
   const oneTimeModulePath = path.resolve(testModuleTmpPath, `${crypto.createHash('SHA1').update(testModulePath).digest('hex')}-${fixtureName}-${installModules}`);
   if (!fs.existsSync(oneTimeModulePath)) {
-    d(`creating test module '%s' in %s`, fixtureName, oneTimeModulePath);
+    d(`creating test module '${fixtureName}' in ${oneTimeModulePath}`);
     await fs.promises.mkdir(oneTimeModulePath, { recursive: true });
-    await fs.promises.cp(path.resolve(import.meta.dirname, `../../test/fixture/${ fixtureName }`), oneTimeModulePath, { recursive: true, force: true });
+    await fs.promises.cp(path.resolve(import.meta.dirname, `../fixture/${ fixtureName }`), oneTimeModulePath, { recursive: true, force: true });
+    await fs.promises.cp(path.resolve(import.meta.dirname, `../../.yarn`), path.join(oneTimeModulePath, '.yarn'), { recursive: true, force: true });
     if (installModules) {
-      await spawn('yarn', ['install'], { cwd: oneTimeModulePath });
+      d(`installModules is ${installModules}, installing dependencies in ${oneTimeModulePath}`);
+      await spawn('yarn', ['install', '--immutable'], { cwd: oneTimeModulePath });
     }
   }
   await fs.promises.rm(testModulePath, { recursive: true, force: true });
   await fs.promises.cp(oneTimeModulePath, testModulePath, { recursive: true, force: true });
+  d(`contents of ${testModulePath}:`, fs.readdirSync(testModulePath));
   resetMSVSVersion();
 }
 

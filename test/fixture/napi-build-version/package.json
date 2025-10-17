@@ -9,5 +9,10 @@
   "license": "MIT",
   "dependencies": {
     "sqlite3": "5.1.6"
+  },
+  "dependenciesMeta": {
+    "sqlite3": {
+      "built": true
+    }
   }
 }

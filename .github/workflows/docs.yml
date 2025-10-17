@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: 22.12.x
       - name: Install dependencies
-        run: yarn --frozen-lockfile
+        run: yarn --immutable
       - name: Build API documentation
         run: yarn build:docs
       - name: Azure login

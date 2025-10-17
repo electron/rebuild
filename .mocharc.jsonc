@@ -6,5 +6,6 @@
     "ts"
   ],
   "import": "tsx",
-  "spec": ["test/*.ts"]
+  "spec": ["test/*.ts"],
+  "timeout": 30000
 }
