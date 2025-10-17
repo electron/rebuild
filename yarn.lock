@@ -433,6 +433,9 @@ __metadata:
     typedoc: "npm:~0.25.13"
     typescript: "npm:~5.4.5"
     yargs: "npm:^17.0.1"
+  dependenciesMeta:
+    electron:
+      built: true
   bin:
     electron-rebuild: lib/cli.js
   languageName: unknown
