@@ -35,7 +35,8 @@ export async function resetTestModule(testModulePath: string, installModules = t
   if (!fs.existsSync(oneTimeModulePath)) {
     d(`creating test module '${fixtureName}' in ${oneTimeModulePath}`);
     await fs.promises.mkdir(oneTimeModulePath, { recursive: true });
-    await fs.promises.cp(path.resolve(import.meta.dirname, `../../test/fixture/${ fixtureName }`), oneTimeModulePath, { recursive: true, force: true });
+    await fs.promises.cp(path.resolve(import.meta.dirname, `../fixture/${ fixtureName }`), oneTimeModulePath, { recursive: true, force: true });
+    await fs.promises.cp(path.resolve(import.meta.dirname, `../../.yarn`), path.join(oneTimeModulePath, '.yarn'), { recursive: true, force: true });
     if (installModules) {
       d(`installModules is ${installModules}, installing dependencies in ${oneTimeModulePath}`);
       await spawn('yarn', ['install', '--immutable'], { cwd: oneTimeModulePath });
