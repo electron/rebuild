@@ -13,7 +13,7 @@
     "watch": "tsc -w",
     "prepare": "yarn build",
     "lint": "eslint --ext .ts .",
-    "spec": "mocha",
+    "spec": "tsc && mocha",
     "test": "yarn prewarm-headers && yarn lint && yarn spec",
     "prewarm-headers": "node-gyp install --ensure"
   },
