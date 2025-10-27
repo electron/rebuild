@@ -47,7 +47,6 @@
   },
   "dependencies": {
     "@malept/cross-spawn-promise": "^2.0.0",
-    "chalk": "^4.0.0",
     "debug": "^4.1.1",
     "detect-libc": "^2.0.1",
     "got": "^11.7.0",

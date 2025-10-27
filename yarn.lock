@@ -412,7 +412,6 @@ __metadata:
     "@typescript-eslint/parser": "npm:^6.21.0"
     chai: "npm:^4.2.0"
     chai-as-promised: "npm:^7.1.1"
-    chalk: "npm:^4.0.0"
     debug: "npm:^4.1.1"
     detect-libc: "npm:^2.0.1"
     electron: "npm:^35.7.5"

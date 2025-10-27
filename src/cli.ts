@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-import chalk from 'chalk';
 import fs from 'graceful-fs';
 import path from 'node:path';
+import util from 'node:util';
 import ora from 'ora';
 import yargs from 'yargs/yargs';
 
@@ -66,8 +66,8 @@ if (process.argv.length === 3 && process.argv[2] === '--version') {
 }
 
 const handler = (err: Error): void => {
-  console.error(chalk.red('\nAn unhandled error occurred inside electron-rebuild'));
-  console.error(chalk.red(`${err.message}\n\n${err.stack}`));
+  console.error(util.styleText('red', '\nAn unhandled error occurred inside electron-rebuild'));
+  console.error(util.styleText('red', `${err.message}\n\n${err.stack}`));
   process.exit(-1);
 };
 
