@@ -1,8 +1,9 @@
-## Electron Rebuild
+# @electron/rebuild
 
 [![Test](https://github.com/electron/rebuild/actions/workflows/test.yml/badge.svg)](https://github.com/electron/rebuild/actions/workflows/test.yml)
 [![NPM](https://img.shields.io/npm/v/@electron/rebuild.svg?style=flat)](https://npm.im/@electron/rebuild)
 [![Coverage Status](https://codecov.io/gh/electron/rebuild/branch/main/graph/badge.svg)](https://codecov.io/gh/electron/rebuild)
+[![API docs](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fregistry.npmjs.org%2F%40electron%2Frebuild%2Flatest&query=%24.version&logo=typescript&logoColor=white&label=API%20Docs)](https://packages.electronjs.org/rebuild)
 
 This executable rebuilds native Node.js modules against the version of Node.js
 that your Electron project is using. This allows you to use native Node.js
@@ -28,7 +29,8 @@ Or if you're on Windows:
 ```sh
 .\node_modules\.bin\electron-rebuild.cmd
 ```
-If you have a good node-gyp config but you see an error about a missing element on Windows like `Could not load the Visual C++ component "VCBuild.exe"`, try to launch electron-rebuild in an npm script:
+
+If you have a good node-gyp config but you see an error about a missing element on Windows like `Could not load the Visual C++ component "VCBuild.exe"`, try to launch `electron-rebuild` in an npm script:
 
 ```json
 "scripts": {
@@ -45,10 +47,10 @@ npm run rebuild
 ### What are the requirements?
 
 Node v22.12.0 or higher is required. Building native modules from source uses
-[`node-gyp`](https://github.com/nodejs/node-gyp#installation), refer to the link for its
+[`node-gyp`](https://github.com/nodejs/node-gyp#installation). Refer to the link for its
 installation/runtime requirements.
 
-### CLI Arguments
+### CLI arguments
 
 ```
 Usage: electron-rebuild --version [version] --module-dir [path]
@@ -101,18 +103,21 @@ electron-rebuild provides a function compatible with the [`afterCopy` hook](http
 for Electron Packager. For example:
 
 ```javascript
-import packager from '@electron/packager';
-import { rebuild } from '@electron/rebuild';
+import packager from "@electron/packager";
+import { rebuild } from "@electron/rebuild";
 
 packager({
   // … other options
-  afterCopy: [(buildPath, electronVersion, platform, arch, callback) => {
-    rebuild({ buildPath, electronVersion, arch })
-      .then(() => callback())
-      .catch((error) => callback(error));
-  }],
+  afterCopy: [
+    (buildPath, electronVersion, platform, arch, callback) => {
+      rebuild({ buildPath, electronVersion, arch })
+        .then(() => callback())
+        .catch((error) => callback(error));
+    },
+  ],
   // … other options
 });
+
 ```
 
 ### How can I integrate this with [prebuild](https://github.com/prebuild/prebuild)?
@@ -122,7 +127,7 @@ it also uses [prebuild-install](https://github.com/prebuild/prebuild-install) to
 this is the case, then `electron-rebuild` will run `prebuild-install` to download the correct
 binaries from the project's GitHub Releases instead of rebuilding them.
 
-### How can I integrate this into Grunt / Gulp / Whatever?
+### How can I integrate this into my build pipeline?
 
 electron-rebuild is also a library that you can require into your app or
 build process. It has a very simple API:
@@ -148,32 +153,35 @@ import { rebuild } from '@electron/rebuild';
 // Returns a Promise indicating whether the operation succeeded or not
 ```
 
+For full API usage, see the [API documentation](https://packages.electronjs.org/rebuild).
+
 A full build process might look something like:
 
 ```javascript
 // ESM
-import { rebuild } from '@electron/rebuild'
+import { rebuild } from "@electron/rebuild";
 
 rebuild({
   buildPath: import.meta.dirname,
-  electronVersion: '35.1.5'
+  electronVersion: "35.1.5",
 })
-.then(() => console.info('Rebuild Successful'))
-.catch((e) => {
-  console.error('Building modules didn\'t work!')
-  console.error(e)
-})
+  .then(() => console.info("Rebuild Successful"))
+  .catch((e) => {
+    console.error("Building modules didn't work!");
+    console.error(e);
+  });
 
 // CommonJS
-const { rebuild } = require('@electron/rebuild')
+const { rebuild } = require("@electron/rebuild");
 
 rebuild({
   buildPath: __dirname,
-  electronVersion: '35.1.5'
+  electronVersion: "35.1.5",
 })
-.then(() => console.info('Rebuild Successful'))
-.catch((e) => {
-  console.error('Building modules didn\'t work!')
-  console.error(e)
-})
+  .then(() => console.info("Rebuild Successful"))
+  .catch((e) => {
+    console.error("Building modules didn't work!");
+    console.error(e);
+  });
+
 ```
