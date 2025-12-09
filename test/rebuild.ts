@@ -171,13 +171,13 @@ describe('rebuilder', () => {
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
         arch: process.arch,
-        onlyModules: ['windows-active-process', 'ref-napi'], // TODO: check to see if there's a bug with scoped modules
+        onlyModules: ['windows-active-process', 'ref-napi', '@newrelic/native-metrics'],
         force: true
       });
       let built = 0;
       rebuilder.lifecycle.on('module-done', () => built++);
       await rebuilder;
-      expect(built).to.equal(2);
+      expect(built).to.equal(3);
     });
   });
 
