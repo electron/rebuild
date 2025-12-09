@@ -149,7 +149,8 @@ export class ModuleWalker {
       }
       this.realModulePaths.add(realPath);
 
-      if (this.prodDeps.has(`${prefix}${modulePath}`) && (!this.onlyModules || this.onlyModules.includes(modulePath))) {
+      const moduleName = `${prefix}${modulePath}`;
+      if (this.prodDeps.has(moduleName) && (!this.onlyModules || this.onlyModules.includes(moduleName))) {
         this.modulesToRebuild.push(realPath);
       }
 
