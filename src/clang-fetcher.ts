@@ -2,7 +2,7 @@ import cp from 'node:child_process';
 import debug from 'debug';
 import fs from 'graceful-fs';
 import path from 'node:path';
-import tar from 'tar';
+import * as tar from 'tar';
 import zlib from 'node:zlib';
 import { ELECTRON_GYP_DIR } from './constants.js';
 import { fetch } from './fetcher.js';
