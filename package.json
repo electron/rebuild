@@ -57,7 +57,7 @@
     "ora": "^5.1.0",
     "read-binary-file-arch": "^1.0.6",
     "semver": "^7.3.5",
-    "tar": "^7.5.3",
+    "tar": "^7.5.4",
     "yargs": "^17.0.1"
   },
   "devDependencies": {
