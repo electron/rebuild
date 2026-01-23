@@ -57,7 +57,7 @@
     "ora": "^5.1.0",
     "read-binary-file-arch": "^1.0.6",
     "semver": "^7.3.5",
-    "tar": "^6.0.5",
+    "tar": "^7.5.6",
     "yargs": "^17.0.1"
   },
   "devDependencies": {
@@ -71,7 +71,6 @@
     "@types/node": "~22.10.7",
     "@types/node-abi": "^3.0.0",
     "@types/semver": "^7.3.9",
-    "@types/tar": "^6.1.0",
     "@types/yargs": "^17.0.2",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
