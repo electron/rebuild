@@ -99,7 +99,7 @@ This package is automatically used with Electron Forge when packaging an Electro
 
 ### How can I integrate this into [Electron Packager](https://github.com/electron/packager)?
 
-electron-rebuild provides a function compatible with the [`afterCopy` hook](https://electron.github.io/packager/main/interfaces/Options.html#afterCopy)
+electron-rebuild provides a function compatible with the [`afterCopy` hook](https://packages.electronjs.org/packager/v19.0.5/interfaces/Options.html#aftercopy)
 for Electron Packager. For example:
 
 ```javascript
@@ -109,10 +109,8 @@ import { rebuild } from "@electron/rebuild";
 packager({
   // … other options
   afterCopy: [
-    (buildPath, electronVersion, platform, arch, callback) => {
-      rebuild({ buildPath, electronVersion, arch })
-        .then(() => callback())
-        .catch((error) => callback(error));
+    async ({ buildPath, electronVersion, arch }) => {
+      await rebuild({ buildPath, electronVersion, arch });
     },
   ],
   // … other options
