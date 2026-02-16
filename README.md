@@ -103,7 +103,7 @@ electron-rebuild provides a function compatible with the [`afterCopy` hook](http
 for Electron Packager. For example:
 
 ```javascript
-import packager from "@electron/packager";
+import { packager } from "@electron/packager";
 import { rebuild } from "@electron/rebuild";
 
 packager({
