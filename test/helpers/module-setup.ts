@@ -1,11 +1,10 @@
-import debug from 'debug';
 import crypto from 'node:crypto';
-import fs from 'graceful-fs';
+import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawn } from '@malept/cross-spawn-promise';
 
-const d = debug('electron-rebuild');
+import { d } from '../../src/debug.js';
+import { spawn } from '@malept/cross-spawn-promise';
 
 const originalGypMSVSVersion: string | undefined = process.env.GYP_MSVS_VERSION;
 const TIMEOUT_IN_MINUTES = process.platform === 'win32' ? 5 : 2;

@@ -1,10 +1,9 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import fs from 'graceful-fs';
+import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
 import { getProjectRootPath } from '../lib/search-module.js';
-import { promisifiedGracefulFs } from '../lib/promisifiedGracefulFs.js';
 
 let baseDir: string;
 
@@ -29,7 +28,7 @@ describe('search-module', () => {
 
             if(!fs.existsSync(lockfilePath)) {
               await fs.promises.mkdir(baseDir, { recursive: true });
-              await promisifiedGracefulFs.writeFile(lockfilePath, Buffer.from([]), {});
+              await fs.promises.writeFile(lockfilePath, Buffer.from([]), {});
             }
           });
 

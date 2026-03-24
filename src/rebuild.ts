@@ -1,6 +1,5 @@
-import debug from 'debug';
 import { EventEmitter } from 'node:events';
-import fs from 'graceful-fs';
+import fs from 'node:fs';
 import { getAbi } from 'node-abi';
 import os from 'node:os';
 import path from 'node:path';
@@ -9,6 +8,7 @@ import { generateCacheKey, lookupModuleState } from './cache.js';
 import { BuildType, IRebuilder, RebuildMode } from './types.js';
 import { ModuleRebuilder } from './module-rebuilder.js';
 import { ModuleType, ModuleWalker } from './module-walker.js';
+import { d } from './debug.js';
 
 export interface RebuildOptions {
   /**
@@ -124,8 +124,6 @@ export interface RebuildOptions {
 export interface RebuilderOptions extends RebuildOptions {
   lifecycle: EventEmitter;
 }
-
-const d = debug('electron-rebuild');
 
 const defaultMode: RebuildMode = 'sequential';
 const defaultTypes: ModuleType[] = ['prod', 'optional'];

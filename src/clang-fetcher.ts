@@ -1,15 +1,11 @@
 import cp from 'node:child_process';
-import debug from 'debug';
-import fs from 'graceful-fs';
+import fs from 'node:fs';
 import path from 'node:path';
-import * as tar from 'tar';
-import zlib from 'node:zlib';
 import { ELECTRON_GYP_DIR } from './constants.js';
-import { fetch } from './fetcher.js';
+import { fetchUrl } from './fetcher.js';
 import { downloadLinuxSysroot } from './sysroot-fetcher.js';
-import { promisifiedGracefulFs } from './promisifiedGracefulFs.js';
-
-const d = debug('electron-rebuild');
+import { d } from './debug.js';
+import { spawn } from '@malept/cross-spawn-promise';
 
 const CDS_URL = 'https://commondatastorage.googleapis.com/chromium-browser-clang';
 
@@ -48,7 +44,7 @@ export async function getClangEnvironmentVars(electronVersion: string, targetArc
 
   const gypArgs = [];
   if (process.platform === 'win32') {
-    console.log(await promisifiedGracefulFs.readdir(clangDir));
+    console.log(await fs.promises.readdir(clangDir));
     gypArgs.push(`/p:CLToolExe=clang-cl.exe`, `/p:CLToolPath=${clangDir}`);
   }
 
@@ -88,14 +84,14 @@ async function downloadClangVersion(electronVersion: string) {
   if (fs.existsSync(path.resolve(clangDirPath, 'bin', 'clang'))) return clangDirPath;
   await fs.promises.mkdir(ELECTRON_GYP_DIR, { recursive: true });
 
-  const electronDeps = await fetch(`https://raw.githubusercontent.com/electron/electron/v${electronVersion}/DEPS`, 'text');
+  const electronDeps = await fetchUrl(`https://raw.githubusercontent.com/electron/electron/v${electronVersion}/DEPS`, 'text');
   const chromiumRevisionExtractor = /'chromium_version':\n\s+'([^']+)/g;
   const chromiumRevisionMatch = chromiumRevisionExtractor.exec(electronDeps);
   if (!chromiumRevisionMatch) throw new Error('Failed to determine Chromium revision for given Electron version');
   const chromiumRevision = chromiumRevisionMatch[1];
   d('fetching clang for Chromium:', chromiumRevision);
 
-  const base64ClangUpdate = await fetch(`https://chromium.googlesource.com/chromium/src.git/+/${chromiumRevision}/tools/clang/scripts/update.py?format=TEXT`, 'text');
+  const base64ClangUpdate = await fetchUrl(`https://chromium.googlesource.com/chromium/src.git/+/${chromiumRevision}/tools/clang/scripts/update.py?format=TEXT`, 'text');
   const clangUpdate = Buffer.from(base64ClangUpdate, 'base64').toString('utf8');
 
   const clangVersionString = clangVersionFromRevision(clangUpdate) || clangVersionFromSVN(clangUpdate);
@@ -104,18 +100,13 @@ async function downloadClangVersion(electronVersion: string) {
 
   const clangDownloadURL = getClangDownloadURL('clang', clangVersionString, process.platform, process.arch);
 
-  const contents = await fetch(clangDownloadURL, 'buffer');
-  d('deflating clang');
-  zlib.deflateSync(contents);
-  const tarPath = path.resolve(ELECTRON_GYP_DIR, `${electronVersion}-clang.tar`);
+  const contents = await fetchUrl(clangDownloadURL, 'buffer');
+  const tarPath = path.resolve(ELECTRON_GYP_DIR, `${electronVersion}-clang.tgz`);
   if (fs.existsSync(tarPath)) await fs.promises.rm(tarPath, { recursive: true, force: true });
-  await promisifiedGracefulFs.writeFile(tarPath, Buffer.from(contents));
+  await fs.promises.writeFile(tarPath, contents);
   await fs.promises.mkdir(clangDirPath, { recursive: true });
-  d('tar running on clang');
-  await tar.x({
-    file: tarPath,
-    cwd: clangDirPath,
-  });
+  d('extracting clang');
+  await spawn('tar', ['-xf', tarPath, '-C', clangDirPath], { stdio: 'ignore' });
   await fs.promises.rm(tarPath, { recursive: true, force: true });
   d('cleaning up clang tar file');
   return clangDirPath;

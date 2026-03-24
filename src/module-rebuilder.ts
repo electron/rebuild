@@ -1,5 +1,4 @@
-import debug from 'debug';
-import fs from 'graceful-fs';
+import fs from 'node:fs';
 import path from 'node:path';
 
 import { cacheModuleState } from './cache.js';
@@ -8,9 +7,7 @@ import { Prebuildify } from './module-type/prebuildify.js';
 import { PrebuildInstall } from './module-type/prebuild-install.js';
 import { NodePreGyp } from './module-type/node-pre-gyp.js';
 import { IRebuilder } from './types.js';
-import { promisifiedGracefulFs } from './promisifiedGracefulFs.js';
-
-const d = debug('electron-rebuild');
+import { d } from './debug.js';
 
 export class ModuleRebuilder {
   private modulePath: string;
@@ -40,7 +37,7 @@ export class ModuleRebuilder {
 
   async alreadyBuiltByRebuild(): Promise<boolean> {
     if (fs.existsSync(this.metaPath)) {
-      const meta = await promisifiedGracefulFs.readFile(this.metaPath, 'utf8');
+      const meta = await fs.promises.readFile(this.metaPath, 'utf8');
       return meta === this.metaData;
     }
 
@@ -121,7 +118,7 @@ export class ModuleRebuilder {
     const buildLocation = path.resolve(this.modulePath, 'build', this.rebuilder.buildType);
 
     d('searching for .node file', buildLocation);
-    const buildLocationFiles = await promisifiedGracefulFs.readdir(buildLocation);
+    const buildLocationFiles = await fs.promises.readdir(buildLocation);
     d('testing files', buildLocationFiles);
 
     const nodeFile = buildLocationFiles.find((file) => file !== '.node' && file.endsWith('.node'));
@@ -133,14 +130,14 @@ export class ModuleRebuilder {
         const abiPath = path.resolve(this.modulePath, `bin/${this.rebuilder.platform}-${this.rebuilder.arch}-${this.rebuilder.ABI}`);
         d('copying to prebuilt place:', abiPath);
         await fs.promises.mkdir(abiPath, { recursive: true });
-        await promisifiedGracefulFs.copyFile(nodePath, path.join(abiPath, `${this.nodeGyp.moduleName}.node`));
+        await fs.promises.copyFile(nodePath, path.join(abiPath, `${this.nodeGyp.moduleName}.node`));
       }
     }
   }
 
   async writeMetadata(): Promise<void> {
     await fs.promises.mkdir(path.dirname(this.metaPath), { recursive: true });
-    await promisifiedGracefulFs.writeFile(this.metaPath, this.metaData);
+    await fs.promises.writeFile(this.metaPath, this.metaData);
   }
 
   async rebuild(cacheKey: string): Promise<boolean> {

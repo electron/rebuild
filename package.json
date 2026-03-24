@@ -46,26 +46,15 @@
   },
   "dependencies": {
     "@malept/cross-spawn-promise": "^2.0.0",
-    "debug": "^4.1.1",
-    "detect-libc": "^2.0.1",
-    "graceful-fs": "^4.2.11",
     "node-abi": "^4.2.0",
     "node-api-version": "^0.2.1",
-    "node-gyp": "^11.2.0",
-    "ora": "^5.1.0",
-    "read-binary-file-arch": "^1.0.6",
-    "semver": "^7.3.5",
-    "tar": "^7.5.6",
-    "yargs": "^17.0.1"
+    "node-gyp": "^12.2.0",
+    "read-binary-file-arch": "^1.0.6"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.0",
-    "@types/debug": "^4.1.5",
-    "@types/graceful-fs": "^4.1.9",
     "@types/node": "~22.10.7",
     "@types/node-abi": "^3.0.0",
-    "@types/semver": "^7.3.9",
-    "@types/yargs": "^17.0.2",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "@vitest/coverage-v8": "^4.1.2",

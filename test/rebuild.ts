@@ -1,13 +1,12 @@
 import { EventEmitter } from 'node:events';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import fs from 'graceful-fs';
+import fs from 'node:fs';
 import path from 'node:path';
 
 import { cleanupTestModule, MINUTES_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath, resetMSVSVersion, resetTestModule, TIMEOUT_IN_MILLISECONDS } from './helpers/module-setup.js';
 import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild.js';
 import { getExactElectronVersionSync } from './helpers/electron-version.js';
 import { Rebuilder, rebuild } from '../lib/rebuild.js';
-import { promisifiedGracefulFs } from '../lib/promisifiedGracefulFs.js';
 
 const testElectronVersion = getExactElectronVersionSync();
 
@@ -50,7 +49,7 @@ describe('rebuilder', () => {
 
     it('should not download files in the module directory', async () => {
       const modulePath = path.resolve(testModulePath, 'node_modules/ref-napi');
-      const fileNames = await promisifiedGracefulFs.readdir(modulePath);
+      const fileNames = await fs.promises.readdir(modulePath);
 
       expect(fileNames).not.toContain(testElectronVersion);
     });

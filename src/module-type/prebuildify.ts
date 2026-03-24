@@ -1,11 +1,9 @@
-import debug from 'debug';
-import fs from 'graceful-fs';
+import fs from 'node:fs';
 import path from 'node:path';
 
 import { ConfigVariables, getNodeArch } from '../arch.js';
 import { NativeModule } from './index.js';
-
-const d = debug('electron-rebuild');
+import { d } from '../debug.js';
 
 export function determineNativePrebuildArch(arch: string): string {
   if (arch === 'armv7l') {
