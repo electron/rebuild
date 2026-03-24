@@ -1,7 +1,6 @@
 import { setTimeout as sleep } from 'node:timers/promises';
 
 import debug from 'debug';
-import got from 'got';
 
 const d = debug('electron-rebuild');
 
@@ -9,16 +8,17 @@ export async function fetch<T extends 'buffer' | 'text', RT = T extends 'buffer'
   if (retries === 0) throw new Error('Failed to fetch a clang resource, run with DEBUG=electron-rebuild for more information');
   d('downloading:', url);
   try {
-    const response = await got.default.get(url, {
-      responseType,
-    });
-    if (response.statusCode !== 200) {
-      d('got bad status code:', response.statusCode);
+    const response = await globalThis.fetch(url);
+    if (response.status !== 200) {
+      d('got bad status code:', response.status);
       await sleep(2000);
       return fetch(url, responseType, retries - 1);
     }
     d('response came back OK');
-    return response.body as RT;
+    if (responseType === 'buffer') {
+      return Buffer.from(await response.arrayBuffer()) as RT;
+    }
+    return await response.text() as RT;
   } catch (err) {
     d('request failed for some reason', err);
     await sleep(2000);

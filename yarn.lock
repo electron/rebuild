@@ -416,7 +416,6 @@ __metadata:
     electron: "npm:^35.7.5"
     eslint: "npm:^7.7.0"
     eslint-plugin-mocha: "npm:^9.0.0"
-    got: "npm:^11.7.0"
     graceful-fs: "npm:^4.2.11"
     mocha: "npm:^11.1.0"
     node-abi: "npm:^4.2.0"
@@ -2638,7 +2637,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"got@npm:^11.7.0, got@npm:^11.8.5":
+"got@npm:^11.8.5":
   version: 11.8.5
   resolution: "got@npm:11.8.5"
   dependencies:
