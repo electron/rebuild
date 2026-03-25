@@ -1,8 +1,3 @@
-const enabled = /(^|[\s,])(electron-rebuild|\*)([\s,]|$)/.test(process.env.DEBUG || '');
+import debug from 'debug';
 
-function log(...args: unknown[]): void {
-  if (enabled) console.error('electron-rebuild', ...args);
-}
-log.enabled = enabled;
-
-export const d = log;
+export const d = debug('electron-rebuild');

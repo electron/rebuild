@@ -99,11 +99,13 @@ __metadata:
   dependencies:
     "@malept/cross-spawn-promise": "npm:^2.0.0"
     "@tsconfig/node22": "npm:^22.0.0"
+    "@types/debug": "npm:^4.1.5"
     "@types/node": "npm:~22.10.7"
     "@types/node-abi": "npm:^3.0.0"
     "@typescript-eslint/eslint-plugin": "npm:^6.21.0"
     "@typescript-eslint/parser": "npm:^6.21.0"
     "@vitest/coverage-v8": "npm:^4.1.2"
+    debug: "npm:^4.1.1"
     electron: "npm:^39.8.5"
     eslint: "npm:^7.7.0"
     node-abi: "npm:^4.2.0"
@@ -523,6 +525,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/debug@npm:^4.1.5":
+  version: 4.1.13
+  resolution: "@types/debug@npm:4.1.13"
+  dependencies:
+    "@types/ms": "npm:*"
+  checksum: 10c0/e5e124021bbdb23a82727eee0a726ae0fc8a3ae1f57253cbcc47497f259afb357de7f6941375e773e1abbfa1604c1555b901a409d762ec2bb4c1612131d4afb7
+  languageName: node
+  linkType: hard
+
 "@types/deep-eql@npm:*":
   version: 4.0.2
   resolution: "@types/deep-eql@npm:4.0.2"
@@ -557,6 +568,13 @@ __metadata:
   dependencies:
     "@types/node": "npm:*"
   checksum: 10c0/d5f85a944e719b4df4b649ee0b825263a6de68efd57a972774df48cf5ec5b816ab1f057be4d55f2f57a8822f74dcc3ed5bad7045366c41e9dc09214398d87ec0
+  languageName: node
+  linkType: hard
+
+"@types/ms@npm:*":
+  version: 2.1.0
+  resolution: "@types/ms@npm:2.1.0"
+  checksum: 10c0/5ce692ffe1549e1b827d99ef8ff71187457e0eb44adbae38fdf7b9a74bae8d20642ee963c14516db1d35fa2652e65f47680fdf679dcbde52bbfadd021f497225
   languageName: node
   linkType: hard
 

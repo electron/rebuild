@@ -234,11 +234,18 @@ export class Rebuilder implements IRebuilder {
 
     this.lifecycle.emit('start');
 
-    for (const modulePath of await this.modulesToRebuild()) {
+    const candidatePaths = [...await this.modulesToRebuild(), this.buildPath];
+    const nativeModulePaths = candidatePaths.filter(p => fs.existsSync(path.resolve(p, 'binding.gyp')));
+
+    this.lifecycle.emit('modules-found', nativeModulePaths.map(p => {
+      const name = path.basename(p);
+      const parent = path.basename(path.dirname(p));
+      return parent !== 'node_modules' ? `${parent}/${name}` : name;
+    }));
+
+    for (const modulePath of nativeModulePaths) {
       this.rebuilds.push(() => this.rebuildModuleAt(modulePath));
     }
-
-    this.rebuilds.push(() => this.rebuildModuleAt(this.buildPath));
 
     if (this.mode !== 'sequential') {
       await Promise.all(this.rebuilds.map(fn => fn()));
@@ -260,9 +267,6 @@ export class Rebuilder implements IRebuilder {
   }
 
   async rebuildModuleAt(modulePath: string): Promise<void> {
-    if (!(fs.existsSync(path.resolve(modulePath, 'binding.gyp')))) {
-      return;
-    }
 
     const moduleRebuilder = new ModuleRebuilder(this, modulePath);
 

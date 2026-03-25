@@ -9,7 +9,6 @@ import { getProjectRootPath } from './search-module.js';
 import { locateElectronModule } from './electron-locator.js';
 import { ModuleType } from './module-walker.js';
 import { rebuild } from './rebuild.js';
-import { Spinner } from './spinner.js';
 
 const options = {
   version: { short: 'v', type: 'string', description: 'The version of Electron to build against' },
@@ -119,20 +118,7 @@ process.on('unhandledRejection', handler);
     throw new Error('force-abi must be a number');
   }
 
-  let modulesDone = 0;
-  let moduleTotal = 0;
-  const rebuildSpinner = new Spinner('Searching dependency tree').start();
-  let lastModuleName: string;
-
-  const redraw = (moduleName?: string): void => {
-    if (moduleName) lastModuleName = moduleName;
-
-    if (argv.parallel) {
-      rebuildSpinner.text = `Building modules: ${modulesDone}/${moduleTotal}`;
-    } else {
-      rebuildSpinner.text = `Building module: ${lastModuleName}, Completed: ${modulesDone}`;
-    }
-  };
+  console.error('Searching dependency tree');
 
   const rebuilder = rebuild({
     buildPath: rootDirectory,
@@ -155,24 +141,20 @@ process.on('unhandledRejection', handler);
 
   const lifecycle = rebuilder.lifecycle;
 
-  lifecycle.on('module-found', (moduleName: string) => {
-    moduleTotal += 1;
-    redraw(moduleName);
-  });
-
-  lifecycle.on('module-done', () => {
-    modulesDone += 1;
-    redraw();
+  lifecycle.on('modules-found', (moduleNames: string[]) => {
+    if (moduleNames.length > 0) {
+      console.error(`Building modules: ${moduleNames.join(', ')}`);
+    } else {
+      console.error('No native modules found');
+    }
   });
 
   try {
     await rebuilder;
   } catch (err) {
-    rebuildSpinner.text = 'Rebuild Failed';
-    rebuildSpinner.fail();
+    console.error(styleText('red', '✖ Rebuild Failed'));
     throw err;
   }
 
-  rebuildSpinner.text = 'Rebuild Complete';
-  rebuildSpinner.succeed();
+  console.error(styleText('green', '✔ Rebuild Complete'));
 })();
