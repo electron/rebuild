@@ -1,3 +1,4 @@
+import debug from 'debug';
 import { EventEmitter } from 'node:events';
 import fs from 'node:fs';
 import { getAbi } from 'node-abi';
@@ -8,7 +9,8 @@ import { generateCacheKey, lookupModuleState } from './cache.js';
 import { BuildType, IRebuilder, RebuildMode } from './types.js';
 import { ModuleRebuilder } from './module-rebuilder.js';
 import { ModuleType, ModuleWalker } from './module-walker.js';
-import { d } from './debug.js';
+
+const d = debug('electron-rebuild');
 
 export interface RebuildOptions {
   /**

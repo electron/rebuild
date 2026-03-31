@@ -1,9 +1,11 @@
+import debug from 'debug';
 import fs from 'node:fs';
 import path from 'node:path';
 
 import { locateBinary, NativeModule } from './index.js';
 import { spawn } from '@malept/cross-spawn-promise';
-import { d } from '../debug.js';
+
+const d = debug('electron-rebuild');
 
 export class PrebuildInstall extends NativeModule {
   async usesTool(): Promise<boolean> {

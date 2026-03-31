@@ -39,7 +39,6 @@ if (argv.help) {
     const short = 'short' in opt ? `-${opt.short}, ` : '    ';
     console.log(`  ${short}--${name.padEnd(22)} ${opt.description}`);
   }
-  console.log('\nCopyright 2016-2021');
   process.exit(0);
 }
 

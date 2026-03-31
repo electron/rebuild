@@ -1,9 +1,10 @@
 import crypto from 'node:crypto';
+import debug from 'debug';
 import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
 
-import { d } from './debug.js';
+const d = debug('electron-rebuild');
 
 // Update this number if you change the caching logic to ensure no bad cache hits
 const ELECTRON_REBUILD_CACHE_ID = 1;

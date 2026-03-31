@@ -1,9 +1,11 @@
+import debug from 'debug';
 import fs from 'node:fs';
 import path from 'node:path';
 
 import { ConfigVariables, getNodeArch } from '../arch.js';
 import { NativeModule } from './index.js';
-import { d } from '../debug.js';
+
+const d = debug('electron-rebuild');
 
 export function determineNativePrebuildArch(arch: string): string {
   if (arch === 'armv7l') {

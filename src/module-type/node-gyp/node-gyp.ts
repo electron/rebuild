@@ -1,11 +1,13 @@
+import { fork } from 'node:child_process';
+import debug from 'debug';
 import path from 'node:path';
 
 import { ELECTRON_GYP_DIR } from '../../constants.js';
 import { getClangEnvironmentVars } from '../../clang-fetcher.js';
 import { NativeModule } from '../index.js';
-import { fork } from 'node:child_process';
-import { d } from '../../debug.js';
 import { detectLibcFamily } from '../../detect-libc.js';
+
+const d = debug('electron-rebuild');
 
 export class NodeGyp extends NativeModule {
   async buildArgs(prefixedArgs: string[]): Promise<string[]> {

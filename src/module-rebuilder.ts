@@ -1,3 +1,4 @@
+import debug from 'debug';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -7,7 +8,8 @@ import { Prebuildify } from './module-type/prebuildify.js';
 import { PrebuildInstall } from './module-type/prebuild-install.js';
 import { NodePreGyp } from './module-type/node-pre-gyp.js';
 import { IRebuilder } from './types.js';
-import { d } from './debug.js';
+
+const d = debug('electron-rebuild');
 
 export class ModuleRebuilder {
   private modulePath: string;

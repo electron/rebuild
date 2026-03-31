@@ -1,11 +1,13 @@
 import cp from 'node:child_process';
+import debug from 'debug';
 import fs from 'node:fs';
 import path from 'node:path';
 import { ELECTRON_GYP_DIR } from './constants.js';
 import { fetchUrl } from './fetcher.js';
 import { downloadLinuxSysroot } from './sysroot-fetcher.js';
-import { d } from './debug.js';
 import { spawn } from '@malept/cross-spawn-promise';
+
+const d = debug('electron-rebuild');
 
 const CDS_URL = 'https://commondatastorage.googleapis.com/chromium-browser-clang';
 

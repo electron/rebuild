@@ -1,8 +1,10 @@
+import debug from 'debug';
 import { readBinaryFileArch } from 'read-binary-file-arch';
 
 import { locateBinary, NativeModule } from './index.js';
 import { spawn } from '@malept/cross-spawn-promise';
-import { d } from '../debug.js';
+
+const d = debug('electron-rebuild');
 
 export class NodePreGyp extends NativeModule {
   async usesTool(): Promise<boolean> {

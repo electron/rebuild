@@ -1,6 +1,7 @@
+import debug from 'debug';
 import { setTimeout as sleep } from 'node:timers/promises';
 
-import { d } from './debug.js';
+const d = debug('electron-rebuild');
 
 export async function fetchUrl<T extends 'buffer' | 'text', RT = T extends 'buffer' ? Buffer : string>(url: string, responseType: T, retries = 3): Promise<RT> {
   if (retries === 0) throw new Error('Failed to fetch a clang resource, run with DEBUG=electron-rebuild for more information');

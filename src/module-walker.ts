@@ -1,9 +1,11 @@
+import debug from 'debug';
 import fs from 'node:fs';
 import path from 'node:path';
 
 import { readPackageJson } from './read-package-json.js';
 import { searchForModule, searchForNodeModules } from './search-module.js';
-import { d } from './debug.js';
+
+const d = debug('electron-rebuild');
 
 export type ModuleType = 'prod' | 'dev' | 'optional';
 

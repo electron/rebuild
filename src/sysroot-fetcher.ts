@@ -1,11 +1,13 @@
 import crypto from 'node:crypto';
+import debug from 'debug';
 import fs from 'node:fs';
 import path from 'node:path';
 
 import { ELECTRON_GYP_DIR } from './constants.js';
 import { fetchUrl } from './fetcher.js';
 import { spawn } from '@malept/cross-spawn-promise';
-import { d } from './debug.js';
+
+const d = debug('electron-rebuild');
 
 const sysrootArchAliases: Record<string, string> = {
   x64: 'amd64',
