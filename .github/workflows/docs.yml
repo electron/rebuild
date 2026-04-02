@@ -33,9 +33,6 @@ jobs:
           subscription-id: ${{ secrets.AZURE_OIDC_SUBSCRIPTION_ID }}
       - name: Upload to Azure Blob Storage
         uses: azure/cli@9eb25b8360668fb0ecbafa808d40e2197b2f5f52  # tag: v3.0.0
-        env:
-          AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_ECOSYSTEM_PACKAGES_STORAGE_ACCOUNT_NAME }}
-          REF_NAME: ${{ github.ref_name }}
         with:
-          inlineScript: |
-            az storage blob upload-batch --account-name "$AZURE_STORAGE_ACCOUNT_NAME" -d "\$web/rebuild/$REF_NAME" -s ./docs --overwrite --auth-mode login
+          inlineScript: | # zizmor: ignore[template-injection] This only runs on tags
+            az storage blob upload-batch --account-name ${{ secrets.AZURE_ECOSYSTEM_PACKAGES_STORAGE_ACCOUNT_NAME }} -d '$web/${{ github.event.repository.name }}/${{ github.ref_name }}' -s ./docs --overwrite --auth-mode login
