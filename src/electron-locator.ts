@@ -8,7 +8,7 @@ const electronModuleNames = ['electron',  'electron-prebuilt-compile'];
 async function locateModuleByImport(): Promise<string | null> {
   for (const moduleName of electronModuleNames) {
     try {
-      const modulePath = path.resolve(fileURLToPath(import.meta.resolve(path.join(moduleName, 'package.json'))), '..');
+      const modulePath = path.resolve(fileURLToPath(import.meta.resolve(`${moduleName}/package.json`)), '..');
       if (fs.existsSync(path.join(modulePath, 'package.json'))) {
         return modulePath;
       }

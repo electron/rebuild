@@ -1,5 +1,5 @@
 import { EventEmitter } from 'node:events';
-import { expect } from 'chai';
+import { describe, expect, it } from 'vitest';
 import path from 'node:path';
 
 import {
@@ -11,25 +11,25 @@ import { Rebuilder, RebuilderOptions } from '../lib/rebuild.js';
 
 describe('determineNativePrebuildArch', () => {
   it('returns arm if passed in armv7l', () => {
-    expect(determineNativePrebuildArch('armv7l')).to.equal('arm');
+    expect(determineNativePrebuildArch('armv7l')).toBe('arm');
   });
 
   it('returns the input arch if the input is not armv7l', () => {
-    expect(determineNativePrebuildArch('x64')).to.equal('x64');
+    expect(determineNativePrebuildArch('x64')).toBe('x64');
   });
 });
 
 describe('determineNativePrebuildExtension', () => {
   it('returns armv8 suffix for an arm64 arch', () => {
-    expect(determineNativePrebuildExtension('arm64')).to.equal('armv8.node');
+    expect(determineNativePrebuildExtension('arm64')).toBe('armv8.node');
   });
 
   it('returns armv7 suffix for an armv7l arch', () => {
-    expect(determineNativePrebuildExtension('armv7l')).to.equal('armv7.node');
+    expect(determineNativePrebuildExtension('armv7l')).toBe('armv7.node');
   });
 
   it('returns no suffix for non-ARM arches', () => {
-    expect(determineNativePrebuildExtension('x64')).to.equal('node');
+    expect(determineNativePrebuildExtension('x64')).toBe('node');
   });
 });
 
@@ -52,13 +52,13 @@ describe('prebuildify', () => {
     it('succeeds if prebuildify exists in devDependencies', async () => {
       const rebuilder = createRebuilder();
       const prebuildify = new Prebuildify(rebuilder, path.join(fixtureBaseDir, 'has-prebuildify-devdep'));
-      expect(await prebuildify.usesTool()).to.equal(true);
+      expect(await prebuildify.usesTool()).toBe(true);
     });
 
     it('fails if prebuildify does not exist in devDependencies', async () => {
       const rebuilder = createRebuilder();
       const prebuildify = new Prebuildify(rebuilder, path.join(fixtureBaseDir, 'no-prebuildify-devdep'));
-      expect(await prebuildify.usesTool()).to.equal(false);
+      expect(await prebuildify.usesTool()).toBe(false);
     });
   });
 
@@ -68,7 +68,7 @@ describe('prebuildify', () => {
         const noPrebuildsDir = import.meta.dirname;
         const rebuilder = createRebuilder();
         const prebuildify = new Prebuildify(rebuilder, noPrebuildsDir);
-        expect(await prebuildify.findPrebuiltModule()).to.equal(false);
+        expect(await prebuildify.findPrebuiltModule()).toBe(false);
       });
     });
 
@@ -77,7 +77,7 @@ describe('prebuildify', () => {
         const fixtureDir = path.join(fixtureBaseDir, 'abi');
         const rebuilder = createRebuilder();
         const prebuildify = new Prebuildify(rebuilder, fixtureDir);
-        expect(await prebuildify.findPrebuiltModule()).to.equal(true);
+        expect(await prebuildify.findPrebuiltModule()).toBe(true);
       });
     });
 
@@ -86,21 +86,21 @@ describe('prebuildify', () => {
         const fixtureDir = path.join(fixtureBaseDir, 'napi');
         const rebuilder = createRebuilder();
         const prebuildify = new Prebuildify(rebuilder, fixtureDir);
-        expect(await prebuildify.findPrebuiltModule()).to.equal(true);
+        expect(await prebuildify.findPrebuiltModule()).toBe(true);
       });
 
       it('should find a prebuilt native module for armv7l/node', async () => {
         const fixtureDir = path.join(fixtureBaseDir, 'napi');
         const rebuilder = createRebuilder({ arch: 'armv7l' });
         const prebuildify = new Prebuildify(rebuilder, fixtureDir);
-        expect(await prebuildify.findPrebuiltModule()).to.equal(true);
+        expect(await prebuildify.findPrebuiltModule()).toBe(true);
       });
 
       it('should find a prebuilt native module for arm64/electron', async () => {
         const fixtureDir = path.join(fixtureBaseDir, 'napi');
         const rebuilder = createRebuilder({ arch: 'arm64' });
         const prebuildify = new Prebuildify(rebuilder, fixtureDir);
-        expect(await prebuildify.findPrebuiltModule()).to.equal(true);
+        expect(await prebuildify.findPrebuiltModule()).toBe(true);
       });
     });
 
@@ -109,7 +109,7 @@ describe('prebuildify', () => {
         const fixtureDir = path.join(fixtureBaseDir, 'not-found');
         const rebuilder = createRebuilder();
         const prebuildify = new Prebuildify(rebuilder, fixtureDir);
-        expect(await prebuildify.findPrebuiltModule()).to.equal(false);
+        expect(await prebuildify.findPrebuiltModule()).toBe(false);
       });
     });
   });
@@ -119,7 +119,7 @@ describe('prebuildify', () => {
       const fixtureDir = path.join(fixtureBaseDir, 'napi');
       let rebuilder = createRebuilder();
       let prebuildify = new Prebuildify(rebuilder, fixtureDir);
-      expect(await prebuildify.findPrebuiltModule()).to.equal(true);
+      expect(await prebuildify.findPrebuiltModule()).toBe(true);
 
       let alternativePlatform: NodeJS.Platform;
       if (process.platform === 'win32') {
@@ -130,13 +130,13 @@ describe('prebuildify', () => {
 
       rebuilder = createRebuilder({ platform: alternativePlatform });
       prebuildify = new Prebuildify(rebuilder, fixtureDir);
-      expect(await prebuildify.findPrebuiltModule()).to.equal(true);
+      expect(await prebuildify.findPrebuiltModule()).toBe(true);
     });
   });
 
   it('should find module fork', async () => {
     const rebuilder = createRebuilder();
     const prebuildify = new Prebuildify(rebuilder, path.join(import.meta.dirname, 'fixture', 'forked-module-test'));
-    expect(await prebuildify.usesTool()).to.equal(true);
+    expect(await prebuildify.usesTool()).toBe(true);
   });
 });
