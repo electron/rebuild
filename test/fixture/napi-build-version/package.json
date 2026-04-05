@@ -8,11 +8,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "sqlite3": "5.1.6"
-  },
-  "dependenciesMeta": {
-    "sqlite3": {
-      "built": true
-    }
+    "node-pre-gyp-test": "file:./node-pre-gyp-test"
   }
 }

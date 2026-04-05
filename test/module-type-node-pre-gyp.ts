@@ -12,7 +12,7 @@ chai.use(chaiAsPromised);
 describe('node-pre-gyp', function () {
   this.timeout(TIMEOUT_IN_MILLISECONDS);
 
-  const modulePath = path.join(testModulePath, 'node_modules', 'sqlite3');
+  const modulePath = path.join(testModulePath, 'node_modules', 'node-pre-gyp-test');
   const rebuilderArgs: RebuilderOptions = {
     buildPath: testModulePath,
     electronVersion: '8.0.0',
@@ -44,7 +44,7 @@ describe('node-pre-gyp', function () {
         electronVersion: '2.0.0',
       });
       const nodePreGyp = new NodePreGyp(rebuilder, modulePath);
-      expect(nodePreGyp.findPrebuiltModule()).to.eventually.be.rejectedWith("Native module 'sqlite3' requires Node-API but Electron v2.0.0 does not support Node-API");
+      expect(nodePreGyp.findPrebuiltModule()).to.eventually.be.rejectedWith("Native module 'node-pre-gyp-test' requires Node-API but Electron v2.0.0 does not support Node-API");
     });
   });
 
