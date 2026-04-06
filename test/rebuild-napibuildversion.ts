@@ -14,7 +14,7 @@ describe('rebuild with napi_build_versions in binary config', async function () 
   this.timeout(TIMEOUT_IN_MILLISECONDS);
 
   const napiBuildVersion = 6;
-  const napiBuildVersionSpecificPath = (arch: string, libc: string) => path.resolve(testModulePath, `node_modules/sqlite3/lib/binding/napi-v${ napiBuildVersion }-${ process.platform }-${ libc }-${ arch }/node_sqlite3.node`);
+  const napiBuildVersionSpecificPath = (arch: string, libc: string) => path.resolve(testModulePath, `node_modules/node-pre-gyp-test/lib/binding/napi-v${ napiBuildVersion }-${ process.platform }-${ libc }-${ arch }/node_sqlite3.node`);
 
   before(async () => {
     await resetTestModule(testModulePath, true, 'napi-build-version');
@@ -40,7 +40,7 @@ describe('rebuild with napi_build_versions in binary config', async function () 
         buildFromSource: true, // need to skip node-pre-gyp prebuilt binary
       });
 
-      await expectNativeModuleToBeRebuilt(testModulePath, 'sqlite3');
+      await expectNativeModuleToBeRebuilt(testModulePath, 'node-pre-gyp-test');
       expect(fs.existsSync(binaryPath)).to.be.true;
     });
   }

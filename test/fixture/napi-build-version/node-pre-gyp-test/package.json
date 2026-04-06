@@ -1,0 +1,17 @@
+{
+  "name": "node-pre-gyp-test",
+  "version": "5.1.6",
+  "description": "Minimal @mapbox/node-pre-gyp fixture. Binary config mirrors sqlite3@5.1.6 so prebuilds resolve from TryGhost/node-sqlite3 releases.",
+  "main": "index.js",
+  "dependencies": {
+    "@mapbox/node-pre-gyp": "^2.0.3"
+  },
+  "binary": {
+    "host": "https://github.com/TryGhost/node-sqlite3/releases/download/",
+    "module_name": "node_sqlite3",
+    "module_path": "./lib/binding/napi-v{napi_build_version}-{platform}-{libc}-{arch}",
+    "remote_path": "v{version}",
+    "package_name": "napi-v{napi_build_version}-{platform}-{libc}-{arch}.tar.gz",
+    "napi_versions": [3, 6]
+  }
+}
