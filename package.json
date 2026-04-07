@@ -10,8 +10,8 @@
     "build:docs": "typedoc src/main.ts",
     "coverage": "yarn prewarm-headers && yarn spec --coverage",
     "watch": "tsc -w",
-    "prepare": "yarn build",
-    "lint": "oxlint --type-aware && oxfmt --check",
+    "prepare": "husky && yarn build",
+    "lint": "oxlint && oxfmt --check",
     "spec": "tsc && vitest run",
     "test": "yarn prewarm-headers && yarn lint && yarn spec",
     "prewarm-headers": "node-gyp install --ensure"
@@ -80,8 +80,8 @@
   },
   "lint-staged": {
     "*.ts": [
-      "oxlint --type-aware --fix",
-      "oxfmt"
+      "oxlint --fix",
+      "oxfmt --write"
     ]
   },
   "resolutions": {
