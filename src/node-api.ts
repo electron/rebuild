@@ -17,7 +17,9 @@ export class NodeAPI {
     const electronNapiVersion = napiVersionFromElectronVersion(this.electronVersion);
 
     if (!electronNapiVersion) {
-      throw new Error(`Native module '${this.moduleName}' requires Node-API but Electron v${this.electronVersion} does not support Node-API`);
+      throw new Error(
+        `Native module '${this.moduleName}' requires Node-API but Electron v${this.electronVersion} does not support Node-API`,
+      );
     }
 
     return electronNapiVersion;
@@ -27,10 +29,12 @@ export class NodeAPI {
     const electronNapiVersion = this.getVersionForElectron();
 
     // Filter out Node-API versions that are too high
-    const filteredVersions = moduleNapiVersions.filter((v) => (v <= electronNapiVersion));
+    const filteredVersions = moduleNapiVersions.filter((v) => v <= electronNapiVersion);
 
     if (filteredVersions.length === 0) {
-      throw new Error(`Native module '${this.moduleName}' supports Node-API versions ${moduleNapiVersions} but Electron v${this.electronVersion} only supports Node-API v${electronNapiVersion}`);
+      throw new Error(
+        `Native module '${this.moduleName}' supports Node-API versions ${moduleNapiVersions.join(', ')} but Electron v${this.electronVersion} only supports Node-API v${electronNapiVersion}`,
+      );
     }
 
     return Math.max(...filteredVersions);

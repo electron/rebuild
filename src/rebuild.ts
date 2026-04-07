@@ -178,6 +178,8 @@ export class Rebuilder implements IRebuilder {
       this.useCache = false;
     }
 
+    // FIXME: this entire guard is unreachable according to the types
+    /* oxlint-disable typescript-eslint(restrict-template-expressions) */
     if (typeof this.electronVersion === 'number') {
       if (`${this.electronVersion}`.split('.').length === 1) {
         this.electronVersion = `${this.electronVersion}.0.0`;
@@ -185,6 +187,7 @@ export class Rebuilder implements IRebuilder {
         this.electronVersion = `${this.electronVersion}.0`;
       }
     }
+    /* oxlint-enable typescript-eslint(restrict-template-expressions) */
     if (typeof this.electronVersion !== 'string') {
       throw new Error(`Expected a string version for electron version, got a "${typeof this.electronVersion}"`);
     }

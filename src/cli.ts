@@ -50,7 +50,7 @@ if (process.argv.length === 3 && process.argv[2] === '--version') {
         )
       ).default.version,
     );
-  } catch (err) {
+  } catch {
     console.log(
       'Electron Rebuild Version:',
       (
@@ -75,7 +75,7 @@ process.on('uncaughtException', handler);
 process.on('unhandledRejection', handler);
 
 
-(async (): Promise<void> => {
+void (async (): Promise<void> => {
   const projectRootPath = await getProjectRootPath(process.cwd());
   const electronModulePath = argv.e ? path.resolve(process.cwd(), (argv.e as string)) : await locateElectronModule(projectRootPath);
   let electronModuleVersion = argv.v as string;
@@ -86,7 +86,7 @@ process.on('unhandledRejection', handler);
       const pkgJson = await import(pathToFileURL(path.join(electronModulePath, 'package.json')).toString(), { with: { type: 'json' }});
 
       electronModuleVersion = pkgJson.default.version;
-    } catch (e) {
+    } catch {
       throw new Error(`Unable to find electron's version number, either install it or specify an explicit version`);
     }
   }

@@ -91,7 +91,7 @@ export class ModuleWalker {
     let childPackageJson;
     try {
       childPackageJson = await readPackageJson(modulePath, true);
-    } catch (err) {
+    } catch {
       return;
     }
     const moduleWait: Promise<void[]>[] = [];
