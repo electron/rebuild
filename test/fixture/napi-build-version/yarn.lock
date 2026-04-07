@@ -125,14 +125,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-pre-gyp-test@file:./node-pre-gyp-test::locator=workspace-app%40workspace%3A.":
-  version: 5.1.6
-  resolution: "node-pre-gyp-test@file:./node-pre-gyp-test#./node-pre-gyp-test::hash=f33b18&locator=workspace-app%40workspace%3A."
-  dependencies:
-    "@mapbox/node-pre-gyp": "npm:^2.0.3"
-  checksum: 10c0/2f3a0eea2166a16ba1ccbd4f881d348dc3f5de8ef9d47c73f5de5e431f630a41827fb4e84401301a1a22bd1841261e091bb0990b671f9f6bf9c96e2fdd1ad0d8
+"node-pre-gyp-test@link:./node-pre-gyp-test::locator=workspace-app%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "node-pre-gyp-test@link:./node-pre-gyp-test::locator=workspace-app%40workspace%3A."
   languageName: node
-  linkType: hard
+  linkType: soft
 
 "nopt@npm:^8.0.0":
   version: 8.1.0
@@ -195,7 +192,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "workspace-app@workspace:."
   dependencies:
-    node-pre-gyp-test: "file:./node-pre-gyp-test"
+    "@mapbox/node-pre-gyp": "npm:^2.0.3"
+    node-pre-gyp-test: "link:./node-pre-gyp-test"
   languageName: unknown
   linkType: soft
 

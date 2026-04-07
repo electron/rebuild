@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+import { expect } from 'vitest';
 import fs from 'graceful-fs';
 import path from 'node:path';
 
@@ -16,7 +16,7 @@ export async function expectNativeModuleToBeRebuilt(
   const message = `${path.basename(modulePath)} build meta should ${metaShouldExist ? '' : 'not '}exist`;
   const buildType = options.buildType || 'Release';
   const metaPath = path.resolve(basePath, 'node_modules', modulePath, 'build', buildType, '.forge-meta');
-  expect(fs.existsSync(metaPath), message).to.equal(metaShouldExist);
+  expect(fs.existsSync(metaPath), message).toBe(metaShouldExist);
 }
 
 export async function expectNativeModuleToNotBeRebuilt(

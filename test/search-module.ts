@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import fs from 'graceful-fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -21,7 +21,7 @@ describe('search-module', () => {
     describe('multi-level workspace', () => {
       for (const lockFile of ['yarn.lock', 'package-lock.json', 'pnpm-lock.yaml']) {
         describe(lockFile, () => {
-          before(async () => {
+          beforeAll(async () => {
             await createTempDir();
             await fs.promises.cp(path.resolve(import.meta.dirname, 'fixture', 'multi-level-workspace'), baseDir, { recursive: true, force: true });
 
@@ -35,22 +35,22 @@ describe('search-module', () => {
 
           it('finds the folder with the lockfile', async () => {
             const packageDir = path.join(baseDir, 'packages', 'bar');
-            expect(await getProjectRootPath(packageDir)).to.equal(baseDir);
+            expect(await getProjectRootPath(packageDir)).toBe(baseDir);
           });
 
-          after(removeTempDir);
+          afterAll(removeTempDir);
         });
       }
     });
 
     describe('no workspace', () => {
-      before(createTempDir);
+      beforeAll(createTempDir);
 
       it('returns the input directory if a lockfile cannot be found', async () => {
-        expect(await getProjectRootPath(baseDir)).to.equal(baseDir);
+        expect(await getProjectRootPath(baseDir)).toBe(baseDir);
       });
 
-      after(removeTempDir);
+      afterAll(removeTempDir);
     });
   });
 });

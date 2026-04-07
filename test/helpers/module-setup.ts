@@ -24,12 +24,11 @@ export function resetMSVSVersion(): void {
 const testModuleTmpPath = fs.mkdtempSync(path.resolve(os.tmpdir(), 'e-r-test-module-'));
 
 export async function resetTestModule(testModulePath: string, installModules = true, fixtureName = 'native-app1'): Promise<void> {
-  /**
-   * Remove the `--import` CLI flag added by Mocha so Node doesn't try to load
-   * `tsx` when we spawn the `node-gyp` worker, which would fail because the
-   * test fixtures don't include that dependency.
-   */
-  process.execArgv = process.execArgv.filter(item => item !== '--import=tsx');
+  // The forked node-gyp worker (`fork()` in lib/module-type/node-gyp/) needs
+  // a clean Node — it doesn't want vitest's worker flags (--require, --conditions
+  // development, --experimental-import-meta-resolve, etc.). Clear execArgv so
+  // none of those propagate to the worker child.
+  process.execArgv = [];
 
   const oneTimeModulePath = path.resolve(testModuleTmpPath, `${crypto.createHash('SHA1').update(testModulePath).digest('hex')}-${fixtureName}-${installModules}`);
   if (!fs.existsSync(oneTimeModulePath)) {

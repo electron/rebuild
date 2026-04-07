@@ -8,6 +8,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "node-pre-gyp-test": "file:./node-pre-gyp-test"
+    "@mapbox/node-pre-gyp": "^2.0.3",
+    "node-pre-gyp-test": "link:./node-pre-gyp-test"
   }
 }

@@ -1,18 +1,17 @@
 import path from 'node:path';
+import { afterAll, beforeAll, describe, it } from 'vitest';
 
 import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild.js';
 import { getExactElectronVersionSync } from './helpers/electron-version.js';
 import { getProjectRootPath } from '../lib/search-module.js';
 import { rebuild } from '../lib/rebuild.js';
-import { TIMEOUT_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath, cleanupTestModule, resetTestModule } from './helpers/module-setup.js';
+import { TEST_MODULE_PATH as testModulePath, TIMEOUT_IN_MILLISECONDS, cleanupTestModule, resetTestModule } from './helpers/module-setup.js';
 
 const testElectronVersion = getExactElectronVersionSync();
 
-describe('rebuild for yarn workspace', function() {
-  this.timeout(TIMEOUT_IN_MILLISECONDS);
-
+describe('rebuild for yarn workspace', { timeout: TIMEOUT_IN_MILLISECONDS }, () => {
   describe('core behavior', () => {
-    before(async () => {
+    beforeAll(async () => {
       await resetTestModule(testModulePath, true, 'workspace-test');
       const projectRootPath = await getProjectRootPath(path.join(testModulePath, 'workspace-test', 'child-workspace'));
 
@@ -23,7 +22,7 @@ describe('rebuild for yarn workspace', function() {
         projectRootPath
       });
     });
-    after(() => cleanupTestModule(testModulePath));
+    afterAll(() => cleanupTestModule(testModulePath));
 
     it('should have rebuilt top level prod dependencies', async () => {
       await expectNativeModuleToBeRebuilt(testModulePath, 'snappy');

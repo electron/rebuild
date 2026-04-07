@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import fs from 'graceful-fs';
 import path from 'node:path';
 
@@ -6,30 +6,35 @@ import { locateElectronModule } from '../lib/electron-locator.js';
 
 const baseFixtureDir = path.resolve(import.meta.dirname, 'fixture', 'electron-locator');
 
-async function expectElectronCanBeFound(projectRootPath: string, startDir: string): Promise<void> {
+function expectElectronCanBeFound(projectRootPath: string, startDir: string): void {
   it('should return a valid path', async () => {
     const electronPath = await locateElectronModule(projectRootPath, startDir);
-    expect(electronPath).to.be.a('string');
+    expect(electronPath).toBeTypeOf('string');
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    expect(fs.existsSync(electronPath!)).to.be.equal(true);
+    expect(fs.existsSync(electronPath!)).toBe(true);
   });
 }
 
 describe('locateElectronModule', () => {
   describe('when electron is not installed', () => {
     const electronDir = path.resolve(import.meta.dirname, '..', 'node_modules', 'electron');
+    const movedDir = `${electronDir}-moved`;
 
-    before(async () => {
-      await fs.promises.rename(electronDir, `${electronDir}-moved`);
+    beforeAll(async () => {
+      // Restore from a possibly-leaked rename from a prior crashed test run.
+      if (fs.existsSync(movedDir) && !fs.existsSync(electronDir)) {
+        await fs.promises.rename(movedDir, electronDir);
+      }
+      await fs.promises.rename(electronDir, movedDir);
     });
 
     it('should return null when electron is not installed', async () => {
       const fixtureDir = path.join(baseFixtureDir, 'not-installed');
-      expect(await locateElectronModule(fixtureDir, fixtureDir)).to.be.equal(null);
+      expect(await locateElectronModule(fixtureDir, fixtureDir)).toBe(null);
     });
 
-    after(async () => {
-      await fs.promises.rename(`${electronDir}-moved`, electronDir);
+    afterAll(async () => {
+      await fs.promises.rename(movedDir, electronDir);
     });
   });
 
