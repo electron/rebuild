@@ -11,7 +11,10 @@ const d = debug('electron-rebuild');
 const ELECTRON_REBUILD_CACHE_ID = 1;
 
 class Snap {
-  constructor(public hash: string, public data: Buffer) {}
+  constructor(
+    public hash: string,
+    public data: Buffer,
+  ) {}
 }
 
 interface Snapshot {
@@ -32,20 +35,19 @@ type CacheOptions = {
 
 const takeSnapshot = async (dir: string, relativeTo = dir): Promise<Snapshot> => {
   const snap: Snapshot = {};
-  await Promise.all((await promisifiedGracefulFs.readdir(dir)).map(async (child) => {
-    if (child === 'node_modules') return;
-    const childPath = path.resolve(dir, child);
-    const relative = path.relative(relativeTo, childPath);
-    if ((await fs.promises.stat(childPath)).isDirectory()) {
-      snap[relative] = await takeSnapshot(childPath, relativeTo);
-    } else {
-      const data = await promisifiedGracefulFs.readFile(childPath);
-      snap[relative] = new Snap(
-        crypto.createHash('SHA256').update(data).digest('hex'),
-        data,
-      );
-    }
-  }));
+  await Promise.all(
+    (await promisifiedGracefulFs.readdir(dir)).map(async (child) => {
+      if (child === 'node_modules') return;
+      const childPath = path.resolve(dir, child);
+      const relative = path.relative(relativeTo, childPath);
+      if ((await fs.promises.stat(childPath)).isDirectory()) {
+        snap[relative] = await takeSnapshot(childPath, relativeTo);
+      } else {
+        const data = await promisifiedGracefulFs.readFile(childPath);
+        snap[relative] = new Snap(crypto.createHash('SHA256').update(data).digest('hex'), data);
+      }
+    }),
+  );
   return snap;
 };
 
@@ -71,7 +73,7 @@ const serialize = (snap: Snapshot): any => {
       jsonReady[key] = {
         __isSnap: true,
         hash: s.hash,
-        data: s.data.toString('base64')
+        data: s.data.toString('base64'),
       };
     } else {
       jsonReady[key] = serialize(snap[key] as Snapshot);
@@ -85,10 +87,7 @@ const unserialize = (jsonReady: any): Snapshot => {
   const snap: Snapshot = {};
   for (const key in jsonReady) {
     if (jsonReady[key].__isSnap) {
-      snap[key] = new Snap(
-        jsonReady[key].hash,
-        Buffer.from(jsonReady[key].data, 'base64')
-      );
+      snap[key] = new Snap(jsonReady[key].hash, Buffer.from(jsonReady[key].data, 'base64'));
     } else {
       snap[key] = unserialize(jsonReady[key]);
     }
@@ -96,22 +95,33 @@ const unserialize = (jsonReady: any): Snapshot => {
   return snap;
 };
 
-export const cacheModuleState = async (dir: string, cachePath: string, key: string): Promise<void> => {
+export const cacheModuleState = async (
+  dir: string,
+  cachePath: string,
+  key: string,
+): Promise<void> => {
   const snap = await takeSnapshot(dir);
 
   const moduleBuffer = Buffer.from(JSON.stringify(serialize(snap)));
-  const zipped = await new Promise<Buffer>(resolve => zlib.gzip(moduleBuffer, (_, result) => resolve(result)));
+  const zipped = await new Promise<Buffer>((resolve) =>
+    zlib.gzip(moduleBuffer, (_, result) => resolve(result)),
+  );
   await fs.promises.mkdir(cachePath, { recursive: true });
   await promisifiedGracefulFs.writeFile(path.resolve(cachePath, key), zipped);
 };
 
 type ApplyDiffFunction = (dir: string) => Promise<void>;
 
-export const lookupModuleState = async (cachePath: string, key: string): Promise<ApplyDiffFunction | boolean> => {
+export const lookupModuleState = async (
+  cachePath: string,
+  key: string,
+): Promise<ApplyDiffFunction | boolean> => {
   if (fs.existsSync(path.resolve(cachePath, key))) {
     return async function applyDiff(dir: string): Promise<void> {
       const zipped = await promisifiedGracefulFs.readFile(path.resolve(cachePath, key));
-      const unzipped: Buffer = await new Promise(resolve => { zlib.gunzip(zipped, (_, result) => resolve(result)); });
+      const unzipped: Buffer = await new Promise((resolve) => {
+        zlib.gunzip(zipped, (_, result) => resolve(result));
+      });
       const diff = unserialize(JSON.parse(unzipped.toString()));
       await writeSnapshot(diff, dir);
     };
@@ -134,29 +144,35 @@ async function hashDirectory(dir: string, relativeTo?: string): Promise<HashTree
   relativeTo ??= dir;
   d('hashing dir', dir);
   const dirTree: HashTree = {};
-  await Promise.all((await promisifiedGracefulFs.readdir(dir)).map(async (child) => {
-    d('found child', child, 'in dir', dir);
-    // Ignore output directories
-    if (dir === relativeTo && (child === 'build' || child === 'bin')) return;
-    // Don't hash nested node_modules
-    if (child === 'node_modules') return;
+  await Promise.all(
+    (await promisifiedGracefulFs.readdir(dir)).map(async (child) => {
+      d('found child', child, 'in dir', dir);
+      // Ignore output directories
+      if (dir === relativeTo && (child === 'build' || child === 'bin')) return;
+      // Don't hash nested node_modules
+      if (child === 'node_modules') return;
 
-    const childPath = path.resolve(dir, child);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const relative = path.relative(relativeTo!, childPath);
-    if ((await fs.promises.stat(childPath)).isDirectory()) {
-      dirTree[relative] = await hashDirectory(childPath, relativeTo);
-    } else {
-      dirTree[relative] = crypto.createHash('SHA256').update(await promisifiedGracefulFs.readFile(childPath)).digest('hex');
-    }
-  }));
+      const childPath = path.resolve(dir, child);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const relative = path.relative(relativeTo!, childPath);
+      if ((await fs.promises.stat(childPath)).isDirectory()) {
+        dirTree[relative] = await hashDirectory(childPath, relativeTo);
+      } else {
+        dirTree[relative] = crypto
+          .createHash('SHA256')
+          .update(await promisifiedGracefulFs.readFile(childPath))
+          .digest('hex');
+      }
+    }),
+  );
 
   return dirTree;
 }
 
 export async function generateCacheKey(opts: CacheOptions): Promise<string> {
   const tree = await hashDirectory(opts.modulePath);
-  const hasher = crypto.createHash('SHA256')
+  const hasher = crypto
+    .createHash('SHA256')
     .update(`${ELECTRON_REBUILD_CACHE_ID}`)
     .update(path.basename(opts.modulePath))
     .update(opts.ABI)

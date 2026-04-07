@@ -12,28 +12,88 @@ import { ModuleType } from './module-walker.js';
 import { rebuild } from './rebuild.js';
 import { pathToFileURL } from 'node:url';
 
-const argv = yargs(process.argv.slice(2)).version(false).options({
-  version: { alias: 'v', type: 'string', description: 'The version of Electron to build against' },
-  force: { alias: 'f', type: 'boolean', description: 'Force rebuilding modules, even if we would skip it otherwise' },
-  arch: { alias: 'a', type: 'string', description: "Override the target architecture to something other than your system's" },
-  'module-dir': { alias: 'm', type: 'string', description: 'The path to the node_modules directory to rebuild' },
-  // TODO: should be type: array
-  'which-module': { alias: 'w', type: 'string', description: 'A specific module to build, or comma separated list of modules. Modules will only be rebuilt if they also match the types of dependencies being rebuilt (see --types).' },
-  // TODO: should be type: array
-  only: { alias: 'o', type: 'string', description: 'Only build specified module, or comma separated list of modules. All others are ignored.' },
-  'electron-prebuilt-dir': { alias: 'e', type: 'string', description: 'The path to the prebuilt electron module' },
-  'dist-url': { alias: 'd', type: 'string', description: 'Custom header tarball URL' },
-  // TODO: should be type: array
-  types: { alias: 't', type: 'string', description: 'The types of dependencies to rebuild.  Comma separated list of "prod", "dev" and "optional".  Default is "prod,optional"' },
-  parallel: { alias: 'p', type: 'boolean', description: 'Rebuild in parallel, this is enabled by default on macOS and Linux' },
-  sequential: { alias: 's', type: 'boolean', description: 'Rebuild modules sequentially, this is enabled by default on Windows' },
-  debug: { alias: 'b', type: 'boolean', description: 'Build debug version of modules' },
-  'prebuild-tag-prefix': { type: 'string', description: 'GitHub tag prefix passed to prebuild-install. Default is "v"' },
-  'force-abi': { type: 'number', description: 'Override the ABI version for the version of Electron you are targeting.  Only use when targeting Nightly releases.' },
-  'use-electron-clang': { type: 'boolean', description: 'Use the clang executable that Electron used when building its binary. This will guarantee compiler compatibility' },
-  'disable-pre-gyp-copy': { type: 'boolean', description: 'Disables the pre-gyp copy step' },
-  'build-from-source': { type: 'boolean', description: 'Skips prebuild download and rebuilds module from source.'},
-}).usage('Usage: $0 --version [version] --module-dir [path]')
+const argv = yargs(process.argv.slice(2))
+  .version(false)
+  .options({
+    version: {
+      alias: 'v',
+      type: 'string',
+      description: 'The version of Electron to build against',
+    },
+    force: {
+      alias: 'f',
+      type: 'boolean',
+      description: 'Force rebuilding modules, even if we would skip it otherwise',
+    },
+    arch: {
+      alias: 'a',
+      type: 'string',
+      description: "Override the target architecture to something other than your system's",
+    },
+    'module-dir': {
+      alias: 'm',
+      type: 'string',
+      description: 'The path to the node_modules directory to rebuild',
+    },
+    // TODO: should be type: array
+    'which-module': {
+      alias: 'w',
+      type: 'string',
+      description:
+        'A specific module to build, or comma separated list of modules. Modules will only be rebuilt if they also match the types of dependencies being rebuilt (see --types).',
+    },
+    // TODO: should be type: array
+    only: {
+      alias: 'o',
+      type: 'string',
+      description:
+        'Only build specified module, or comma separated list of modules. All others are ignored.',
+    },
+    'electron-prebuilt-dir': {
+      alias: 'e',
+      type: 'string',
+      description: 'The path to the prebuilt electron module',
+    },
+    'dist-url': { alias: 'd', type: 'string', description: 'Custom header tarball URL' },
+    // TODO: should be type: array
+    types: {
+      alias: 't',
+      type: 'string',
+      description:
+        'The types of dependencies to rebuild.  Comma separated list of "prod", "dev" and "optional".  Default is "prod,optional"',
+    },
+    parallel: {
+      alias: 'p',
+      type: 'boolean',
+      description: 'Rebuild in parallel, this is enabled by default on macOS and Linux',
+    },
+    sequential: {
+      alias: 's',
+      type: 'boolean',
+      description: 'Rebuild modules sequentially, this is enabled by default on Windows',
+    },
+    debug: { alias: 'b', type: 'boolean', description: 'Build debug version of modules' },
+    'prebuild-tag-prefix': {
+      type: 'string',
+      description: 'GitHub tag prefix passed to prebuild-install. Default is "v"',
+    },
+    'force-abi': {
+      type: 'number',
+      description:
+        'Override the ABI version for the version of Electron you are targeting.  Only use when targeting Nightly releases.',
+    },
+    'use-electron-clang': {
+      type: 'boolean',
+      description:
+        'Use the clang executable that Electron used when building its binary. This will guarantee compiler compatibility',
+    },
+    'disable-pre-gyp-copy': { type: 'boolean', description: 'Disables the pre-gyp copy step' },
+    'build-from-source': {
+      type: 'boolean',
+      description: 'Skips prebuild download and rebuilds module from source.',
+    },
+  })
+  .usage('Usage: $0 --version [version] --module-dir [path]')
   .help()
   .alias('help', 'h')
   .epilog('Copyright 2016-2021')
@@ -74,20 +134,26 @@ const handler = (err: Error): void => {
 process.on('uncaughtException', handler);
 process.on('unhandledRejection', handler);
 
-
 void (async (): Promise<void> => {
   const projectRootPath = await getProjectRootPath(process.cwd());
-  const electronModulePath = argv.e ? path.resolve(process.cwd(), (argv.e as string)) : await locateElectronModule(projectRootPath);
+  const electronModulePath = argv.e
+    ? path.resolve(process.cwd(), argv.e as string)
+    : await locateElectronModule(projectRootPath);
   let electronModuleVersion = argv.v as string;
 
   if (!electronModuleVersion) {
     try {
       if (!electronModulePath) throw new Error('Prebuilt electron module not found');
-      const pkgJson = await import(pathToFileURL(path.join(electronModulePath, 'package.json')).toString(), { with: { type: 'json' }});
+      const pkgJson = await import(
+        pathToFileURL(path.join(electronModulePath, 'package.json')).toString(),
+        { with: { type: 'json' } }
+      );
 
       electronModuleVersion = pkgJson.default.version;
     } catch {
-      throw new Error(`Unable to find electron's version number, either install it or specify an explicit version`);
+      throw new Error(
+        `Unable to find electron's version number, either install it or specify an explicit version`,
+      );
     }
   }
 
@@ -98,11 +164,19 @@ void (async (): Promise<void> => {
     // node modules, which might not always be the case but it's at least a
     // good guess
     rootDirectory = path.resolve(import.meta.dirname, '../../..');
-    if (!fs.existsSync(rootDirectory) || !fs.existsSync(path.resolve(rootDirectory, 'package.json'))) {
+    if (
+      !fs.existsSync(rootDirectory) ||
+      !fs.existsSync(path.resolve(rootDirectory, 'package.json'))
+    ) {
       // Then we try the CWD
       rootDirectory = process.cwd();
-      if (!fs.existsSync(rootDirectory) || !fs.existsSync(path.resolve(rootDirectory, 'package.json'))) {
-        throw new Error('Unable to find parent node_modules directory, specify it via --module-dir, E.g. "--module-dir ." for the current directory');
+      if (
+        !fs.existsSync(rootDirectory) ||
+        !fs.existsSync(path.resolve(rootDirectory, 'package.json'))
+      ) {
+        throw new Error(
+          'Unable to find parent node_modules directory, specify it via --module-dir, E.g. "--module-dir ." for the current directory',
+        );
       }
     }
   } else {
@@ -136,8 +210,8 @@ void (async (): Promise<void> => {
     onlyModules: argv.o ? (argv.o as string).split(',') : null,
     force: argv.f as boolean,
     headerURL: argv.d as string,
-    types: argv.t ? (argv.t as string).split(',') as ModuleType[] : ['prod', 'optional'],
-    mode: argv.p ? 'parallel' : (argv.s ? 'sequential' : undefined),
+    types: argv.t ? ((argv.t as string).split(',') as ModuleType[]) : ['prod', 'optional'],
+    mode: argv.p ? 'parallel' : argv.s ? 'sequential' : undefined,
     debug: argv.debug,
     prebuildTagPrefix: (argv.prebuildTagPrefix as string) || 'v',
     forceABI: argv.forceAbi as number,

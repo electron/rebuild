@@ -6,4 +6,4 @@ export const promisifiedGracefulFs = {
   readFile: promisify(gracefulFS.readFile),
   readdir: promisify(gracefulFS.readdir),
   writeFile: promisify(gracefulFS.writeFile),
-} as Pick<typeof gracefulFS['promises'], 'copyFile' | 'readFile' | 'readdir' | 'writeFile'>;
+} as Pick<(typeof gracefulFS)['promises'], 'copyFile' | 'readFile' | 'readdir' | 'writeFile'>;

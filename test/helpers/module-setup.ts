@@ -23,19 +23,34 @@ export function resetMSVSVersion(): void {
 
 const testModuleTmpPath = fs.mkdtempSync(path.resolve(os.tmpdir(), 'e-r-test-module-'));
 
-export async function resetTestModule(testModulePath: string, installModules = true, fixtureName = 'native-app1'): Promise<void> {
+export async function resetTestModule(
+  testModulePath: string,
+  installModules = true,
+  fixtureName = 'native-app1',
+): Promise<void> {
   // The forked node-gyp worker (`fork()` in lib/module-type/node-gyp/) needs
   // a clean Node — it doesn't want vitest's worker flags (--require, --conditions
   // development, --experimental-import-meta-resolve, etc.). Clear execArgv so
   // none of those propagate to the worker child.
   process.execArgv = [];
 
-  const oneTimeModulePath = path.resolve(testModuleTmpPath, `${crypto.createHash('SHA1').update(testModulePath).digest('hex')}-${fixtureName}-${installModules}`);
+  const oneTimeModulePath = path.resolve(
+    testModuleTmpPath,
+    `${crypto.createHash('SHA1').update(testModulePath).digest('hex')}-${fixtureName}-${installModules}`,
+  );
   if (!fs.existsSync(oneTimeModulePath)) {
     d(`creating test module '${fixtureName}' in ${oneTimeModulePath}`);
     await fs.promises.mkdir(oneTimeModulePath, { recursive: true });
-    await fs.promises.cp(path.resolve(import.meta.dirname, `../fixture/${ fixtureName }`), oneTimeModulePath, { recursive: true, force: true });
-    await fs.promises.cp(path.resolve(import.meta.dirname, `../../.yarn`), path.join(oneTimeModulePath, '.yarn'), { recursive: true, force: true });
+    await fs.promises.cp(
+      path.resolve(import.meta.dirname, `../fixture/${fixtureName}`),
+      oneTimeModulePath,
+      { recursive: true, force: true },
+    );
+    await fs.promises.cp(
+      path.resolve(import.meta.dirname, `../../.yarn`),
+      path.join(oneTimeModulePath, '.yarn'),
+      { recursive: true, force: true },
+    );
     if (installModules) {
       d(`installModules is ${installModules}, installing dependencies in ${oneTimeModulePath}`);
       await spawn('yarn', ['install', '--immutable'], { cwd: oneTimeModulePath });

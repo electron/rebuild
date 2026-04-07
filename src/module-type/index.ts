@@ -34,7 +34,10 @@ export class NativeModule {
     return this._moduleName;
   }
 
-  async packageJSONFieldWithDefault(key: string, defaultValue: PackageJSONValue): Promise<PackageJSONValue> {
+  async packageJSONFieldWithDefault(
+    key: string,
+    defaultValue: PackageJSONValue,
+  ): Promise<PackageJSONValue> {
     const result = await this.packageJSONField(key);
     return result === undefined ? defaultValue : result;
   }
@@ -46,10 +49,10 @@ export class NativeModule {
   }
 
   async getSupportedNapiVersions(): Promise<number[] | undefined> {
-    const binary = (await this.packageJSONFieldWithDefault(
-      'binary',
-      {}
-    )) as Record<string, number[]>;
+    const binary = (await this.packageJSONFieldWithDefault('binary', {})) as Record<
+      string,
+      number[]
+    >;
 
     return binary?.napi_versions;
   }
@@ -58,7 +61,10 @@ export class NativeModule {
    * Search dependencies for package using either `packageName` or
    * `@namespace/packageName` in the case of forks.
    */
-  async findPackageInDependencies(packageName: string, packageProperty = 'dependencies'): Promise<string | null> {
+  async findPackageInDependencies(
+    packageName: string,
+    packageProperty = 'dependencies',
+  ): Promise<string | null> {
     const dependencies = await this.packageJSONFieldWithDefault(packageProperty, {});
     if (typeof dependencies !== 'object') return null;
 
@@ -66,8 +72,9 @@ export class NativeModule {
     // eslint-disable-next-line no-prototype-builtins
     if (dependencies.hasOwnProperty(packageName)) return packageName;
 
-    const forkedPackage = Object.keys(dependencies).find(dependency =>
-      dependency.startsWith('@') && dependency.endsWith(`/${packageName}`));
+    const forkedPackage = Object.keys(dependencies).find(
+      (dependency) => dependency.startsWith('@') && dependency.endsWith(`/${packageName}`),
+    );
 
     return forkedPackage || null;
   }

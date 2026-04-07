@@ -2,7 +2,12 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { EventEmitter } from 'node:events';
 import path from 'node:path';
 
-import { cleanupTestModule, resetTestModule, TEST_MODULE_PATH as testModulePath, TIMEOUT_IN_MILLISECONDS } from './helpers/module-setup.js';
+import {
+  cleanupTestModule,
+  resetTestModule,
+  TEST_MODULE_PATH as testModulePath,
+  TIMEOUT_IN_MILLISECONDS,
+} from './helpers/module-setup.js';
 import { NodePreGyp } from '../lib/module-type/node-pre-gyp.js';
 import { Rebuilder, RebuilderOptions } from '../lib/rebuild.js';
 
@@ -12,7 +17,7 @@ describe('node-pre-gyp', { timeout: TIMEOUT_IN_MILLISECONDS }, () => {
     buildPath: testModulePath,
     electronVersion: '8.0.0',
     arch: process.arch,
-    lifecycle: new EventEmitter()
+    lifecycle: new EventEmitter(),
   };
 
   beforeAll(async () => await resetTestModule(testModulePath));
@@ -23,7 +28,9 @@ describe('node-pre-gyp', { timeout: TIMEOUT_IN_MILLISECONDS }, () => {
       const rebuilder = new Rebuilder(rebuilderArgs);
       const nodePreGyp = new NodePreGyp(rebuilder, modulePath);
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      expect(nodePreGyp.nodeAPI.getNapiVersion((await nodePreGyp.getSupportedNapiVersions())!)).toBe(3);
+      expect(
+        nodePreGyp.nodeAPI.getNapiVersion((await nodePreGyp.getSupportedNapiVersions())!),
+      ).toBe(3);
       expect(await nodePreGyp.getNodePreGypRuntimeArgs()).toEqual([]);
     });
 
@@ -39,7 +46,9 @@ describe('node-pre-gyp', { timeout: TIMEOUT_IN_MILLISECONDS }, () => {
         electronVersion: '2.0.0',
       });
       const nodePreGyp = new NodePreGyp(rebuilder, modulePath);
-      expect(() => nodePreGyp.nodeAPI.ensureElectronSupport()).toThrow("Native module 'node-pre-gyp-test' requires Node-API but Electron v2.0.0 does not support Node-API");
+      expect(() => nodePreGyp.nodeAPI.ensureElectronSupport()).toThrow(
+        "Native module 'node-pre-gyp-test' requires Node-API but Electron v2.0.0 does not support Node-API",
+      );
     });
   });
 
@@ -79,7 +88,10 @@ describe('node-pre-gyp', { timeout: TIMEOUT_IN_MILLISECONDS }, () => {
 
   it('should find module fork', async () => {
     const rebuilder = new Rebuilder(rebuilderArgs);
-    const nodePreGyp = new NodePreGyp(rebuilder, path.join(import.meta.dirname, 'fixture', 'forked-module-test'));
+    const nodePreGyp = new NodePreGyp(
+      rebuilder,
+      path.join(import.meta.dirname, 'fixture', 'forked-module-test'),
+    );
     expect(await nodePreGyp.usesTool()).toBe(true);
   });
 });

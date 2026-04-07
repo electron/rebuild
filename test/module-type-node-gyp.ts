@@ -1,13 +1,16 @@
 import { EventEmitter } from 'node:events';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import { cleanupTestModule, resetTestModule, TEST_MODULE_PATH as testModulePath } from './helpers/module-setup.js';
+import {
+  cleanupTestModule,
+  resetTestModule,
+  TEST_MODULE_PATH as testModulePath,
+} from './helpers/module-setup.js';
 import { NodeGyp } from '../lib/module-type/node-gyp/node-gyp.js';
 import { Rebuilder } from '../lib/rebuild.js';
 
 describe('node-gyp', () => {
   describe('buildArgs', () => {
-
     beforeAll(async () => await resetTestModule(testModulePath, false));
     afterAll(async () => await cleanupTestModule(testModulePath));
 
@@ -15,7 +18,7 @@ describe('node-gyp', () => {
       const rebuilder = new Rebuilder({
         buildPath: testModulePath,
         electronVersion: electronVersion,
-        lifecycle: new EventEmitter()
+        lifecycle: new EventEmitter(),
       });
       const nodeGyp = new NodeGyp(rebuilder, testModulePath);
       return nodeGyp.buildArgs([]);
@@ -68,11 +71,13 @@ describe('node-gyp', () => {
           buildPath: testModulePath,
           electronVersion: '15.3.0',
           lifecycle: new EventEmitter(),
-          platform
+          platform,
         });
         const nodeGyp = new NodeGyp(rebuilder, testModulePath);
 
-        await expect(nodeGyp.rebuildModule()).rejects.toThrow("node-gyp does not support cross-compiling native modules from source.");
+        await expect(nodeGyp.rebuildModule()).rejects.toThrow(
+          'node-gyp does not support cross-compiling native modules from source.',
+        );
       });
     });
   });

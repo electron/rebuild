@@ -174,7 +174,9 @@ export class Rebuilder implements IRebuilder {
     d('ignoreModules', this.ignoreModules);
 
     if (this.useCache && this.force) {
-      console.warn('[WARNING]: Electron Rebuild has force enabled and cache enabled, force take precedence and the cache will not be used.');
+      console.warn(
+        '[WARNING]: Electron Rebuild has force enabled and cache enabled, force take precedence and the cache will not be used.',
+      );
       this.useCache = false;
     }
 
@@ -189,7 +191,9 @@ export class Rebuilder implements IRebuilder {
     }
     /* oxlint-enable typescript-eslint(restrict-template-expressions) */
     if (typeof this.electronVersion !== 'string') {
-      throw new Error(`Expected a string version for electron version, got a "${typeof this.electronVersion}"`);
+      throw new Error(
+        `Expected a string version for electron version, got a "${typeof this.electronVersion}"`,
+      );
     }
 
     this.ABIVersion = options.forceABI?.toString();
@@ -215,7 +219,7 @@ export class Rebuilder implements IRebuilder {
       this.force,
       this.headerURL,
       types,
-      this.debug
+      this.debug,
     );
   }
 
@@ -246,7 +250,7 @@ export class Rebuilder implements IRebuilder {
     this.rebuilds.push(() => this.rebuildModuleAt(this.buildPath));
 
     if (this.mode !== 'sequential') {
-      await Promise.all(this.rebuilds.map(fn => fn()));
+      await Promise.all(this.rebuilds.map((fn) => fn()));
     } else {
       for (const rebuildFn of this.rebuilds) {
         await rebuildFn();
@@ -265,7 +269,7 @@ export class Rebuilder implements IRebuilder {
   }
 
   async rebuildModuleAt(modulePath: string): Promise<void> {
-    if (!(fs.existsSync(path.resolve(modulePath, 'binding.gyp')))) {
+    if (!fs.existsSync(path.resolve(modulePath, 'binding.gyp'))) {
       return;
     }
 
@@ -279,7 +283,7 @@ export class Rebuilder implements IRebuilder {
 
     this.lifecycle.emit('module-found', moduleName);
 
-    if (!this.force && await moduleRebuilder.alreadyBuiltByRebuild()) {
+    if (!this.force && (await moduleRebuilder.alreadyBuiltByRebuild())) {
       d(`skipping: ${moduleName} as it is already built`);
       this.lifecycle.emit('module-done', moduleName);
       this.lifecycle.emit('module-skip', moduleName);
