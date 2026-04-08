@@ -958,11 +958,11 @@ __metadata:
   linkType: hard
 
 "nan@npm:^2.14.1":
-  version: 2.23.0
-  resolution: "nan@npm:2.23.0"
+  version: 2.26.2
+  resolution: "nan@npm:2.26.2"
   dependencies:
     node-gyp: "npm:latest"
-  checksum: 10c0/b986dd257dca53ab43a3b6ca6d0eafde697b69e1d63b242fa4aece50ce97eb169f9c4a5d8eb0eb5f58d118a9595fee11f3198fa210f023440053bb6f54109e73
+  checksum: 10c0/ff204c964729279cf3abb8b170c77753ed36092e2235f11bfb0204dfd3e8cc2d5a3bcfdfd3b677f06a0743d7f835d873dce59f23a2dbf6fb671d9351cc655d73
   languageName: node
   linkType: hard
 
