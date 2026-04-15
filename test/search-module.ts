@@ -23,11 +23,15 @@ describe('search-module', () => {
         describe(lockFile, () => {
           beforeAll(async () => {
             await createTempDir();
-            await fs.promises.cp(path.resolve(import.meta.dirname, 'fixture', 'multi-level-workspace'), baseDir, { recursive: true, force: true });
+            await fs.promises.cp(
+              path.resolve(import.meta.dirname, 'fixture', 'multi-level-workspace'),
+              baseDir,
+              { recursive: true, force: true },
+            );
 
             const lockfilePath = path.join(baseDir, lockFile);
 
-            if(!fs.existsSync(lockfilePath)) {
+            if (!fs.existsSync(lockfilePath)) {
               await fs.promises.mkdir(baseDir, { recursive: true });
               await promisifiedGracefulFs.writeFile(lockfilePath, Buffer.from([]), {});
             }

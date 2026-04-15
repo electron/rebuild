@@ -12,10 +12,19 @@ export async function expectNativeModuleToBeRebuilt(
   modulePath: string,
   options: ExpectRebuildOptions = {},
 ): Promise<void> {
-  const metaShouldExist = Object.prototype.hasOwnProperty.call(options, 'metaShouldExist') ? options.metaShouldExist : true;
+  const metaShouldExist = Object.prototype.hasOwnProperty.call(options, 'metaShouldExist')
+    ? options.metaShouldExist
+    : true;
   const message = `${path.basename(modulePath)} build meta should ${metaShouldExist ? '' : 'not '}exist`;
   const buildType = options.buildType || 'Release';
-  const metaPath = path.resolve(basePath, 'node_modules', modulePath, 'build', buildType, '.forge-meta');
+  const metaPath = path.resolve(
+    basePath,
+    'node_modules',
+    modulePath,
+    'build',
+    buildType,
+    '.forge-meta',
+  );
   expect(fs.existsSync(metaPath), message).toBe(metaShouldExist);
 }
 

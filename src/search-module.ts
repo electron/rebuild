@@ -1,7 +1,11 @@
 import fs from 'graceful-fs';
 import path from 'node:path';
 
-async function shouldContinueSearch(traversedPath: string, rootPath?: string, stopAtPackageJSON?: boolean): Promise<boolean> {
+async function shouldContinueSearch(
+  traversedPath: string,
+  rootPath?: string,
+  stopAtPackageJSON?: boolean,
+): Promise<boolean> {
   if (rootPath) {
     return Promise.resolve(traversedPath !== path.dirname(rootPath));
   } else if (stopAtPackageJSON) {
@@ -18,7 +22,7 @@ async function traverseAncestorDirectories(
   pathGenerator: PathGeneratorFunction,
   rootPath?: string,
   maxItems?: number,
-  stopAtPackageJSON?: boolean
+  stopAtPackageJSON?: boolean,
 ): Promise<string[]> {
   const paths: string[] = [];
   let traversedPath = path.resolve(cwd);
@@ -50,9 +54,10 @@ async function traverseAncestorDirectories(
 export async function searchForModule(
   cwd: string,
   moduleName: string,
-  rootPath?: string
+  rootPath?: string,
 ): Promise<string[]> {
-  const pathGenerator: PathGeneratorFunction = (traversedPath) => path.join(traversedPath, 'node_modules', moduleName);
+  const pathGenerator: PathGeneratorFunction = (traversedPath) =>
+    path.join(traversedPath, 'node_modules', moduleName);
   return traverseAncestorDirectories(cwd, pathGenerator, rootPath, undefined, true);
 }
 
@@ -63,7 +68,8 @@ export async function searchForModule(
  * @param rootPath the project's root path. If provided, the traversal will stop at this path.
  */
 export async function searchForNodeModules(cwd: string, rootPath?: string): Promise<string[]> {
-  const pathGenerator: PathGeneratorFunction = (traversedPath) => path.join(traversedPath, 'node_modules');
+  const pathGenerator: PathGeneratorFunction = (traversedPath) =>
+    path.join(traversedPath, 'node_modules');
   return traverseAncestorDirectories(cwd, pathGenerator, rootPath, undefined, true);
 }
 
@@ -75,7 +81,8 @@ export async function searchForNodeModules(cwd: string, rootPath?: string): Prom
  */
 export async function getProjectRootPath(cwd: string): Promise<string> {
   for (const lockFilename of ['yarn.lock', 'package-lock.json', 'pnpm-lock.yaml']) {
-    const pathGenerator: PathGeneratorFunction = (traversedPath) => path.join(traversedPath, lockFilename);
+    const pathGenerator: PathGeneratorFunction = (traversedPath) =>
+      path.join(traversedPath, lockFilename);
     const lockPaths = await traverseAncestorDirectories(cwd, pathGenerator, undefined, 1);
     if (lockPaths.length > 0) {
       return path.dirname(lockPaths[0]);

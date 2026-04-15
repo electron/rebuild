@@ -14,10 +14,7 @@ export class NodePreGyp extends NativeModule {
   async locateBinary(): Promise<string | null> {
     const packageName = await this.findPackageInDependencies('node-pre-gyp');
     if (!packageName) return null;
-    return locateBinary(
-      this.modulePath,
-      `node_modules/${packageName}/bin/node-pre-gyp`
-    );
+    return locateBinary(this.modulePath, `node_modules/${packageName}/bin/node-pre-gyp`);
   }
 
   async run(nodePreGypPath: string): Promise<void> {
@@ -33,11 +30,11 @@ export class NodePreGyp extends NativeModule {
         `--arch=${this.rebuilder.arch}`, // fallback build arch
         `--target_arch=${this.rebuilder.arch}`, // prebuild arch
         `--target_platform=${this.rebuilder.platform}`,
-        ...await this.getNodePreGypRuntimeArgs(),
+        ...(await this.getNodePreGypRuntimeArgs()),
       ],
       {
         cwd: this.modulePath,
-      }
+      },
     );
   }
 
@@ -110,15 +107,19 @@ export class NodePreGyp extends NativeModule {
   }
 
   private async getModulePaths(nodePreGypPath: string): Promise<string[]> {
-    const results = await spawn(process.execPath, [
-      nodePreGypPath,
-      'reveal',
-      'module', // pick property with module path
-      `--target_arch=${this.rebuilder.arch}`,
-      `--target_platform=${this.rebuilder.platform}`,
-    ], {
-      cwd: this.modulePath,
-    });
+    const results = await spawn(
+      process.execPath,
+      [
+        nodePreGypPath,
+        'reveal',
+        'module', // pick property with module path
+        `--target_arch=${this.rebuilder.arch}`,
+        `--target_platform=${this.rebuilder.platform}`,
+      ],
+      {
+        cwd: this.modulePath,
+      },
+    );
 
     // Packages with multiple binaries will output one per line
     return results.split('\n').filter(Boolean);

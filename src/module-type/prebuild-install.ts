@@ -15,10 +15,7 @@ export class PrebuildInstall extends NativeModule {
   async locateBinary(): Promise<string | null> {
     const packageName = await this.findPackageInDependencies('prebuild-install');
     if (!packageName) return null;
-    return locateBinary(
-      this.modulePath,
-      `node_modules/${packageName}/bin.js`
-    );
+    return locateBinary(this.modulePath, `node_modules/${packageName}/bin.js`);
   }
 
   async run(prebuildInstallPath: string): Promise<void> {
@@ -30,11 +27,11 @@ export class PrebuildInstall extends NativeModule {
         `--arch=${this.rebuilder.arch}`,
         `--platform=${this.rebuilder.platform}`,
         `--tag-prefix=${this.rebuilder.prebuildTagPrefix}`,
-        ...await this.getPrebuildInstallRuntimeArgs(),
+        ...(await this.getPrebuildInstallRuntimeArgs()),
       ],
       {
         cwd: this.modulePath,
-      }
+      },
     );
   }
 
@@ -63,22 +60,23 @@ export class PrebuildInstall extends NativeModule {
    * Whether a prebuild-install-based native module exists.
    */
   async prebuiltModuleExists(): Promise<boolean> {
-    return fs.existsSync(path.resolve(this.modulePath, 'prebuilds', `${this.rebuilder.platform}-${this.rebuilder.arch}`, `electron-${this.rebuilder.ABI}.node`));
+    return fs.existsSync(
+      path.resolve(
+        this.modulePath,
+        'prebuilds',
+        `${this.rebuilder.platform}-${this.rebuilder.arch}`,
+        `electron-${this.rebuilder.ABI}.node`,
+      ),
+    );
   }
 
   async getPrebuildInstallRuntimeArgs(): Promise<string[]> {
     const moduleNapiVersions = await this.getSupportedNapiVersions();
     if (moduleNapiVersions) {
       const napiVersion = this.nodeAPI.getNapiVersion(moduleNapiVersions);
-      return [
-        '--runtime=napi',
-        `--target=${napiVersion}`,
-      ];
+      return ['--runtime=napi', `--target=${napiVersion}`];
     } else {
-      return [
-        '--runtime=electron',
-        `--target=${this.rebuilder.electronVersion}`,
-      ];
+      return ['--runtime=electron', `--target=${this.rebuilder.electronVersion}`];
     }
   }
 }

@@ -3,8 +3,18 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from
 import fs from 'graceful-fs';
 import path from 'node:path';
 
-import { cleanupTestModule, MINUTES_IN_MILLISECONDS, TEST_MODULE_PATH as testModulePath, resetMSVSVersion, resetTestModule, TIMEOUT_IN_MILLISECONDS } from './helpers/module-setup.js';
-import { expectNativeModuleToBeRebuilt, expectNativeModuleToNotBeRebuilt } from './helpers/rebuild.js';
+import {
+  cleanupTestModule,
+  MINUTES_IN_MILLISECONDS,
+  TEST_MODULE_PATH as testModulePath,
+  resetMSVSVersion,
+  resetTestModule,
+  TIMEOUT_IN_MILLISECONDS,
+} from './helpers/module-setup.js';
+import {
+  expectNativeModuleToBeRebuilt,
+  expectNativeModuleToNotBeRebuilt,
+} from './helpers/rebuild.js';
 import { getExactElectronVersionSync } from './helpers/electron-version.js';
 import { Rebuilder, rebuild } from '../lib/rebuild.js';
 import { promisifiedGracefulFs } from '../lib/promisifiedGracefulFs.js';
@@ -12,7 +22,6 @@ import { promisifiedGracefulFs } from '../lib/promisifiedGracefulFs.js';
 const testElectronVersion = getExactElectronVersionSync();
 
 describe('rebuilder', () => {
-
   describe('core behavior', { timeout: TIMEOUT_IN_MILLISECONDS }, () => {
     beforeAll(async () => {
       await resetTestModule(testModulePath);
@@ -20,7 +29,7 @@ describe('rebuilder', () => {
       await rebuild({
         buildPath: testModulePath,
         electronVersion: testElectronVersion,
-        arch: process.arch
+        arch: process.arch,
       });
     });
 
@@ -85,7 +94,13 @@ describe('rebuilder', () => {
     it('should rebuild all modules again when disabled but the electron ABI changed', async () => {
       await rebuild({ buildPath, electronVersion, arch });
       resetMSVSVersion();
-      const rebuilder = rebuild({ buildPath, electronVersion: '3.0.0', arch, extraModules, force: false });
+      const rebuilder = rebuild({
+        buildPath,
+        electronVersion: '3.0.0',
+        arch,
+        extraModules,
+        force: false,
+      });
       let skipped = 0;
       rebuilder.lifecycle.on('module-skip', () => {
         skipped++;
@@ -94,17 +109,21 @@ describe('rebuilder', () => {
       expect(skipped).toBe(0);
     });
 
-    it('should rebuild all modules again when enabled', async () => {
-      await rebuild({ buildPath, electronVersion, arch });
-      resetMSVSVersion();
-      const rebuilder = rebuild({ buildPath, electronVersion, arch, extraModules, force: true });
-      let skipped = 0;
-      rebuilder.lifecycle.on('module-skip', () => {
-        skipped++;
-      });
-      await rebuilder;
-      expect(skipped).toBe(0);
-    }, process.platform === 'darwin' ? 5 * MINUTES_IN_MILLISECONDS : TIMEOUT_IN_MILLISECONDS);
+    it(
+      'should rebuild all modules again when enabled',
+      async () => {
+        await rebuild({ buildPath, electronVersion, arch });
+        resetMSVSVersion();
+        const rebuilder = rebuild({ buildPath, electronVersion, arch, extraModules, force: true });
+        let skipped = 0;
+        rebuilder.lifecycle.on('module-skip', () => {
+          skipped++;
+        });
+        await rebuilder;
+        expect(skipped).toBe(0);
+      },
+      process.platform === 'darwin' ? 5 * MINUTES_IN_MILLISECONDS : TIMEOUT_IN_MILLISECONDS,
+    );
   });
 
   describe('ignore rebuild', { timeout: 2 * MINUTES_IN_MILLISECONDS }, () => {
@@ -116,25 +135,42 @@ describe('rebuilder', () => {
     const electronVersion = testElectronVersion;
     const arch = process.arch;
 
-    it('should rebuild all modules again when enabled', async () => {
-      await rebuild({ buildPath, electronVersion, arch });
-      resetMSVSVersion();
-      const rebuilder = rebuild({ buildPath, electronVersion, arch, ignoreModules: ['native-hello-world'], force: true });
-      let skipped = 0;
-      rebuilder.lifecycle.on('module-skip', () => {
-        skipped++;
-      });
-      await rebuilder;
-      expect(skipped).toBe(1);
-    }, process.platform === 'win32' ? 5 * MINUTES_IN_MILLISECONDS : 2 * MINUTES_IN_MILLISECONDS);
+    it(
+      'should rebuild all modules again when enabled',
+      async () => {
+        await rebuild({ buildPath, electronVersion, arch });
+        resetMSVSVersion();
+        const rebuilder = rebuild({
+          buildPath,
+          electronVersion,
+          arch,
+          ignoreModules: ['native-hello-world'],
+          force: true,
+        });
+        let skipped = 0;
+        rebuilder.lifecycle.on('module-skip', () => {
+          skipped++;
+        });
+        await rebuilder;
+        expect(skipped).toBe(1);
+      },
+      process.platform === 'win32' ? 5 * MINUTES_IN_MILLISECONDS : 2 * MINUTES_IN_MILLISECONDS,
+    );
   });
 
   describe('only rebuild', { timeout: 2 * MINUTES_IN_MILLISECONDS }, () => {
     beforeEach(async () => await resetTestModule(testModulePath));
-    afterEach(async() => await cleanupTestModule(testModulePath));
+    afterEach(async () => await cleanupTestModule(testModulePath));
 
     it('should rebuild only specified modules', async () => {
-      const nativeModuleBinary = path.join(testModulePath, 'node_modules', 'native-hello-world', 'build', 'Release', 'hello_world.node');
+      const nativeModuleBinary = path.join(
+        testModulePath,
+        'node_modules',
+        'native-hello-world',
+        'build',
+        'Release',
+        'hello_world.node',
+      );
       expect(fs.existsSync(nativeModuleBinary)).toBe(true);
       await fs.promises.rm(nativeModuleBinary, { recursive: true, force: true });
       expect(fs.existsSync(nativeModuleBinary)).toBe(false);
@@ -143,7 +179,7 @@ describe('rebuilder', () => {
         electronVersion: testElectronVersion,
         arch: process.arch,
         onlyModules: ['native-hello-world'],
-        force: true
+        force: true,
       });
       let built = 0;
       rebuilder.lifecycle.on('module-done', () => built++);
@@ -158,7 +194,7 @@ describe('rebuilder', () => {
         electronVersion: testElectronVersion,
         arch: process.arch,
         onlyModules: ['windows-active-process', 'ref-napi', '@newrelic/native-metrics'],
-        force: true
+        force: true,
       });
       let built = 0;
       rebuilder.lifecycle.on('module-done', () => built++);
@@ -173,7 +209,7 @@ describe('rebuilder', () => {
         buildPath: path.join(import.meta.dirname, 'fixture', 'empty-project'),
         electronVersion: testElectronVersion,
         lifecycle: new EventEmitter(),
-        extraModules: ['extra']
+        extraModules: ['extra'],
       });
       const modulesToRebuild = await rebuilder.modulesToRebuild();
       expect(modulesToRebuild).toHaveLength(1);
@@ -183,7 +219,7 @@ describe('rebuilder', () => {
 
   describe('debug rebuild', { timeout: 10 * MINUTES_IN_MILLISECONDS }, () => {
     beforeAll(async () => await resetTestModule(testModulePath));
-    afterAll(async() => await cleanupTestModule(testModulePath));
+    afterAll(async () => await cleanupTestModule(testModulePath));
 
     it('should have rebuilt farmhash module in Debug mode', async () => {
       await rebuild({
@@ -192,7 +228,7 @@ describe('rebuilder', () => {
         arch: process.arch,
         onlyModules: ['farmhash'],
         force: true,
-        debug: true
+        debug: true,
       });
       await expectNativeModuleToBeRebuilt(testModulePath, 'farmhash', { buildType: 'Debug' });
       await expectNativeModuleToNotBeRebuilt(testModulePath, 'farmhash');
@@ -201,7 +237,7 @@ describe('rebuilder', () => {
 
   describe('useElectronClang rebuild', { timeout: 10 * MINUTES_IN_MILLISECONDS }, () => {
     beforeAll(async () => await resetTestModule(testModulePath));
-    afterAll(async() => await cleanupTestModule(testModulePath));
+    afterAll(async () => await cleanupTestModule(testModulePath));
 
     it('should have rebuilt farmhash module using clang mode', async () => {
       await rebuild({
@@ -210,7 +246,7 @@ describe('rebuilder', () => {
         arch: process.arch,
         onlyModules: ['farmhash'],
         force: true,
-        useElectronClang: true
+        useElectronClang: true,
       });
       await expectNativeModuleToBeRebuilt(testModulePath, 'farmhash');
     });

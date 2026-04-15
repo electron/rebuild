@@ -20,7 +20,13 @@ export class ModuleWalker {
   realNodeModulesPaths: Set<string>;
   types: ModuleType[];
 
-  constructor(buildPath: string, projectRootPath: string | undefined, types: ModuleType[], prodDeps: Set<string>, onlyModules: string[] | null) {
+  constructor(
+    buildPath: string,
+    projectRootPath: string | undefined,
+    types: ModuleType[],
+    prodDeps: Set<string>,
+    onlyModules: string[] | null,
+  ) {
     this.buildPath = buildPath;
     this.modulesToRebuild = [];
     this.projectRootPath = projectRootPath;
@@ -32,10 +38,7 @@ export class ModuleWalker {
   }
 
   get nodeModulesPaths(): Promise<string[]> {
-    return searchForNodeModules(
-      this.buildPath,
-      this.projectRootPath
-    );
+    return searchForNodeModules(this.buildPath, this.projectRootPath);
   }
 
   async walkModules(): Promise<void> {
@@ -58,7 +61,7 @@ export class ModuleWalker {
       const modulePaths: string[] = await searchForModule(
         this.buildPath,
         key,
-        this.projectRootPath
+        this.projectRootPath,
       );
       for (const modulePath of modulePaths) {
         markWaiters.push(this.markChildrenAsProdDeps(modulePath));
@@ -70,14 +73,13 @@ export class ModuleWalker {
     d('identified prod deps:', this.prodDeps);
   }
 
-  async findModule(moduleName: string, fromDir: string, foundFn: ((p: string) => Promise<void>)): Promise<void[]> {
-
-    const testPaths = await searchForModule(
-      fromDir,
-      moduleName,
-      this.projectRootPath
-    );
-    const foundFns = testPaths.map(testPath => foundFn(testPath));
+  async findModule(
+    moduleName: string,
+    fromDir: string,
+    foundFn: (p: string) => Promise<void>,
+  ): Promise<void[]> {
+    const testPaths = await searchForModule(fromDir, moduleName, this.projectRootPath);
+    const foundFns = testPaths.map((testPath) => foundFn(testPath));
 
     return Promise.all(foundFns);
   }
@@ -91,13 +93,15 @@ export class ModuleWalker {
     let childPackageJson;
     try {
       childPackageJson = await readPackageJson(modulePath, true);
-    } catch (err) {
+    } catch {
       return;
     }
     const moduleWait: Promise<void[]>[] = [];
 
     const callback = this.markChildrenAsProdDeps.bind(this);
-    for (const key of Object.keys(childPackageJson.dependencies || {}).concat(Object.keys(childPackageJson.optionalDependencies || {}))) {
+    for (const key of Object.keys(childPackageJson.dependencies || {}).concat(
+      Object.keys(childPackageJson.optionalDependencies || {}),
+    )) {
       if (this.prodDeps.has(key)) {
         continue;
       }
@@ -150,7 +154,10 @@ export class ModuleWalker {
       this.realModulePaths.add(realPath);
 
       const moduleName = `${prefix}${modulePath}`;
-      if (this.prodDeps.has(moduleName) && (!this.onlyModules || this.onlyModules.includes(moduleName))) {
+      if (
+        this.prodDeps.has(moduleName) &&
+        (!this.onlyModules || this.onlyModules.includes(moduleName))
+      ) {
         this.modulesToRebuild.push(realPath);
       }
 

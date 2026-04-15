@@ -10,8 +10,8 @@
     "build:docs": "typedoc src/main.ts",
     "coverage": "yarn prewarm-headers && yarn spec --coverage",
     "watch": "tsc -w",
-    "prepare": "yarn build",
-    "lint": "eslint --ext .ts .",
+    "prepare": "husky && yarn build",
+    "lint": "oxlint && oxfmt --check",
     "spec": "tsc && vitest run",
     "test": "yarn prewarm-headers && yarn lint && yarn spec",
     "prewarm-headers": "node-gyp install --ensure"
@@ -66,14 +66,23 @@
     "@types/node-abi": "^3.0.0",
     "@types/semver": "^7.3.9",
     "@types/yargs": "^17.0.2",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
-    "@typescript-eslint/parser": "^6.21.0",
     "@vitest/coverage-v8": "^4.1.2",
     "electron": "^39.8.5",
     "eslint": "^7.7.0",
-    "typedoc": "~0.25.13",
-    "typescript": "~5.4.5",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "oxfmt": "^0.42.0",
+    "oxlint": "^1.57.0",
+    "oxlint-tsgolint": "^0.18.1",
+    "typedoc": "~0.28.0",
+    "typescript": "^6.0.2",
     "vitest": "^4.1.2"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "oxlint --fix",
+      "oxfmt --write"
+    ]
   },
   "resolutions": {
     "@typescript-eslint/typescript-estree/minimatch": "^9.0.7"

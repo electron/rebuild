@@ -130,10 +130,16 @@ export class ModuleRebuilder {
     if (nodePath && fs.existsSync(nodePath)) {
       d('found .node file', nodePath);
       if (!this.rebuilder.disablePreGypCopy) {
-        const abiPath = path.resolve(this.modulePath, `bin/${this.rebuilder.platform}-${this.rebuilder.arch}-${this.rebuilder.ABI}`);
+        const abiPath = path.resolve(
+          this.modulePath,
+          `bin/${this.rebuilder.platform}-${this.rebuilder.arch}-${this.rebuilder.ABI}`,
+        );
         d('copying to prebuilt place:', abiPath);
         await fs.promises.mkdir(abiPath, { recursive: true });
-        await promisifiedGracefulFs.copyFile(nodePath, path.join(abiPath, `${this.nodeGyp.moduleName}.node`));
+        await promisifiedGracefulFs.copyFile(
+          nodePath,
+          path.join(abiPath, `${this.nodeGyp.moduleName}.node`),
+        );
       }
     }
   }
@@ -145,8 +151,8 @@ export class ModuleRebuilder {
 
   async rebuild(cacheKey: string): Promise<boolean> {
     if (
-      !this.rebuilder.buildFromSource && (
-        (await this.findPrebuildifyModule(cacheKey)) ||
+      !this.rebuilder.buildFromSource &&
+      ((await this.findPrebuildifyModule(cacheKey)) ||
         (await this.findPrebuildInstallModule(cacheKey)) ||
         (await this.findNodePreGypInstallModule(cacheKey)))
     ) {
