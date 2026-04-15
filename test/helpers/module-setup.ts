@@ -3,8 +3,10 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { d } from '../../src/debug.js';
+import debug from 'debug';
 import { spawn } from '@malept/cross-spawn-promise';
+
+const d = debug('electron-rebuild');
 
 const originalGypMSVSVersion: string | undefined = process.env.GYP_MSVS_VERSION;
 const TIMEOUT_IN_MINUTES = process.platform === 'win32' ? 5 : 2;
