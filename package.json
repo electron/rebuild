@@ -74,8 +74,8 @@
     "oxfmt": "^0.42.0",
     "oxlint": "^1.57.0",
     "oxlint-tsgolint": "^0.18.1",
-    "typedoc": "~0.25.13",
-    "typescript": "~5.4.5",
+    "typedoc": "~0.28.0",
+    "typescript": "^6.0.2",
     "vitest": "^4.1.2"
   },
   "lint-staged": {
