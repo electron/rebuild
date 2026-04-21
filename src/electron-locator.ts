@@ -1,4 +1,4 @@
-import fs from 'graceful-fs';
+import fs from 'node:fs';
 import path from 'node:path';
 import { searchForModule } from './search-module.js';
 import { fileURLToPath } from 'node:url';

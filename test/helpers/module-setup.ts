@@ -1,8 +1,9 @@
-import debug from 'debug';
 import crypto from 'node:crypto';
-import fs from 'graceful-fs';
+import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+
+import debug from 'debug';
 import { spawn } from '@malept/cross-spawn-promise';
 
 const d = debug('electron-rebuild');

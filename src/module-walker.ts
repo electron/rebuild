@@ -1,10 +1,9 @@
 import debug from 'debug';
-import fs from 'graceful-fs';
+import fs from 'node:fs';
 import path from 'node:path';
 
 import { readPackageJson } from './read-package-json.js';
 import { searchForModule, searchForNodeModules } from './search-module.js';
-import { promisifiedGracefulFs } from './promisifiedGracefulFs.js';
 
 const d = debug('electron-rebuild');
 
@@ -122,7 +121,7 @@ export class ModuleWalker {
 
     d('scanning:', realNodeModulesPath);
 
-    for (const modulePath of await promisifiedGracefulFs.readdir(realNodeModulesPath)) {
+    for (const modulePath of await fs.promises.readdir(realNodeModulesPath)) {
       // Ignore the magical .bin directory
       if (modulePath === '.bin') continue;
 

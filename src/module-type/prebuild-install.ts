@@ -1,9 +1,10 @@
 import debug from 'debug';
-import fs from 'graceful-fs';
+import fs from 'node:fs';
 import path from 'node:path';
-import { spawn } from '@malept/cross-spawn-promise';
 
 import { locateBinary, NativeModule } from './index.js';
+import { spawn } from '@malept/cross-spawn-promise';
+
 const d = debug('electron-rebuild');
 
 export class PrebuildInstall extends NativeModule {

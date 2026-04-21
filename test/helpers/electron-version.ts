@@ -1,4 +1,4 @@
-import fs from 'graceful-fs';
+import fs from 'node:fs';
 import path from 'node:path';
 import electron from 'electron';
 

@@ -1,43 +1,46 @@
 #!/usr/bin/env node
 
-import fs from 'graceful-fs';
+import fs from 'node:fs';
 import path from 'node:path';
-import util from 'node:util';
-import ora from 'ora';
-import yargs from 'yargs/yargs';
+import { parseArgs, styleText } from 'node:util';
+import { pathToFileURL } from 'node:url';
 
 import { getProjectRootPath } from './search-module.js';
 import { locateElectronModule } from './electron-locator.js';
 import { ModuleType } from './module-walker.js';
 import { rebuild } from './rebuild.js';
-import { pathToFileURL } from 'node:url';
 
-const argv = yargs(process.argv.slice(2)).version(false).options({
-  version: { alias: 'v', type: 'string', description: 'The version of Electron to build against' },
-  force: { alias: 'f', type: 'boolean', description: 'Force rebuilding modules, even if we would skip it otherwise' },
-  arch: { alias: 'a', type: 'string', description: "Override the target architecture to something other than your system's" },
-  'module-dir': { alias: 'm', type: 'string', description: 'The path to the node_modules directory to rebuild' },
-  // TODO: should be type: array
-  'which-module': { alias: 'w', type: 'string', description: 'A specific module to build, or comma separated list of modules. Modules will only be rebuilt if they also match the types of dependencies being rebuilt (see --types).' },
-  // TODO: should be type: array
-  only: { alias: 'o', type: 'string', description: 'Only build specified module, or comma separated list of modules. All others are ignored.' },
-  'electron-prebuilt-dir': { alias: 'e', type: 'string', description: 'The path to the prebuilt electron module' },
-  'dist-url': { alias: 'd', type: 'string', description: 'Custom header tarball URL' },
-  // TODO: should be type: array
-  types: { alias: 't', type: 'string', description: 'The types of dependencies to rebuild.  Comma separated list of "prod", "dev" and "optional".  Default is "prod,optional"' },
-  parallel: { alias: 'p', type: 'boolean', description: 'Rebuild in parallel, this is enabled by default on macOS and Linux' },
-  sequential: { alias: 's', type: 'boolean', description: 'Rebuild modules sequentially, this is enabled by default on Windows' },
-  debug: { alias: 'b', type: 'boolean', description: 'Build debug version of modules' },
+const options = {
+  version: { short: 'v', type: 'string', description: 'The version of Electron to build against' },
+  force: { short: 'f', type: 'boolean', description: 'Force rebuilding modules, even if we would skip it otherwise' },
+  arch: { short: 'a', type: 'string', description: "Override the target architecture to something other than your system's" },
+  'module-dir': { short: 'm', type: 'string', description: 'The path to the node_modules directory to rebuild' },
+  'which-module': { short: 'w', type: 'string', description: 'A specific module to build, or comma separated list of modules. Modules will only be rebuilt if they also match the types of dependencies being rebuilt (see --types).' },
+  only: { short: 'o', type: 'string', description: 'Only build specified module, or comma separated list of modules. All others are ignored.' },
+  'electron-prebuilt-dir': { short: 'e', type: 'string', description: 'The path to the prebuilt electron module' },
+  'dist-url': { short: 'd', type: 'string', description: 'Custom header tarball URL' },
+  types: { short: 't', type: 'string', description: 'The types of dependencies to rebuild.  Comma separated list of "prod", "dev" and "optional".  Default is "prod,optional"' },
+  parallel: { short: 'p', type: 'boolean', description: 'Rebuild in parallel, this is enabled by default on macOS and Linux' },
+  sequential: { short: 's', type: 'boolean', description: 'Rebuild modules sequentially, this is enabled by default on Windows' },
+  debug: { short: 'b', type: 'boolean', description: 'Build debug version of modules' },
   'prebuild-tag-prefix': { type: 'string', description: 'GitHub tag prefix passed to prebuild-install. Default is "v"' },
-  'force-abi': { type: 'number', description: 'Override the ABI version for the version of Electron you are targeting.  Only use when targeting Nightly releases.' },
+  'force-abi': { type: 'string', description: 'Override the ABI version for the version of Electron you are targeting.  Only use when targeting Nightly releases.' },
   'use-electron-clang': { type: 'boolean', description: 'Use the clang executable that Electron used when building its binary. This will guarantee compiler compatibility' },
   'disable-pre-gyp-copy': { type: 'boolean', description: 'Disables the pre-gyp copy step' },
-  'build-from-source': { type: 'boolean', description: 'Skips prebuild download and rebuilds module from source.'},
-}).usage('Usage: $0 --version [version] --module-dir [path]')
-  .help()
-  .alias('help', 'h')
-  .epilog('Copyright 2016-2021')
-  .parseSync();
+  'build-from-source': { type: 'boolean', description: 'Skips prebuild download and rebuilds module from source.' },
+  help: { short: 'h', type: 'boolean', description: 'Show help' },
+} as const satisfies Record<string, { type: 'string' | 'boolean'; short?: string; description: string }>;
+
+const { values: argv } = parseArgs({ options, allowPositionals: true });
+
+if (argv.help) {
+  console.log('Usage: electron-rebuild --version [version] --module-dir [path]\n\nOptions:');
+  for (const [name, opt] of Object.entries(options)) {
+    const short = 'short' in opt ? `-${opt.short}, ` : '    ';
+    console.log(`  ${short}--${name.padEnd(22)} ${opt.description}`);
+  }
+  process.exit(0);
+}
 
 if (process.argv.length === 3 && process.argv[2] === '--version') {
   try {
@@ -66,8 +69,8 @@ if (process.argv.length === 3 && process.argv[2] === '--version') {
 }
 
 const handler = (err: Error): void => {
-  console.error(util.styleText('red', '\nAn unhandled error occurred inside electron-rebuild'));
-  console.error(util.styleText('red', `${err.message}\n\n${err.stack}`));
+  console.error(styleText('red', '\nAn unhandled error occurred inside electron-rebuild'));
+  console.error(styleText('red', `${err.message}\n\n${err.stack}`));
   process.exit(-1);
 };
 
@@ -77,8 +80,8 @@ process.on('unhandledRejection', handler);
 
 (async (): Promise<void> => {
   const projectRootPath = await getProjectRootPath(process.cwd());
-  const electronModulePath = argv.e ? path.resolve(process.cwd(), (argv.e as string)) : await locateElectronModule(projectRootPath);
-  let electronModuleVersion = argv.v as string;
+  const electronModulePath = argv['electron-prebuilt-dir'] ? path.resolve(process.cwd(), argv['electron-prebuilt-dir']) : await locateElectronModule(projectRootPath);
+  let electronModuleVersion = argv.version;
 
   if (!electronModuleVersion) {
     try {
@@ -91,7 +94,7 @@ process.on('unhandledRejection', handler);
     }
   }
 
-  let rootDirectory = argv.m as string;
+  let rootDirectory = argv['module-dir'];
 
   if (!rootDirectory) {
     // NB: We assume here that we're going to rebuild the immediate parent's
@@ -109,64 +112,48 @@ process.on('unhandledRejection', handler);
     rootDirectory = path.resolve(process.cwd(), rootDirectory);
   }
 
-  if (argv.forceAbi && typeof argv.forceAbi !== 'number') {
+  const forceAbi = argv['force-abi'] ? Number(argv['force-abi']) : undefined;
+  if (argv['force-abi'] && Number.isNaN(forceAbi)) {
     throw new Error('force-abi must be a number');
   }
 
-  let modulesDone = 0;
-  let moduleTotal = 0;
-  const rebuildSpinner = ora('Searching dependency tree').start();
-  let lastModuleName: string;
-
-  const redraw = (moduleName?: string): void => {
-    if (moduleName) lastModuleName = moduleName;
-
-    if (argv.p) {
-      rebuildSpinner.text = `Building modules: ${modulesDone}/${moduleTotal}`;
-    } else {
-      rebuildSpinner.text = `Building module: ${lastModuleName}, Completed: ${modulesDone}`;
-    }
-  };
+  console.error('Searching dependency tree');
 
   const rebuilder = rebuild({
     buildPath: rootDirectory,
-    electronVersion: electronModuleVersion,
-    arch: (argv.a as string) || process.arch,
-    extraModules: argv.w ? (argv.w as string).split(',') : [],
-    onlyModules: argv.o ? (argv.o as string).split(',') : null,
-    force: argv.f as boolean,
-    headerURL: argv.d as string,
-    types: argv.t ? (argv.t as string).split(',') as ModuleType[] : ['prod', 'optional'],
-    mode: argv.p ? 'parallel' : (argv.s ? 'sequential' : undefined),
+    electronVersion: electronModuleVersion as string,
+    arch: argv.arch || process.arch,
+    extraModules: argv['which-module'] ? argv['which-module'].split(',') : [],
+    onlyModules: argv.only ? argv.only.split(',') : null,
+    force: argv.force,
+    headerURL: argv['dist-url'],
+    types: argv.types ? argv.types.split(',') as ModuleType[] : ['prod', 'optional'],
+    mode: argv.parallel ? 'parallel' : (argv.sequential ? 'sequential' : undefined),
     debug: argv.debug,
-    prebuildTagPrefix: (argv.prebuildTagPrefix as string) || 'v',
-    forceABI: argv.forceAbi as number,
-    useElectronClang: !!argv.useElectronClang,
-    disablePreGypCopy: !!argv.disablePreGypCopy,
+    prebuildTagPrefix: argv['prebuild-tag-prefix'] || 'v',
+    forceABI: forceAbi,
+    useElectronClang: !!argv['use-electron-clang'],
+    disablePreGypCopy: !!argv['disable-pre-gyp-copy'],
     projectRootPath,
-    buildFromSource: !!argv.buildFromSource,
+    buildFromSource: !!argv['build-from-source'],
   });
 
   const lifecycle = rebuilder.lifecycle;
 
-  lifecycle.on('module-found', (moduleName: string) => {
-    moduleTotal += 1;
-    redraw(moduleName);
-  });
-
-  lifecycle.on('module-done', () => {
-    modulesDone += 1;
-    redraw();
+  lifecycle.on('modules-found', (moduleNames: string[]) => {
+    if (moduleNames.length > 0) {
+      console.error(`Building modules: ${moduleNames.join(', ')}`);
+    } else {
+      console.error('No native modules found');
+    }
   });
 
   try {
     await rebuilder;
   } catch (err) {
-    rebuildSpinner.text = 'Rebuild Failed';
-    rebuildSpinner.fail();
+    console.error(styleText('red', '✖ Rebuild Failed'));
     throw err;
   }
 
-  rebuildSpinner.text = 'Rebuild Complete';
-  rebuildSpinner.succeed();
+  console.error(styleText('green', '✔ Rebuild Complete'));
 })();

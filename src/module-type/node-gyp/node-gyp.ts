@@ -1,12 +1,11 @@
+import { fork } from 'node:child_process';
 import debug from 'debug';
-import detectLibc from 'detect-libc';
 import path from 'node:path';
-import semver from 'semver';
 
 import { ELECTRON_GYP_DIR } from '../../constants.js';
 import { getClangEnvironmentVars } from '../../clang-fetcher.js';
 import { NativeModule } from '../index.js';
-import { fork } from 'node:child_process';
+import { detectLibcFamily } from '../../detect-libc.js';
 
 const d = debug('electron-rebuild');
 
@@ -40,7 +39,8 @@ export class NodeGyp extends NativeModule {
     // and --force-process-config must be passed to node-gyp >= 8.4.0 to
     // correctly build modules for them.
     // See also https://github.com/nodejs/node-gyp/pull/2497
-    if (!semver.satisfies(this.rebuilder.electronVersion, '^14.2.0 || ^15.3.0') && semver.major(this.rebuilder.electronVersion) < 16) {
+    const [maj, min] = this.rebuilder.electronVersion.split('.').map(Number);
+    if (maj < 14 || (maj === 14 && min < 2) || (maj === 15 && min < 3)) {
       args.push('--force-process-config');
     }
 
@@ -69,7 +69,7 @@ export class NodeGyp extends NativeModule {
         .replace('{platform}', this.rebuilder.platform)
         .replace('{arch}', this.rebuilder.arch)
         .replace('{version}', await this.packageJSONField('version') as string)
-        .replace('{libc}', await detectLibc.family() || 'unknown');
+        .replace('{libc}', detectLibcFamily() || 'unknown');
       if (napiBuildVersion !== undefined) {
         value = value.replace('{napi_build_version}', napiBuildVersion.toString());
       }

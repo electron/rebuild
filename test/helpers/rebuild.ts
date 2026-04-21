@@ -1,5 +1,5 @@
 import { expect } from 'vitest';
-import fs from 'graceful-fs';
+import fs from 'node:fs';
 import path from 'node:path';
 
 type ExpectRebuildOptions = {

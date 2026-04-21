@@ -1,4 +1,4 @@
-import fs from 'graceful-fs';
+import fs from 'node:fs';
 import path from 'node:path';
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -6,7 +6,7 @@ import { rebuild } from '../lib/rebuild.js';
 import { getExactElectronVersionSync } from './helpers/electron-version.js';
 import { TEST_MODULE_PATH as testModulePath, TIMEOUT_IN_MILLISECONDS, cleanupTestModule, resetTestModule } from './helpers/module-setup.js';
 import { expectNativeModuleToBeRebuilt } from './helpers/rebuild.js';
-import detectLibc from 'detect-libc';
+import { detectLibcFamily } from '../src/detect-libc.js';
 
 const testElectronVersion = getExactElectronVersionSync();
 
@@ -25,7 +25,7 @@ describe('rebuild with napi_build_versions in binary config', { timeout: TIMEOUT
   const archs = ['x64', 'arm64'];
   for (const arch of archs) {
     it(`${ arch } arch should have rebuilt binary with 'napi_build_versions' array and 'libc' provided`, async () => {
-      const libc = await detectLibc.family() || 'unknown';
+      const libc = detectLibcFamily() || 'unknown';
       const binaryPath = napiBuildVersionSpecificPath(arch, libc);
 
       await fs.promises.rm(binaryPath, { recursive: true, force: true });
