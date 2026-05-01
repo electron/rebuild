@@ -5,7 +5,7 @@ import path from 'node:path';
 import {
   determineNativePrebuildArch,
   determineNativePrebuildExtension,
-  Prebuildify
+  Prebuildify,
 } from '../lib/module-type/prebuildify.js';
 import { Rebuilder, RebuilderOptions } from '../lib/rebuild.js';
 
@@ -39,11 +39,11 @@ describe('prebuildify', () => {
     buildPath: 'nonexistent-path',
     electronVersion: '13.0.0',
     arch: 'x64',
-    lifecycle: new EventEmitter()
+    lifecycle: new EventEmitter(),
   };
 
   const createRebuilder = (args: Partial<RebuilderOptions> = {}): Rebuilder => {
-    const rebuilder = new Rebuilder({ ...rebuilderArgs, ...args});
+    const rebuilder = new Rebuilder({ ...rebuilderArgs, ...args });
     rebuilder.platform = 'linux';
     return rebuilder;
   };
@@ -51,13 +51,19 @@ describe('prebuildify', () => {
   describe('usesTool', () => {
     it('succeeds if prebuildify exists in devDependencies', async () => {
       const rebuilder = createRebuilder();
-      const prebuildify = new Prebuildify(rebuilder, path.join(fixtureBaseDir, 'has-prebuildify-devdep'));
+      const prebuildify = new Prebuildify(
+        rebuilder,
+        path.join(fixtureBaseDir, 'has-prebuildify-devdep'),
+      );
       expect(await prebuildify.usesTool()).toBe(true);
     });
 
     it('fails if prebuildify does not exist in devDependencies', async () => {
       const rebuilder = createRebuilder();
-      const prebuildify = new Prebuildify(rebuilder, path.join(fixtureBaseDir, 'no-prebuildify-devdep'));
+      const prebuildify = new Prebuildify(
+        rebuilder,
+        path.join(fixtureBaseDir, 'no-prebuildify-devdep'),
+      );
       expect(await prebuildify.usesTool()).toBe(false);
     });
   });
@@ -136,7 +142,10 @@ describe('prebuildify', () => {
 
   it('should find module fork', async () => {
     const rebuilder = createRebuilder();
-    const prebuildify = new Prebuildify(rebuilder, path.join(import.meta.dirname, 'fixture', 'forked-module-test'));
+    const prebuildify = new Prebuildify(
+      rebuilder,
+      path.join(import.meta.dirname, 'fixture', 'forked-module-test'),
+    );
     expect(await prebuildify.usesTool()).toBe(true);
   });
 });

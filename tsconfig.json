@@ -11,6 +11,7 @@
     "noImplicitThis": true,
     "noUnusedParameters": true,
     "pretty": true,
+    "rootDir": "src",
     "outDir": "lib",
     "types": ["node"]
   },
@@ -18,10 +19,5 @@
     "indentSize": 2,
     "tabSize": 2
   },
-  "exclude": [
-    "node_modules",
-    "lib",
-    "test",
-    "vitest.config.ts"
-  ]
+  "exclude": ["node_modules", "lib", "test", "vitest.config.ts"]
 }
