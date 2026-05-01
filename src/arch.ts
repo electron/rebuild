@@ -6,9 +6,7 @@ import { execSync } from 'node:child_process';
  * Copied from `@electron/get`.
  */
 export function uname(): string {
-  return execSync('uname -m')
-    .toString()
-    .trim();
+  return execSync('uname -m').toString().trim();
 }
 
 export type ConfigVariables = {

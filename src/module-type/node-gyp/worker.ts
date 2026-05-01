@@ -1,10 +1,6 @@
 import NodeGypRunner from 'node-gyp';
 
-process.on('message', async ({
-  nodeGypArgs,
-  devDir,
-  extraNodeGypArgs,
-}) => {
+process.on('message', async ({ nodeGypArgs, devDir, extraNodeGypArgs }) => {
   const nodeGyp = NodeGypRunner();
   nodeGyp.parseArgv(nodeGypArgs);
   nodeGyp.devDir = devDir;
