@@ -15,24 +15,27 @@ jobs:
   test:
     name: Test
     strategy:
+      fail-fast: false
       matrix:
         node-version:
           - '22.12.x'
         os:
           - macos-latest
           - ubuntu-latest
+          - ubuntu-24.04-arm
           - windows-latest
+          - windows-11-arm
     runs-on: "${{ matrix.os }}"
     env:
       GYP_MSVS_VERSION: '2022'
     steps:
       - run: git config --global core.autocrlf input
       - name: Enable Long Paths (Windows)
-        if : ${{ matrix.os == 'windows-latest' }}
+        if : ${{ startsWith(matrix.os, 'windows-') }}
         run: |
           New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
       - name: Setup distutils (Windows)
-        if : ${{ matrix.os == 'windows-latest' }}
+        if : ${{ startsWith(matrix.os, 'windows-') }}
         run: pip3 install setuptools
       - name: Setup distutils (macOS)
         if : ${{ matrix.os == 'macos-latest' }}
