@@ -22,6 +22,10 @@ const options = {
     type: 'string',
     description: "Override the target architecture to something other than your system's",
   },
+  platform: {
+    type: 'string',
+    description: "Override the target platform to something other than your system's",
+  },
   'module-dir': {
     short: 'm',
     type: 'string',
@@ -193,6 +197,7 @@ void (async (): Promise<void> => {
     buildPath: rootDirectory,
     electronVersion: electronModuleVersion as string,
     arch: argv.arch || process.arch,
+    platform: (argv.platform as NodeJS.Platform) || process.platform,
     extraModules: argv['which-module'] ? argv['which-module'].split(',') : [],
     onlyModules: argv.only ? argv.only.split(',') : null,
     force: argv.force,
