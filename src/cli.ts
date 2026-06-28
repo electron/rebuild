@@ -205,7 +205,7 @@ void (async (): Promise<void> => {
     types: argv.types ? (argv.types.split(',') as ModuleType[]) : ['prod', 'optional'],
     mode: argv.parallel ? 'parallel' : argv.sequential ? 'sequential' : undefined,
     debug: argv.debug,
-    prebuildTagPrefix: argv['prebuild-tag-prefix'] || 'v',
+    prebuildTagPrefix: argv['prebuild-tag-prefix'] ?? 'v',
     forceABI: forceAbi,
     useElectronClang: !!argv['use-electron-clang'],
     disablePreGypCopy: !!argv['disable-pre-gyp-copy'],

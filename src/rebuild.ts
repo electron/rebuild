@@ -166,7 +166,7 @@ export class Rebuilder implements IRebuilder {
     this.useCache = options.useCache || false;
     this.useElectronClang = options.useElectronClang || false;
     this.cachePath = options.cachePath || path.resolve(os.homedir(), '.electron-rebuild-cache');
-    this.prebuildTagPrefix = options.prebuildTagPrefix || 'v';
+    this.prebuildTagPrefix = options.prebuildTagPrefix ?? 'v';
     this.msvsVersion = process.env.GYP_MSVS_VERSION;
     this.disablePreGypCopy = options.disablePreGypCopy || false;
     this.buildFromSource = options.buildFromSource || false;
