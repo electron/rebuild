@@ -93,6 +93,16 @@ Options:
   -h, --help                   Show help                               [boolean]
 ```
 
+> [!NOTE]
+> By default, only your `prod` and `optional` dependencies are rebuilt —
+> `devDependencies` are **not** rebuilt. This is because the default value of
+> `types` is `['prod', 'optional']`. If you have a native module in your
+> `devDependencies` that you need rebuilt, you must explicitly include `dev` in
+> the list of types:
+>
+> - CLI: `electron-rebuild --types prod,optional,dev` (or `-t prod,optional,dev`)
+> - API: `rebuild({ ..., types: ['prod', 'optional', 'dev'] })`
+
 ### How can I use this with [Electron Forge](https://github.com/electron/forge)?
 
 This package is automatically used with Electron Forge when packaging an Electron app.
