@@ -48,7 +48,12 @@ const options = {
     type: 'string',
     description: 'The path to the prebuilt electron module',
   },
-  'dist-url': { short: 'd', type: 'string', description: 'Custom header tarball URL' },
+  'dist-url': {
+    short: 'd',
+    type: 'string',
+    description:
+      'Custom header tarball URL. Can also be set via the ELECTRON_REBUILD_DIST_URL environment variable.',
+  },
   types: {
     short: 't',
     type: 'string',
@@ -201,7 +206,7 @@ void (async (): Promise<void> => {
     extraModules: argv['which-module'] ? argv['which-module'].split(',') : [],
     onlyModules: argv.only ? argv.only.split(',') : null,
     force: argv.force,
-    headerURL: argv['dist-url'],
+    headerURL: argv['dist-url'] || process.env.ELECTRON_REBUILD_DIST_URL,
     types: argv.types ? (argv.types.split(',') as ModuleType[]) : ['prod', 'optional'],
     mode: argv.parallel ? 'parallel' : argv.sequential ? 'sequential' : undefined,
     debug: argv.debug,

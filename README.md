@@ -94,6 +94,10 @@ Options:
 ```
 
 > [!NOTE]
+> The `--dist-url` value can also be provided via the `ELECTRON_REBUILD_DIST_URL`
+> environment variable. The `--dist-url` flag takes precedence when both are set.
+
+> [!NOTE]
 > By default, only your `prod` and `optional` dependencies are rebuilt —
 > `devDependencies` are **not** rebuilt. This is because the default value of
 > `types` is `['prod', 'optional']`. If you have a native module in your
