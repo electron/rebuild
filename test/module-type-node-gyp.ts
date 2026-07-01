@@ -58,6 +58,25 @@ describe('node-gyp', () => {
       });
     });
 
+    describe('jobs', () => {
+      it('adds --jobs when jobs is set', async () => {
+        const rebuilder = new Rebuilder({
+          buildPath: testModulePath,
+          electronVersion: '16.0.0',
+          lifecycle: new EventEmitter(),
+          jobs: 4,
+        });
+        const nodeGyp = new NodeGyp(rebuilder, testModulePath);
+        const args = await nodeGyp.buildArgs([]);
+        expect(args).toContain('--jobs=4');
+      });
+
+      it('does not add --jobs when jobs is unset', async () => {
+        const args = await nodeGypArgsForElectronVersion('16.0.0');
+        expect(args.some((arg) => arg.startsWith('--jobs'))).toBe(false);
+      });
+    });
+
     describe('cross-compilation', () => {
       it('throws error early if platform mismatch', async () => {
         let platform: NodeJS.Platform = 'darwin';

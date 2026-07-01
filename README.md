@@ -79,6 +79,9 @@ Options:
   -s, --sequential             Rebuild modules sequentially, this is enabled by
                                default on Windows                      [boolean]
   -b, --debug                  Build debug version of modules          [boolean]
+  -j, --jobs                   Number of parallel compile jobs node-gyp should
+                               run (passed as node-gyp --jobs). Defaults to
+                               node-gyp's own default.                   [number]
       --prebuild-tag-prefix    GitHub tag prefix passed to prebuild-install.
                                Default is "v"                           [string]
       --force-abi              Override the ABI version for the version of
