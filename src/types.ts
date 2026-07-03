@@ -18,6 +18,7 @@ export interface IRebuilder {
   electronVersion: string;
   force: boolean;
   headerURL: string;
+  jobs?: number;
   lifecycle: EventEmitter;
   mode: RebuildMode;
   msvsVersion?: string;

@@ -121,6 +121,12 @@ export interface RebuildOptions {
    * Array of module names to ignore during the rebuild process.
    */
   ignoreModules?: string[];
+  /**
+   * Number of parallel compile jobs `node-gyp` should run, passed through as node-gyp's `--jobs` flag.
+   *
+   * @defaultValue node-gyp's own default when unset
+   */
+  jobs?: number;
 }
 
 export interface RebuilderOptions extends RebuildOptions {
@@ -152,6 +158,7 @@ export class Rebuilder implements IRebuilder {
   public disablePreGypCopy: boolean;
   public buildFromSource: boolean;
   public ignoreModules: string[];
+  public jobs?: number;
 
   constructor(options: RebuilderOptions) {
     this.lifecycle = options.lifecycle;
@@ -171,6 +178,7 @@ export class Rebuilder implements IRebuilder {
     this.disablePreGypCopy = options.disablePreGypCopy || false;
     this.buildFromSource = options.buildFromSource || false;
     this.ignoreModules = options.ignoreModules || [];
+    this.jobs = options.jobs;
     d('ignoreModules', this.ignoreModules);
 
     if (this.useCache && this.force) {

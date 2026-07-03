@@ -71,6 +71,12 @@ const options = {
     description: 'Rebuild modules sequentially, this is enabled by default on Windows',
   },
   debug: { short: 'b', type: 'boolean', description: 'Build debug version of modules' },
+  jobs: {
+    short: 'j',
+    type: 'string',
+    description:
+      "Number of parallel compile jobs node-gyp should run (passed as node-gyp --jobs). Defaults to node-gyp's own default.",
+  },
   'prebuild-tag-prefix': {
     type: 'string',
     description: 'GitHub tag prefix passed to prebuild-install. Default is "v"',
@@ -196,6 +202,11 @@ void (async (): Promise<void> => {
     throw new Error('force-abi must be a number');
   }
 
+  const jobs = argv.jobs ? Number(argv.jobs) : undefined;
+  if (argv.jobs && Number.isNaN(jobs)) {
+    throw new Error('jobs must be a number');
+  }
+
   console.error('Searching dependency tree');
 
   const rebuilder = rebuild({
@@ -216,6 +227,7 @@ void (async (): Promise<void> => {
     disablePreGypCopy: !!argv['disable-pre-gyp-copy'],
     projectRootPath,
     buildFromSource: !!argv['build-from-source'],
+    jobs,
   });
 
   const lifecycle = rebuilder.lifecycle;
