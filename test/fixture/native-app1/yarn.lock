@@ -532,11 +532,11 @@ __metadata:
   linkType: hard
 
 "nan@npm:^2.22.2":
-  version: 2.26.2
-  resolution: "nan@npm:2.26.2"
+  version: 2.29.0
+  resolution: "nan@npm:2.29.0"
   dependencies:
     node-gyp: "npm:latest"
-  checksum: 10c0/ff204c964729279cf3abb8b170c77753ed36092e2235f11bfb0204dfd3e8cc2d5a3bcfdfd3b677f06a0743d7f835d873dce59f23a2dbf6fb671d9351cc655d73
+  checksum: 10c0/c90586afb3f101f64c2997e7481f7c2c5528e196399a1c2653e4fff7354a01f35009e10fd43aa567a4b68be0ac8ed45a60794f5ca0a863120b74aecf4a45ad2c
   languageName: node
   linkType: hard
 
