@@ -9,6 +9,9 @@ permissions:
   id-token: write
   contents: read
 
+# Release paths never touch the Actions cache; enforced regardless of per-step settings.
+cache-mode: none
+
 jobs:
   docs:
     runs-on: ubuntu-latest
