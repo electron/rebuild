@@ -17,6 +17,7 @@ export class ModuleWalker {
   projectRootPath?: string;
   realModulePaths: Set<string>;
   realNodeModulesPaths: Set<string>;
+  private exploredModulePaths: Set<string>;
   types: ModuleType[];
 
   constructor(
@@ -34,6 +35,7 @@ export class ModuleWalker {
     this.onlyModules = onlyModules;
     this.realModulePaths = new Set();
     this.realNodeModulesPaths = new Set();
+    this.exploredModulePaths = new Set();
   }
 
   get nodeModulesPaths(): Promise<string[]> {
@@ -88,6 +90,12 @@ export class ModuleWalker {
       return;
     }
 
+    const realModulePath = await fs.promises.realpath(modulePath);
+    if (this.exploredModulePaths.has(realModulePath)) {
+      return;
+    }
+    this.exploredModulePaths.add(realModulePath);
+
     d('exploring', modulePath);
     let childPackageJson;
     try {
@@ -101,10 +109,6 @@ export class ModuleWalker {
     for (const key of Object.keys(childPackageJson.dependencies || {}).concat(
       Object.keys(childPackageJson.optionalDependencies || {}),
     )) {
-      if (this.prodDeps.has(key)) {
-        continue;
-      }
-
       this.prodDeps.add(key);
 
       moduleWait.push(this.findModule(key, modulePath, callback));
