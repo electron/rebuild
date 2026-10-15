@@ -33,8 +33,13 @@ export class ModuleRebuilder {
     return path.resolve(this.modulePath, 'build', this.rebuilder.buildType, '.forge-meta');
   }
 
+  /**
+   * The marker written to `.forge-meta` after a successful rebuild, and compared against on
+   * subsequent runs to decide whether the module can be skipped. It must capture every input
+   * that changes the resulting binary, so that e.g. a Linux build is not reused for macOS.
+   */
   get metaData(): string {
-    return `${this.rebuilder.arch}--${this.rebuilder.ABI}`;
+    return `${this.rebuilder.platform}--${this.rebuilder.arch}--${this.rebuilder.ABI}`;
   }
 
   async alreadyBuiltByRebuild(): Promise<boolean> {
